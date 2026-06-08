@@ -69,3 +69,74 @@ To support the AI Builder and WhatsApp features, our database must link:
 ### 💬 Chatbot Integration (WhatsApp Bridge)
 * **Message Router**: Set up a webhook handler to receive incoming WhatsApp messages (User Profile updates, new project notes).
 * **Asynchronous LLM Worker**: When a user texts *"I finished a React login page"* on WhatsApp, the backend should route this to the LLM agent, update the user's project records in PostgreSQL, and trigger a push notification, instantly updating their live web portfolio.
+
+---
+
+## 4. Empirical Survey Results (N = 37)
+
+This section compiles the actual quantitative data extracted from the survey responses on June 8, 2026.
+
+### Geographic Distribution (Q1)
+| Country | Response Count | Percentage |
+| :--- | :---: | :---: |
+| 🇿🇲 Zambia | 18 | 48.6% |
+| 🇬🇭 Ghana | 10 | 27.0% |
+| 🇲🇿 Mozambique | 5 | 13.5% |
+| Nigeria | 1 | 2.7% |
+| 🇳🇬Nigeria  | 1 | 2.7% |
+| 🇨🇮 Ivory Coast | 1 | 2.7% |
+| South Africa | 1 | 2.7% |
+
+### Primary Technical Focus (Q2)
+| Focus Area | Response Count | Percentage |
+| :--- | :---: | :---: |
+| Other | 13 | 35.1% |
+| Software Engineering / Web Development | 11 | 29.7% |
+| Digital Marketing & Content Creation | 8 | 21.6% |
+| Data Science / AI / Analytics | 4 | 10.8% |
+| UI/UX Design | 1 | 2.7% |
+
+### Academic / Professional Status (Q3)
+| Status | Response Count | Percentage |
+| :--- | :---: | :---: |
+| University Student (Undergraduate) | 33 | 89.2% |
+| Recent Graduate (Within 1 year) | 3 | 8.1% |
+| Junior Freelancer | 1 | 2.7% |
+
+### Core Hiring Barriers (Q4 - Select All That Apply)
+| Barrier | Mentions | % of Respondents |
+| :--- | :---: | :---: |
+| Job descriptions require 3+ years of experience for "entry-level" roles. | 26 | 70.3% |
+| Lack of a professional network or industry connections. | 18 | 48.6% |
+| International platforms (like Upwork or Fiverr) favor established profiles with massive histories. | 14 | 37.8% |
+| Traditional resumes don't capture my practical coding/design skills. | 5 | 13.5% |
+| Language barriers when applying to global or cross-border roles. | 5 | 13.5% |
+
+### Portfolio Showcasing Preferences (Q5)
+| Showcasing Method | Response Count | Percentage |
+| :--- | :---: | :---: |
+| I don't have a structured way to show my work yet. | 19 | 51.4% |
+| I send a standard Word/PDF resume with text descriptions. | 15 | 40.5% |
+| I built my own personal portfolio website (managed via hosting/code). | 2 | 5.4% |
+| I share links to raw, unorganized repositories (GitHub, Figma, Behance). | 1 | 2.7% |
+
+### Metrics & Sentiment Averages (Q6 & Q7)
+* **Average Resume Confidence Score**: **3.22 / 5.00**
+  - *Interpretative Note*: A score below 3.5 validates that students feel standard text resumes do not represent their technical capabilities.
+* **Average AI Case-Study Value Rating**: **4.22 / 5.00**
+  - *Interpretative Note*: A high score demonstrates massive student demand for automated AI portfolio contextualization.
+
+### Mobile Data & Internet Disruptions (Q8)
+| Interruption Frequency | Response Count | Percentage |
+| :--- | :---: | :---: |
+| Frequently (A few times a week) | 12 | 32.4% |
+| Occasionally | 10 | 27.0% |
+| Constantly (Daily issue) | 10 | 27.0% |
+| Rarely / I have stable, unlimited Wi-Fi | 5 | 13.5% |
+
+### WhatsApp Bot Adoption Interest (Q9)
+| Choice | Response Count | Percentage |
+| :--- | :---: | :---: |
+| Yes, this would save me massive data and time. | 20 | 54.1% |
+| Maybe, depending on how easy it is to use. | 11 | 29.7% |
+| No, I prefer using a standard web browser on a laptop. | 6 | 16.2% |
