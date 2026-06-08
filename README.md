@@ -23,7 +23,8 @@ borderline/
 │   ├── agent_source_of_truth.md  # Core rules for AI-driven development
 │   ├── andela_design_comparison.md  # Deep dive comparing Andela and BorderLine architectures
 │   ├── product_strategy.md       # Target audience, brand brief, visual guides
-│   └── systems_map.md            # Fellowship stage 1 systems map & feedback loops
+│   ├── systems_map.md            # Fellowship stage 1 systems map & feedback loops
+│   └── technical_architecture.md  # System architecture, database schema, and analytics pipeline
 ├── research/                  # Survey questions, raw feedback, and user studies
 │   └── google_form_survey_script.json  # Google Apps Script configuration
 ├── app/                       # (Future) Frontend and backend codebase
