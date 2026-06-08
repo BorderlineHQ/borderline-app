@@ -21,6 +21,7 @@ BorderLine is an ecosystem built by **Team 4 (Africoded)** for the **Yango Fello
 borderline/
 ├── docs/                      # Technical plans, strategies, and blueprints
 │   ├── agent_source_of_truth.md  # Core rules for AI-driven development
+│   ├── andela_design_comparison.md  # Deep dive comparing Andela and BorderLine architectures
 │   ├── product_strategy.md       # Target audience, brand brief, visual guides
 │   └── systems_map.md            # Fellowship stage 1 systems map & feedback loops
 ├── research/                  # Survey questions, raw feedback, and user studies
