@@ -22,6 +22,7 @@ borderline/
 ├── docs/                      # Technical plans, strategies, and blueprints
 │   ├── agent_source_of_truth.md  # Core rules for AI-driven development
 │   ├── andela_design_comparison.md  # Deep dive comparing Andela and BorderLine architectures
+│   ├── marketing_copy.md         # Landing page copy, headlines, and survey statistics usage
 │   ├── product_strategy.md       # Target audience, brand brief, visual guides
 │   ├── systems_map.md            # Fellowship stage 1 systems map & feedback loops
 │   └── technical_architecture.md  # System architecture, database schema, and analytics pipeline
