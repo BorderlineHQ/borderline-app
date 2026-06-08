@@ -27,7 +27,10 @@ borderline/
 │   ├── systems_map.md            # Fellowship stage 1 systems map & feedback loops
 │   └── technical_architecture.md  # System architecture, database schema, and analytics pipeline
 ├── research/                  # Survey questions, raw feedback, and user studies
-│   └── google_form_survey_script.json  # Google Apps Script configuration
+│   ├── google_form_survey_script.json  # Google Apps Script configuration
+│   ├── survey_interpretation.md  # Strategic interpretation of results
+│   ├── survey_report.md          # Comprehensive visual report & team guide
+│   └── survey_responses.csv      # Sanitized raw responses (CSV)
 ├── app/                       # (Future) Frontend and backend codebase
 ├── DESIGN.md                  # Google OSS Design specification for AI agents
 └── README.md                  # Project root entry point
