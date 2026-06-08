@@ -26,6 +26,7 @@ borderline/
 ├── research/                  # Survey questions, raw feedback, and user studies
 │   └── google_form_survey_script.json  # Google Apps Script configuration
 ├── app/                       # (Future) Frontend and backend codebase
+├── DESIGN.md                  # Google OSS Design specification for AI agents
 └── README.md                  # Project root entry point
 ```
 
@@ -33,7 +34,7 @@ borderline/
 
 ## 🛠️ Development & Steering
 
-This project utilizes **Agent-Driven Development**. AI agents working on this codebase are governed by the guidelines in the [Agent Source of Truth](file:///C:/Users/gokro/Documents/GitHub/borderline/docs/agent_source_of_truth.md). Please update the SOT if you implement new architecture, tools, or style constants.
+This project utilizes **Agent-Driven Development**. AI agents working on this codebase are governed by the design tokens in [DESIGN.md](file:///C:/Users/gokro/Documents/GitHub/borderline/DESIGN.md) and guidelines in the [Agent Source of Truth](file:///C:/Users/gokro/Documents/GitHub/borderline/docs/agent_source_of_truth.md). Please update these files if you implement new styles, architecture, or tools.
 
 ---
 
