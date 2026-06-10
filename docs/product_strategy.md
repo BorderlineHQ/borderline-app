@@ -5,7 +5,7 @@ This document serves as the strategic foundation for BorderLine. It defines the 
 ---
 
 ## 1. Product Vision & Roadmap
-BorderLine flips the traditional recruitment script by focusing on the raw potential of students and entry-level talent, using AI to help them aggregate, showcase, and monetize their skills globally.
+BorderLine is an AI-powered economic infrastructure that verifies, connects, and monetises the continent's emerging builders. It flips the traditional recruitment script by focusing on raw potential and practical skills over corporate work history.
 
 We will scale in three distinct phases:
 1. **Phase 1: Web Application (MVP)**: A mobile-responsive web platform focused on profile creation, AI portfolio building, and cloud-hosted matching algorithms.
@@ -17,7 +17,7 @@ We will scale in three distinct phases:
 ## 2. Core Feature Set (MVP & Beyond)
 
 ### 🚀 AI-Driven Portfolio Builder (MVP Priority)
-Bridges the "chicken-and-egg" problem (needing experience to get work, and work to get experience) for junior talent.
+Bridges the gap for early-career talent by providing proof of skill.
 * **Project Aggregation**: Users input class projects, hackathon code repositories, side hustles, or design concepts.
 * **AI Contextualizer**: A cloud-hosted Large Language Model (LLM) analyzes their raw input and automatically structures it into professional, result-oriented case studies. It highlights technical competencies, role responsibilities, and project impact.
 * **Proof-of-Skill Generation**: Generates dynamic, shareable digital portfolios that visually emphasize what the user can build rather than where they have previously worked.
@@ -35,12 +35,16 @@ Acts as a critical accessibility bridge for users under strict local mobile data
 ---
 
 ## 3. Brand Architecture & Visual Guidelines
-We borrow the frictionless logistics of **Uber**, the elite talent-empowerment ethos of **Andela**, and the warm, human-centric, community-driven belonging of **Airbnb**.
+We borrow the frictionless logistics of **Uber**, the elite talent-empowerment ethos of **Andela**, and the data-forward precision of **Mercor**.
 
-* **Brand Tone**: Human-centric, relatable, bold, encouraging, and unapologetically African (reflecting the optimism and digital-native hustle of West & East African youth).
-* **Typography**: Clean, modern sans-serif fonts (e.g., `Inter`, `Plus Jakarta Sans`, or `Satoshi`) for readability on mobile screens.
-* **Color Palette**: Deep, trust-building foundational colors (midnight blues, deep navy) paired with highly vibrant, energetic accents (warm amber, energetic teal, sunset orange).
-* **Visual Style**: **Glassmorphism & Frosted Glass UI**. Semi-transparent cards with subtle background glows, clean borders, and crisp drop shadows.
+* **Brand Tone**: Confident, systemic, precise, and grounded in African ambition. The tone of infrastructure, not a startup pitch.
+* **Core Brand Pillars**:
+  1. **Economic Opportunity**: Every feature must ladder to income generation.
+  2. **Digital Access**: Design for the user on a cracked phone screen with intermittent 3G.
+  3. **Trust Infrastructure**: Verified portfolios are the product. Trust is the currency.
+  4. **Job Creation**: Not just matching — creating new work by lowering employer risk.
+* **Typography**: Clean, modern sans-serif fonts (`DM Sans` for display, `Inter` for body text) for readability on mobile screens.
+* **Visual Style**: **Clean, light, data-forward.** Inspired by Mercor's restraint and Andela's enterprise credibility. Whitespace, crisp borders, and subtle elevation replace heavy shadows and glassmorphism.
 * **Imagery**: Authentic, candid, high-quality photos of young African creators in their environments. (Avoid corporate stock photography).
 
 ---
@@ -49,6 +53,7 @@ We borrow the frictionless logistics of **Uber**, the elite talent-empowerment e
 
 | Platform | Target Audience | Key Differentiator | Barriers |
 | :--- | :--- | :--- | :--- |
+| **Mercor** | AI/ML experts globally | AI-driven matching for frontier AI work at top AI labs | Requires deep specialization; no entry-level path |
+| **Andela** | Mid-to-senior engineers (135+ countries) | Enterprise-grade "human compute layer" for AI teams | High barrier to entry; vacated junior space |
 | **LinkedIn / Jobberman** | Established Professionals | Text-based corporate summaries and chronological histories | Requires existing network and corporate titles |
-| **Andela / Deel** | Senior / Elite Developers | High-ticket global placements for experienced engineers | High barrier to entry for junior talent |
-| **BorderLine (Our Sweet Spot)** | **African Tech Students & Entry-Level Freelancers** | **AI-Built Portfolios, Cloud MVP, WhatsApp Link, Student-First** | **Low data overhead, bypasses corporate history requirements** |
+| **BorderLine (Our Sweet Spot)** | **Africa's early-career digital builders** | **AI-verified trust layer + WhatsApp-native access = the infrastructure Andela left behind** | **Must prove AI verification quality at scale** |

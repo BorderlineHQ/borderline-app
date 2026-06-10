@@ -1,17 +1,17 @@
 # BorderLine
 
-> **"Andela for Freelancers and Entry-Levels"**
-> *AI-powered work and talent acceleration platform designed specifically for young African creators navigating the digital economy.*
+> **Where Companies Are Built. Where Careers Begin.**
+> *The trust layer for Africa's digital workforce. AI-powered economic infrastructure that verifies, connects, and monetises the continent's emerging builders.*
 
-BorderLine is an ecosystem built by **Team 4 (Africoded)** for the **Yango Fellowship**. It bypasses traditional corporate resume walls ("The Resume Trap") and helps entry-level talent aggregate, showcase, and monetize their functional capabilities globally.
+BorderLine is an ecosystem built by **Team 4 (Africoded)** for the **Yango Fellowship**. It bypasses traditional corporate resume walls and helps entry-level talent aggregate, showcase, and monetize their functional capabilities globally.
 
 ---
 
 ## 🚀 Key Features
 
-* **AI-Driven Portfolio Builder**: Scans code repositories, design mockups, class projects, or raw text and automatically generates professional, result-oriented case studies.
-* **Low-Data WhatsApp Extension**: A text-based assistant enabling users to update profiles, request skill verification, and receive job matches without consuming heavy mobile data.
-* **Smart-Matching Engine**: Connects verified junior talent profiles directly with local African startups and global remote employers.
+* **AI-Verified Portfolios**: Converts raw projects into structured, employer-ready case studies backed by automated skill verification.
+* **WhatsApp-Native Access**: Full platform functionality via text — profile updates, job matching, and notifications on 2G/3G.
+* **Smart Matching & Monetisation**: Connects verified builders with local startups and global employers, with built-in escrow and Mobile Money payouts.
 
 ---
 
@@ -21,7 +21,7 @@ BorderLine is an ecosystem built by **Team 4 (Africoded)** for the **Yango Fello
 borderline/
 ├── docs/                      # Technical plans, strategies, and blueprints
 │   ├── agent_source_of_truth.md  # Core rules for AI-driven development
-│   ├── andela_design_comparison.md  # Deep dive comparing Andela and BorderLine architectures
+│   ├── andela_design_comparison.md  # Deep dive comparing BorderLine, Andela, and Mercor
 │   ├── marketing_copy.md         # Landing page copy, headlines, and survey statistics usage
 │   ├── product_strategy.md       # Target audience, brand brief, visual guides
 │   ├── systems_map.md            # Fellowship stage 1 systems map & feedback loops

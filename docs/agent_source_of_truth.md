@@ -7,8 +7,8 @@ Whenever major architectural changes, new schema definitions, or design decision
 ---
 
 ## 1. Project Core Vision
-BorderLine is an AI-powered talent validation and acceleration platform designed for African students, self-taught creators, and entry-level freelancers (ages 18–26).
-* **The Problem**: Traditional job networks (LinkedIn, Upwork) rely on text-based resumes and historical platform ratings. This creates a "Resume Trap" where entry-level talent cannot find opportunities because they lack corporate work history.
+BorderLine is an AI-powered economic infrastructure that verifies, connects, and monetises the continent's emerging builders (ages 18–26).
+* **The Problem**: Traditional job networks (LinkedIn, Upwork) rely on text-based resumes and historical platform ratings. This excludes early-career builders who lack corporate work history but have practical skills.
 * **The Solution**: An AI-driven "Trust Layer" that converts raw class projects, offline hackathon repos, and design concepts into professional, result-oriented case studies.
 * **Key Access Strategy**: A lightweight WhatsApp chatbot extension that allows cash-constrained users to update profiles, receive matches, and check jobs without loading heavy, data-intensive web pages.
 
@@ -40,45 +40,62 @@ To maintain the visual aesthetics defined by the brand consultants, all UI compo
 ```css
 :root {
   /* Foundations */
-  --color-bg-dark: #070913;      /* Deep Midnight Blue */
-  --color-card-bg: rgba(15, 20, 39, 0.6); /* Translucent Navy for Glassmorphism */
-  --color-border: rgba(255, 255, 255, 0.08);
+  --color-bg-light: #FFFFFF;      /* Clean White */
+  --color-surface: #FAFAFA;       /* Warm Gray-50 */
+  --color-surface-elevated: #FFFFFF; /* White Cards */
+  --color-border: #E5E7EB;        /* Gray-200 */
 
   /* Typography */
-  --color-text-primary: #F8FAFC;  /* Off-White */
-  --color-text-secondary: #94A3B8;/* Cool Slate */
+  --color-text-primary: #111827;  /* Gray-900 */
+  --color-text-secondary: #6B7280;/* Gray-500 */
+  --color-text-tertiary: #9CA3AF; /* Gray-400 */
 
-  /* Vibrant Accents */
-  --color-teal: #0D9488;          /* Primary Action / Trust */
-  --color-amber: #D97706;         /* Alerts / Highlights */
-  --color-orange: #EA580C;        /* Energy / Accent */
+  /* Accents */
+  --color-accent: #16A34A;        /* Forest Green - Trust / Growth */
+  --color-accent-hover: #15803D;  /* Darker Green */
+  --color-accent-subtle: #F0FDF4; /* Green-50 - Badge Backgrounds */
+  --color-accent-secondary: #4F46E5; /* Indigo-600 */
   
-  /* Gradients */
-  --gradient-glow: radial-gradient(circle at top left, rgba(13, 148, 136, 0.15), transparent 60%);
+  /* Utilities */
+  --color-danger: #DC2626;        /* Red-600 */
+  --color-hero-bg: #111827;       /* Dark Section Background */
 }
 ```
 
 ### B. Typography
-* **Primary Font**: `Inter`, `Plus Jakarta Sans`, or `Satoshi` (sans-serif).
+* **Display Font**: `DM Sans` (sans-serif), bold, tight letter spacing. Used for large headers and hero sections.
+* **Primary Font**: `Inter` (sans-serif). Used for body text and standard UI elements.
+* **Monospace**: `JetBrains Mono` for code snippets.
 * Avoid browser default fonts. Maintain clean vertical rhythm and hierarchy.
 
-### C. UI Aesthetics (Glassmorphism)
-All cards and interactive modules should feel like frosted glass:
-* **Background**: `rgba(15, 20, 39, 0.6)` with `backdrop-filter: blur(12px)`.
-* **Border**: Subtle, thin borders: `1px solid rgba(255, 255, 255, 0.08)`.
-* **Shadows**: Smooth, soft drop-shadows to give depth: `box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37)`.
-* **Hover Micro-animations**: Slight translate and glow effects when cards or buttons are hovered:
+### C. UI Aesthetics (Clean Light Mode)
+All cards and interactive modules should feel crisp, clean, and professional:
+* **Background**: `var(--color-surface-elevated)` (`#FFFFFF`).
+* **Border**: Subtle, thin borders: `1px solid var(--color-border)`.
+* **Shadows**: Smooth, soft drop-shadows to give depth: `box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08)`.
+* **Hover Micro-animations**: Slight border color and shadow changes:
   ```css
+  .interactive-card {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
   .interactive-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(13, 148, 136, 0.3);
-    box-shadow: 0 12px 40px 0 rgba(13, 148, 136, 0.1);
+    border-color: #D1D5DB;
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
   }
   ```
 
 ---
 
-## 4. AI Agent Workflow Rules
+## 4. Design Principles
+1. **Clean over clever** — No blur effects, no glow states. Whitespace is the primary design tool.
+2. **Data-forward** — Lead with numbers (e.g., users placed, jobs matched, avg earnings).
+3. **Restrained accent usage** — Green accent only for CTAs and success states. Body text is gray-900 on white.
+4. **Enterprise-credible** — Every screen should look like it belongs on a pitch deck.
+5. **Mobile-optimized** — Components must render cleanly on data-constrained mobile browsers.
+
+---
+
+## 5. AI Agent Workflow Rules
 
 1. **Check this SOT first**: Whenever starting a task, open this file to review active paradigms.
 2. **Never leave placeholders**: All components must be fully styled, functioning, and populated with realistic mock data or actual outputs. Use image generation tools for required illustrations.
