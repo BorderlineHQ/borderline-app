@@ -33,3 +33,17 @@ Thumbs.db
 desktop.ini
 # Word temp files
 ~$*.docx
+
+# Next.js / TypeScript additional
+.pnp
+.pnp.*
+.yarn/*
+!/.yarn/patches
+!/.yarn/plugins
+!/.yarn/releases
+!/.yarn/versions
+coverage/
+*.pem
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
