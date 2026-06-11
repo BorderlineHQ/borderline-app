@@ -40,25 +40,26 @@ To maintain the visual aesthetics defined by the brand consultants, all UI compo
 ```css
 :root {
   /* Foundations */
-  --color-bg-light: #FFFFFF;      /* Clean White */
-  --color-surface: #FAFAFA;       /* Warm Gray-50 */
-  --color-surface-elevated: #FFFFFF; /* White Cards */
-  --color-border: #E5E7EB;        /* Gray-200 */
+  --color-bg: #030712;            /* Deep Black/Charcoal */
+  --color-surface: #0B0F19;       /* Slate Dark-900 */
+  --color-surface-elevated: #0E1420; /* Slate Dark-800 - Standard Cards */
+  --color-surface-darkgreen: #05180D; /* Hunter Green - Features Background */
+  --color-border: #1F2937;        /* Muted Gray Border */
 
   /* Typography */
-  --color-text-primary: #111827;  /* Gray-900 */
-  --color-text-secondary: #6B7280;/* Gray-500 */
-  --color-text-tertiary: #9CA3AF; /* Gray-400 */
+  --color-text-primary: #FFFFFF;  /* White */
+  --color-text-secondary: #9CA3AF;/* Light Muted Gray */
+  --color-text-tertiary: #6B7280; /* Dark Muted Gray */
 
   /* Accents */
-  --color-accent: #16A34A;        /* Forest Green - Trust / Growth */
-  --color-accent-hover: #15803D;  /* Darker Green */
-  --color-accent-subtle: #F0FDF4; /* Green-50 - Badge Backgrounds */
-  --color-accent-secondary: #4F46E5; /* Indigo-600 */
+  --color-accent: #22C55E;        /* Neon Green - Trust / Growth */
+  --color-accent-hover: #16A34A;  /* Darker Green */
+  --color-accent-subtle: rgba(34, 197, 94, 0.1); /* Subtle green fill */
+  --color-accent-secondary: #10B981; /* Emerald green */
   
   /* Utilities */
-  --color-danger: #DC2626;        /* Red-600 */
-  --color-hero-bg: #111827;       /* Dark Section Background */
+  --color-danger: #EF4444;        /* Soft Red */
+  --color-hero-bg: #030712;       /* Dark Section Background */
 }
 ```
 
@@ -68,30 +69,64 @@ To maintain the visual aesthetics defined by the brand consultants, all UI compo
 * **Monospace**: `JetBrains Mono` for code snippets.
 * Avoid browser default fonts. Maintain clean vertical rhythm and hierarchy.
 
-### C. UI Aesthetics (Clean Light Mode)
-All cards and interactive modules should feel crisp, clean, and professional:
-* **Background**: `var(--color-surface-elevated)` (`#FFFFFF`).
-* **Border**: Subtle, thin borders: `1px solid var(--color-border)`.
-* **Shadows**: Smooth, soft drop-shadows to give depth: `box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08)`.
-* **Hover Micro-animations**: Slight border color and shadow changes:
+### C. UI Aesthetics (Adaptive Dual-Theme Switcher)
+BorderLine supports both **Dark Mode** and **Light Mode** globally. A toggle selector in the navigation bar allows any user (talent, recruiter, or admin) to swap themes dynamically. Components must pull from theme-based CSS custom properties:
+
+```css
+/* Dark Theme Variables */
+body.dark-theme {
+  --color-bg: #030712;
+  --color-surface: #0B0F19;
+  --color-surface-elevated: #0E1420;
+  --color-surface-greenblock: #05180D;
+  --color-border: #1F2937;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #9CA3AF;
+  --color-text-tertiary: #6B7280;
+  --color-accent: #22C55E;
+  --color-accent-hover: #16A34A;
+  --color-accent-subtle: rgba(34, 197, 94, 0.1);
+  --color-accent-secondary: #10B981;
+  --color-danger: #EF4444;
+}
+
+/* Light Theme Variables */
+body.light-theme {
+  --color-bg: #FFFFFF;
+  --color-surface: #FAFAFA;
+  --color-surface-elevated: #FFFFFF;
+  --color-surface-greenblock: #F0FDF4;
+  --color-border: #E5E7EB;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-accent: #16A34A;
+  --color-accent-hover: #15803D;
+  --color-accent-subtle: #F0FDF4;
+  --color-accent-secondary: #4F46E5;
+  --color-danger: #DC2626;
+}
+```
+* **Interactive Hover Micro-animations (Unified)**:
   ```css
-  .interactive-card {
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  .card-interactive {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
   }
-  .interactive-card:hover {
-    border-color: #D1D5DB;
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+  .card-interactive:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 15px 0 var(--color-accent-subtle);
+    transform: translateY(-2px);
   }
   ```
 
 ---
 
 ## 4. Design Principles
-1. **Clean over clever** — No blur effects, no glow states. Whitespace is the primary design tool.
-2. **Data-forward** — Lead with numbers (e.g., users placed, jobs matched, avg earnings).
-3. **Restrained accent usage** — Green accent only for CTAs and success states. Body text is gray-900 on white.
-4. **Enterprise-credible** — Every screen should look like it belongs on a pitch deck.
-5. **Mobile-optimized** — Components must render cleanly on data-constrained mobile browsers.
+1. **Clean over clever** — Soft drop-shadows (light mode) are replaced by high-contrast borders and subtle hover glows (dark mode). Whitespace is the primary design tool.
+2. **Data-forward** — Lead with numbers (e.g., verified stats, user earnings, match latency) using scroll-triggered flip-up wheel or odometer animations.
+3. **Restrained accent usage** — Dynamic green accent is used for active state capsules, checkmarks, stats, and CTAs (Neon Green `#22C55E` in dark mode, Forest Green `#16A34A` in light mode).
+4. **Adaptive Context** — Ensure interfaces are legible, high-contrast, and performant in both light and dark settings.
+5. **Mobile-optimized** — Ensure layouts collapse beautifully and efficiently on mobile screens for users with data and connectivity limits.
 
 ---
 

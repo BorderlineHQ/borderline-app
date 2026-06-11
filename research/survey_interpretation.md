@@ -38,18 +38,18 @@ This matrix shows how the survey questions map directly to the nodes of our **Sy
 
 ```text
   Survey Variables                         Systemic Nodes Validated
-┌─────────────────────────────────┐      ┌───────────────────────────────┐
-│ Q4 (Experience barrier)         ├─────>│ A2 (Legacy Resume Filters)    │
-│ Q8 (Data costs & internet)      ├─────>│ A1 (Cloud & Data Tariffs)     │
-│ Q5 (How they show work)         ├─────>│ B1 (Portfolio Shortage)       │
-│ Q6 (Resume confidence scale)     ├─────>│ B2 (Employer Risk Layer)      │
-│ Q9 (WhatsApp chatbot adoption)  ├─────>│ Primary Intervention Point    │
-└─────────────────────────────────┘      └───────────────────────────────┘
+┌─────────────────────────────────┐      ┌───────────────────────────────────────────────┐
+│ Q4 (Experience barrier)         ├─────>│ Secondary Entry Point (Experience & Claims)   │
+│ Q8 (Data costs & internet)      ├─────>│ Reduced Access / Low Digital Presence         │
+│ Q5 (How they show work)         ├─────>│ Reduced Access / Low Digital Presence         │
+│ Q6 (Resume confidence scale)     ├─────>│ Friction for Beginners & Entry-Level Talent   │
+│ Q9 (WhatsApp chatbot adoption)  ├─────>│ Primary Intervention Point (Chatbot Matcher)  │
+└─────────────────────────────────┘      └───────────────────────────────────────────────┘
 ```
 
-* **A1 (Cloud Fees & Data Tariffs) $\leftrightarrow$ Q8**: Validates the financial barrier. Students cannot afford to host live websites or keep heavy web dashboards open.
-* **B1 (Portfolio Shortage) $\leftrightarrow$ Q5 & Q6**: Validates that standard portfolios are either non-existent or poorly structured, leading to employer distrust.
-* **Intervention Point $\leftrightarrow$ Q7 & Q9**: Validates that an AI-supported, low-data interface directly targets the bottleneck to release the reinforcing loops.
+* **Reduced Access / Low Digital Presence $\leftrightarrow$ Q8**: Validates the financial and infrastructure barriers. High data cost and unstable connections directly prevent students from hosting live websites or keeping heavy web dashboards open, causing low digital presence.
+* **Friction for Beginners & Entry-Level Talent $\leftrightarrow$ Q4, Q5 & Q6**: Validates that employers relying on unverified claims/experience (Q4) combined with a lack of structured portfolios (Q5) and low self-efficacy (Q6) creates major friction that gatekeeps talent from getting experience.
+* **Intervention Points $\leftrightarrow$ Q7 & Q9**: Validates that an AI-supported, low-data WhatsApp and Web interface directly targets the bottleneck to bypass navigation complexity and automate portfolio verification, collapsing the reinforcing loops.
 
 ---
 

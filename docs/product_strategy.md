@@ -44,8 +44,8 @@ We borrow the frictionless logistics of **Uber**, the elite talent-empowerment e
   3. **Trust Infrastructure**: Verified portfolios are the product. Trust is the currency.
   4. **Job Creation**: Not just matching — creating new work by lowering employer risk.
 * **Typography**: Clean, modern sans-serif fonts (`DM Sans` for display, `Inter` for body text) for readability on mobile screens.
-* **Visual Style**: **Clean, light, data-forward.** Inspired by Mercor's restraint and Andela's enterprise credibility. Whitespace, crisp borders, and subtle elevation replace heavy shadows and glassmorphism.
-* **Imagery**: Authentic, candid, high-quality photos of young African creators in their environments. (Avoid corporate stock photography).
+* **Visual Style**: **Premium, High-Contrast Dark Mode.** Inspired by the developer-centric, dark-mode layout of platforms like Vercel, Linear, and Supabase. The background uses a deep charcoal/black canvas with slate-dark elevated cards, neon green highlight accents, and hunter green features grids. Sharp borders and subtle glowing highlights replace heavy shadows.
+* **Imagery**: Authentic, candid, high-quality photos of young African creators in their environments, displayed inside clean card formats.
 
 ---
 

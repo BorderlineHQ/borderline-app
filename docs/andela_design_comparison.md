@@ -35,7 +35,7 @@ BorderLine occupies this massive, underserved gap by building the **supply-side 
 | **Vetting Engine** | Rigorous AI interviews, senior technical reviews, English proficiency. | **AI-Driven Proof-of-Skill**: Ingests raw project notes, class assignments, and Github repos, and auto-generates result-oriented case studies. |
 | **Matching Mechanics** | AI algorithms matching senior specialists to complex enterprise workflows. | **Smart Micro-Matching**: Connects emerging talent with local startups and global remote clients for micro-tasks and junior roles. |
 | **Client Portal** | Heavy corporate recruiter dashboards, high-fidelity data views. | Clean, data-forward card grids showcasing candidate portfolios with verified project metrics. |
-| **Access & Connectivity**| Assumes stable high-speed internet and laptop access for all talent. | **Dual-Interface**: Clean light-mode web app + lightweight, text-based WhatsApp chatbot. |
+| **Access & Connectivity**| Assumes stable high-speed internet and laptop access for all talent. | **Dual-Interface**: Premium dark-mode web app + lightweight, text-based WhatsApp chatbot. |
 | **Compliance & Pay** | Enterprise-grade global payroll integration (e.g., Andela Pay). | Escrow-backed, low-friction micro-payments supporting regional **Mobile Money (MoMo)** systems. |
 
 ---
@@ -50,7 +50,7 @@ Andela and Mercor succeed because clients trust their stamp of approval. BorderL
 ### B. Clean, Data-Forward Recruiter UX
 Recruiters do not want to click through messy student GitHub links, nor do they want distracting design elements.
 * **The Recruiter Feed**: Design a clean, visual grid of candidates inspired by Mercor's restraint. Whitespace, crisp typography (`DM Sans` + `Inter`), and subtle borders.
-* **One-Click Case Studies**: Clicking a developer’s card opens a beautifully formatted, light-mode case study explaining what they built, the tech stack used, and the direct business or technical impact.
+* **One-Click Case Studies**: Clicking a developer’s card opens a beautifully formatted, dark-mode case study explaining what they built, the tech stack used, and the direct business or technical impact.
 
 ---
 
