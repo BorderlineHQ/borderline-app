@@ -39,9 +39,6 @@ const Header: React.FC = () => {
           <Link href="/talent" className={`nav-item ${isActive('/talent') ? 'active' : ''}`}>
             Talent Portal
           </Link>
-          <Link href="/admin" className={`nav-item ${isActive('/admin') ? 'active' : ''}`}>
-            Admin Audit
-          </Link>
           <Link href="/whatsapp" className={`nav-item ${isActive('/whatsapp') ? 'active' : ''} spec-sandbox`}>
             Try our Whatsapp Bot
           </Link>
