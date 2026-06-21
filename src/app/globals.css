@@ -2255,6 +2255,16 @@ body.dark-theme .about-floating-link {
   color: #34D399;
 }
 
+.about-floating-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+
 /* Responsive Visibility Helpers */
 .desktop-only {
   display: flex !important;
