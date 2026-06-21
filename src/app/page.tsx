@@ -41,6 +41,27 @@ const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({
   );
 };
 
+// Reusable partner logo component that fetches from Clearbit and falls back to text on load error
+const PartnerLogo: React.FC<{ domain: string; name: string }> = ({ domain, name }) => {
+  const [error, setError] = useState(false);
+  const logoUrl = `https://logo.clearbit.com/${domain}`;
+
+  return (
+    <div className="partner-logo-item" title={name}>
+      {!error ? (
+        <img
+          src={logoUrl}
+          alt={name}
+          onError={() => setError(true)}
+          className="partner-logo-img"
+        />
+      ) : (
+        <span className="partner-logo-text">{name}</span>
+      )}
+    </div>
+  );
+};
+
 export default function Home() {
   const { theme, mounted } = useApp();
 
@@ -404,48 +425,24 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
       {/* Grayscale partner logos list */}
       <section className="scroll-reveal" style={{ borderTop: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', padding: 'var(--spacing-xl) 0' }}>
         <div className="container">
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-tertiary)', textAlign: 'center', letterSpacing: '0.1em', marginBottom: 'var(--spacing-md)' }}>
-            Trusted by Teams from San Francisco to Lagos
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-tertiary)', textAlign: 'center', letterSpacing: '0.15em', marginBottom: 'var(--spacing-md)' }}>
+            Trusted by Leading Teams & Academic Institutions from San Francisco to Lusaka
           </div>
           <div className="partner-logos-grid">
-            {/* Telecel Logo */}
-            <svg className="partner-logo-svg logo-telecel" viewBox="0 0 90 24" width="90" stroke="currentColor">
-              <circle cx="12" cy="12" r="8" strokeWidth="2" fill="none" />
-              <path d="M12 7V17M9 10H15" strokeWidth="2" strokeLinecap="round" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="11" letterSpacing="-0.5px" stroke="none">telecel</text>
-            </svg>
-            {/* Flywheel Logo */}
-            <svg className="partner-logo-svg logo-flywheel" viewBox="0 0 95 24" width="95" stroke="currentColor">
-              <path d="M4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20C7.58 20 4 16.42 4 12Z" strokeWidth="1.5" fill="none" />
-              <path d="M12 4L12 20M4 12L20 12" strokeWidth="1" />
-              <text x="28" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="11" letterSpacing="-0.5px" stroke="none">flywheel</text>
-            </svg>
-            {/* Yango Logo */}
-            <svg className="partner-logo-svg logo-yango" viewBox="0 0 80 24" width="80" stroke="currentColor">
-              <polygon points="4,5 18,5 11,18" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="0.2px" stroke="none">YANGO</text>
-            </svg>
-            {/* KADA Mobility Logo */}
-            <svg className="partner-logo-svg logo-kada" viewBox="0 0 115 24" width="115" stroke="currentColor">
-              <path d="M4 4L12 12L4 20" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <path d="M9 4L17 12L9 20" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="11" letterSpacing="-0.5px" stroke="none">KADA mobility</text>
-            </svg>
-            {/* MTN Logo */}
-            <svg className="partner-logo-svg logo-mtn" viewBox="0 0 70 24" width="70" stroke="currentColor">
-              <ellipse cx="14" cy="12" rx="10" ry="7" strokeWidth="2" fill="none" />
-              <text x="30" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="-0.5px" stroke="none">MTN</text>
-            </svg>
-            {/* ALX Logo */}
-            <svg className="partner-logo-svg logo-alx" viewBox="0 0 70 24" width="70" stroke="currentColor">
-              <rect x="4" y="4" width="16" height="16" rx="3" strokeWidth="2.5" fill="none" />
-              <text x="28" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="-0.5px" stroke="none">alx</text>
-            </svg>
-            {/* Google Logo */}
-            <svg className="partner-logo-svg logo-google" viewBox="0 0 85 24" width="85" stroke="currentColor">
-              <path d="M12 12H19C19.2 10.9 18.8 9.8 18 9C16.8 7.8 14.8 7.3 13.2 7.8C11.6 8.3 10.3 9.7 10 11.4C9.6 13.5 10.6 15.6 12.5 16.5C14.3 17.3 16.5 16.8 17.8 15.4C18.4 14.8 18.8 14 18.9 13.2H14.5" strokeWidth="2" fill="none" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="-0.5px" stroke="none">Google</text>
-            </svg>
+            {/* Tech Companies */}
+            <PartnerLogo domain="google.com" name="Google" />
+            <PartnerLogo domain="mtn.co.za" name="MTN" />
+            <PartnerLogo domain="yango.com" name="Yango" />
+            <PartnerLogo domain="telecel.com" name="Telecel" />
+            <PartnerLogo domain="flywheel.com" name="Flywheel" />
+            <PartnerLogo domain="alxafrica.com" name="ALX" />
+            <PartnerLogo domain="kadamobility.com" name="KADA Mobility" />
+
+            {/* Academic Institutions */}
+            <PartnerLogo domain="gctu.edu.gh" name="GCTU" />
+            <PartnerLogo domain="unza.zm" name="UNZA" />
+            <PartnerLogo domain="uem.mz" name="UEM" />
+            <PartnerLogo domain="inphb.ci" name="INPHB" />
           </div>
         </div>
       </section>

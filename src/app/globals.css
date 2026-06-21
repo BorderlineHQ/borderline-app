@@ -1638,31 +1638,54 @@ body.light-theme .phone-mockup {
 }
 
 /* Grayscale Partner logos list */
+/* Grayscale Partner logos list */
 .partner-logos-grid {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-xxl);
+  gap: 32px;
   flex-wrap: wrap;
   margin-top: var(--spacing-lg);
-  opacity: 0.4;
-  transition: opacity var(--transition-normal);
 }
 
-.partner-logos-grid:hover {
-  opacity: 0.65;
+.partner-logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  transition: all var(--transition-normal);
 }
 
-.partner-logo-svg {
-  fill: var(--color-text-secondary);
-  height: 24px;
-  transition: fill var(--transition-fast), transform var(--transition-fast);
+.partner-logo-img {
+  max-height: 100%;
+  max-width: 130px;
+  object-fit: contain;
+  filter: grayscale(1) opacity(0.4);
+  transition: all var(--transition-normal);
 }
 
-.partner-logo-svg:hover {
-  fill: var(--color-accent);
+body.dark-theme .partner-logo-img {
+  filter: grayscale(1) invert(0.8) opacity(0.45);
+}
+
+.partner-logo-item:hover .partner-logo-img {
+  filter: grayscale(0) invert(0) opacity(0.95);
   transform: scale(1.05);
 }
+
+.partner-logo-text {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  color: var(--color-text-tertiary);
+  transition: color var(--transition-fast);
+}
+
+.partner-logo-item:hover .partner-logo-text {
+  color: var(--color-accent);
+}
+
 
 /* Hero Checkmarks below CTAs */
 .hero-checkmarks-list {
@@ -2231,3 +2254,230 @@ body.dark-theme .about-floating-title {
 body.dark-theme .about-floating-link {
   color: #34D399;
 }
+
+/* Responsive Visibility Helpers */
+.desktop-only {
+  display: flex !important;
+}
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 992px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: flex !important;
+  }
+}
+
+/* Mobile Menu Header Upgrades */
+.site-header.mobile-open {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.mobile-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.mobile-menu-toggle {
+  background: none;
+  border: 1px solid var(--color-border);
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.mobile-menu-toggle:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-subtle);
+}
+
+/* Mobile Drawer styles */
+.mobile-drawer-content {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px 24px 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.mobile-nav-item {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 10px 16px;
+  border-radius: 9999px;
+  transition: all var(--transition-fast);
+}
+
+.mobile-nav-item:hover {
+  color: var(--color-accent);
+  background-color: var(--color-accent-subtle);
+}
+
+.mobile-nav-item.active {
+  color: var(--color-accent);
+  background-color: var(--color-accent-subtle);
+  font-weight: 600;
+}
+
+.mobile-nav-item.spec-sandbox {
+  border: 1px dashed var(--color-accent-secondary);
+  color: var(--color-accent-secondary);
+}
+
+.mobile-drawer-divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: var(--spacing-md) 0;
+}
+
+.mobile-drawer-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-login-btn {
+  text-align: center;
+  padding: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.mobile-drawer-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mobile-drawer-tools .theme-toggle {
+  width: 100%;
+  height: auto;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+}
+
+/* Responsive Hero and Typography Polish */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2.3rem !important; /* Make sure mobile viewport text is readable and doesn't wrap single words */
+    line-height: 1.2 !important;
+  }
+  
+  .hero-section p {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .hero-badge {
+    font-size: 0.65rem !important;
+    padding: 4px 10px !important;
+  }
+
+  /* Make sure hero buttons scale well on mobile */
+  .hero-section .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Stats Section Mobile Overlap Stacking */
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important; /* Remove gap to enable overlapping */
+    padding: 0 16px;
+    margin-top: var(--spacing-xl);
+  }
+
+  .stat-card {
+    position: relative;
+    border-radius: var(--radius-md) !important;
+    padding: 24px 20px !important;
+    transition: all var(--transition-normal);
+  }
+
+  /* Layering the stacked cards vertically */
+  .stat-card:nth-child(1) {
+    z-index: 10;
+  }
+  
+  .stat-card:nth-child(2) {
+    margin-top: -24px !important;
+    z-index: 20;
+  }
+  
+  .stat-card:nth-child(3) {
+    margin-top: -24px !important;
+    z-index: 30;
+  }
+
+  body.dark-theme .stat-card {
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.45);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  body.light-theme .stat-card {
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .stat-number {
+    font-size: 2.6rem !important;
+  }
+
+  .stat-desc {
+    font-size: 0.85rem !important;
+  }
+}
+
+/* Stats Section Reveal Animation */
+.stats-section.revealed .stat-card {
+  animation: statRevealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.stats-section.revealed .stat-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stats-section.revealed .stat-card:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.stats-section.revealed .stat-card:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes statRevealUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
