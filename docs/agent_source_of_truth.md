@@ -136,3 +136,24 @@ body.light-theme {
 2. **Never leave placeholders**: All components must be fully styled, functioning, and populated with realistic mock data or actual outputs. Use image generation tools for required illustrations.
 3. **Responsive Design**: Ensure mobile-first layouts since many users in Sub-Saharan Africa access the platform via mobile browsers under data-constrained conditions.
 4. **Update Logs**: When creating new directories or altering the DB schema, immediately document the change in this SOT.
+
+---
+
+## 6. Update Log
+
+### 2026-06-15: MVP Platform Foundation Implementation
+* **Folder Structure & State**:
+  * Created [index.ts](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/types/index.ts) with TypeScript definitions for User, Profile, Project, RecruiterProfile, Gig, Application, and WhatsAppMessage.
+  * Created [mockData.ts](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/data/mockData.ts) containing initial African builder profiles, micro-gigs, and applications.
+  * Created [db.ts](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/services/db.ts) implementing persistent `localStorage` synchronization.
+  * Created [ai.ts](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/services/ai.ts) wrapping case study generation calls.
+  * Created [AppContext.tsx](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/context/AppContext.tsx) implementing global React context, layout theme selectors, and reactive WhatsApp chatbot parser.
+  * Created [Header.tsx](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/components/shared/Header.tsx) featuring responsive glassmorphic headers.
+* **API Endpoints**:
+  * Created [route.ts](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/app/api/generate-case-study/route.ts) supporting Gemini API connectivity with clean simulated fallback gates.
+* **Platform Views**:
+  * Landing page ([page.tsx](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/build-mvp-platform-foundation/src/app/page.tsx)) with animated survey tickers.
+  * Talent dashboard ([page.tsx](file:///C:/Users/gokro/.gemini/antigravity/worktrees/borderline/src/app/talent/page.tsx)) with compiler log terminals and mobile matching preview.
+  * Recruiter portal ([page.tsx](file:///C:/Users/gokro/.gemini/antigravity/src/app/recruiter/page.tsx)) with candidate detail drawers and post-gig modal managers.
+  * WhatsApp sandbox ([page.tsx](file:///C:/Users/gokro/.gemini/antigravity/src/app/whatsapp/page.tsx)) with real-time text parsing simulator.
+  * Admin dashboard ([page.tsx](file:///C:/Users/gokro/.gemini/antigravity/src/app/admin/page.tsx)) with stats counters and system transaction ledger feeds.
