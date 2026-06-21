@@ -85,8 +85,10 @@ const Header: React.FC = () => {
           <Link href="/recruiter" className="btn btn-secondary btn-header-login" style={{ borderRadius: '9999px', padding: '6px 14px', fontSize: '0.8rem', fontWeight: 600 }}>
             Login
           </Link>
-          <Link href="/recruiter" className="btn btn-primary btn-header-cta" style={{ borderRadius: '9999px', padding: '6px 14px', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
-            Book a discovery call
+          <Link href="/recruiter" className="btn btn-primary btn-header-cta" style={{ borderRadius: '9999px', padding: '6px 16px', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+            <span className="cta-long">Contact Sales to Partner Your Organization</span>
+            <span className="cta-medium">Contact Sales to Partner</span>
+            <span className="cta-short">Contact Sales</span>
           </Link>
         </div>
       </div>

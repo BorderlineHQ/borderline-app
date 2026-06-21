@@ -247,30 +247,37 @@ a {
   background: var(--color-accent-hover);
 }
 
-/* Header Styles */
+/* Header Styles - Floating Glassmorphic Pill */
 .site-header {
   position: sticky;
-  top: 0;
-  z-index: 100;
-  width: 100%;
-  backdrop-filter: blur(12px);
-  background-color: rgba(3, 7, 18, 0.85);
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color var(--transition-normal), border-color var(--transition-normal);
+  top: 16px;
+  z-index: 1000;
+  width: calc(100% - 32px);
+  max-width: 1280px;
+  margin: 16px auto 0 auto;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  transition: all var(--transition-normal);
 }
 
 body.dark-theme .site-header {
-  background-color: rgba(3, 7, 18, 0.85);
+  background-color: rgba(11, 15, 25, 0.65);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 body.light-theme .site-header {
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.65);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05);
 }
 
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 8px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -298,20 +305,21 @@ body.light-theme .site-header {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
 }
 
 .nav-item {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--color-text-secondary);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  border-radius: 9999px;
   transition: all var(--transition-fast);
 }
 
 .nav-item:hover {
   color: var(--color-accent);
+  background-color: var(--color-accent-subtle);
 }
 
 .nav-item.active {
@@ -334,6 +342,46 @@ body.light-theme .site-header {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+}
+
+/* Responsive Header CTA Button */
+.btn-header-cta span {
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .btn-header-cta .cta-long {
+    display: inline;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+  .btn-header-cta .cta-medium {
+    display: inline;
+  }
+}
+
+@media (max-width: 767px) {
+  .btn-header-cta .cta-short {
+    display: inline;
+  }
+}
+
+/* Responsive Hero CTA Button */
+.hero-cta-desktop {
+  display: inline;
+}
+.hero-cta-mobile {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .hero-cta-desktop {
+    display: none;
+  }
+  .hero-cta-mobile {
+    display: inline;
+  }
 }
 
 .theme-toggle {

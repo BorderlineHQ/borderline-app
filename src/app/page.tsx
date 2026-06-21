@@ -282,7 +282,9 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
             <Link href="/recruiter" className="btn btn-primary" id="btn-hero-recruiter" style={{ borderRadius: '9999px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
-              Book a discovery call <span style={{ marginLeft: '8px' }}>➔</span>
+              <span className="hero-cta-desktop">Contact Sales to Partner Your Organization</span>
+              <span className="hero-cta-mobile">Contact Sales to Partner</span>
+              <span style={{ marginLeft: '8px' }}>➔</span>
             </Link>
             <Link href="/talent" className="btn btn-secondary" id="btn-hero-talent" style={{ borderRadius: '9999px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600 }}>
               Create Your Profile
