@@ -508,7 +508,7 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
               <div className="about-image-wrapper">
                 <div className="about-image-bg"></div>
                 <img 
-                  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=600" 
+                  src="/borderline_talent_cafe.png" 
                   alt="Kwame Mensah - Senior Developer"
                 />
                 <div className="about-floating-card">
