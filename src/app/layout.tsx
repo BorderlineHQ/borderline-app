@@ -3,6 +3,8 @@ import { DM_Sans, Inter, JetBrains_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "../context/AppContext";
 import Header from "../components/shared/Header";
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const dmSans = DM_Sans({
   variable: "--font-display",
@@ -53,6 +55,8 @@ export default function RootLayout({
             </main>
           </div>
         </AppProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
