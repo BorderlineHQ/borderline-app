@@ -7,8 +7,33 @@ import { useApp } from '../context/AppContext';
 // Reusable animated count-up card for survey statistics
 const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({ target, suffix = '%', desc }) => {
   const [value, setValue] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const cardRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, [hasAnimated]);
+
+  useEffect(() => {
+    if (!hasAnimated) return;
+
     let start = 0;
     const duration = 1500; // Animation duration in milliseconds
     const frameRate = 1000 / 60; // 60 FPS
@@ -28,10 +53,10 @@ const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({
     }, frameRate);
 
     return () => clearInterval(timer);
-  }, [target]);
+  }, [hasAnimated, target]);
 
   return (
-    <div className="stat-card">
+    <div className="stat-card" ref={cardRef}>
       <div className="stat-number">
         {value}
         {suffix}
@@ -40,6 +65,7 @@ const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({
     </div>
   );
 };
+
 
 // Reusable partner logo component that fetches from Clearbit and falls back to text on load error
 const PartnerLogo: React.FC<{ domain: string; name: string }> = ({ domain, name }) => {
@@ -428,21 +454,41 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
           <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-tertiary)', textAlign: 'center', letterSpacing: '0.15em', marginBottom: 'var(--spacing-md)' }}>
             Trusted by Leading Teams & Academic Institutions from San Francisco to Lusaka
           </div>
-          <div className="partner-logos-grid">
-            {/* Tech Companies */}
-            <PartnerLogo domain="google.com" name="Google" />
-            <PartnerLogo domain="mtn.co.za" name="MTN" />
-            <PartnerLogo domain="yango.com" name="Yango" />
-            <PartnerLogo domain="telecel.com" name="Telecel" />
-            <PartnerLogo domain="flywheel.com" name="Flywheel" />
-            <PartnerLogo domain="alxafrica.com" name="ALX" />
-            <PartnerLogo domain="kadamobility.com" name="KADA Mobility" />
+          <div className="partner-logos-marquee">
+            <div className="partner-logos-track">
+              <div className="partner-logos-set">
+                {/* Tech Companies */}
+                <PartnerLogo domain="google.com" name="Google" />
+                <PartnerLogo domain="mtn.co.za" name="MTN" />
+                <PartnerLogo domain="yango.com" name="Yango" />
+                <PartnerLogo domain="telecel.com" name="Telecel" />
+                <PartnerLogo domain="flywheel.com" name="Flywheel" />
+                <PartnerLogo domain="alxafrica.com" name="ALX" />
+                <PartnerLogo domain="kadamobility.com" name="KADA Mobility" />
 
-            {/* Academic Institutions */}
-            <PartnerLogo domain="gctu.edu.gh" name="GCTU" />
-            <PartnerLogo domain="unza.zm" name="UNZA" />
-            <PartnerLogo domain="uem.mz" name="UEM" />
-            <PartnerLogo domain="inphb.ci" name="INPHB" />
+                {/* Academic Institutions */}
+                <PartnerLogo domain="gctu.edu.gh" name="GCTU" />
+                <PartnerLogo domain="unza.zm" name="UNZA" />
+                <PartnerLogo domain="uem.mz" name="UEM" />
+                <PartnerLogo domain="inphb.ci" name="INPHB" />
+              </div>
+              <div className="partner-logos-set">
+                {/* Tech Companies */}
+                <PartnerLogo domain="google.com" name="Google" />
+                <PartnerLogo domain="mtn.co.za" name="MTN" />
+                <PartnerLogo domain="yango.com" name="Yango" />
+                <PartnerLogo domain="telecel.com" name="Telecel" />
+                <PartnerLogo domain="flywheel.com" name="Flywheel" />
+                <PartnerLogo domain="alxafrica.com" name="ALX" />
+                <PartnerLogo domain="kadamobility.com" name="KADA Mobility" />
+
+                {/* Academic Institutions */}
+                <PartnerLogo domain="gctu.edu.gh" name="GCTU" />
+                <PartnerLogo domain="unza.zm" name="UNZA" />
+                <PartnerLogo domain="uem.mz" name="UEM" />
+                <PartnerLogo domain="inphb.ci" name="INPHB" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
