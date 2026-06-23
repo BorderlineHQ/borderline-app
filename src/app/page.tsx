@@ -616,25 +616,29 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
       {/* The Core Problem Block */}
       <section className="stats-section scroll-reveal">
         <div className="container">
+          {/* --- Infrastructure Gap Story Block --- */}
           <div className="hero-badge" style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)', backgroundColor: 'transparent', display: 'inline-flex', margin: '0 auto var(--spacing-sm) auto' }}>
             <span>The Infrastructure Gap</span>
           </div>
-          <h2 className="section-title">
-            Africa has the talent. The world has the demand. <span style={{ color: 'var(--color-accent)' }}>The infrastructure doesn't exist yet.</span>
+          <h2 className="section-title" style={{ textAlign: 'center' }}>
+            A Story of Untapped Potential<br />
+            <span style={{ color: 'var(--color-accent)' }}>Africa’s talent pool is booming, but the ecosystem can’t keep up.</span>
           </h2>
-
+          <p style={{ maxWidth: '700px', margin: '0 auto var(--spacing-lg)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
+            <em>Our 2026 BorderLine survey of 100+ tech and creative students across 6 African nations uncovered three systemic choke points that hinder growth.</em> 
+          </p>
           <div className="stats-grid">
-            <StatCard 
-              target={70} 
-              desc="excluded by arbitrary years-of-experience requirements" 
+            <StatCard
+              target={70}
+              desc="excluded by arbitrary years-of-experience requirements"
             />
-            <StatCard 
-              target={92} 
-              desc="have no structured way to prove what they can build to outsiders" 
+            <StatCard
+              target={92}
+              desc="have no structured way to prove what they can build to outsiders"
             />
-            <StatCard 
-              target={59} 
-              desc="face daily connectivity and power barriers that hide their output" 
+            <StatCard
+              target={59}
+              desc="face daily connectivity and power barriers that hide their output"
             />
           </div>
         </div>
