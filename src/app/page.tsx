@@ -2,10 +2,45 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useApp } from '../context/AppContext';
-import { HeroMap } from '../components/HeroMap';
-import { WhatsAppDemo } from '../components/WhatsAppDemo';
-import { VerificationVisualizer } from '../components/VerificationVisualizer';
+
+// Lazy-load heavy interactive components to improve First Contentful Paint (FCP)
+const HeroMap = dynamic(
+  () => import('../components/HeroMap').then((mod) => mod.HeroMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem', opacity: 0.5 }}>
+        Loading map…
+      </div>
+    ),
+  }
+);
+
+const VerificationVisualizer = dynamic(
+  () => import('../components/VerificationVisualizer').then((mod) => mod.VerificationVisualizer),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{ width: '100%', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem', opacity: 0.5 }}>
+        Loading verification flow…
+      </div>
+    ),
+  }
+);
+
+const WhatsAppDemo = dynamic(
+  () => import('../components/WhatsAppDemo').then((mod) => mod.WhatsAppDemo),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{ width: '100%', minHeight: '480px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem', opacity: 0.5 }}>
+        Loading chat demo…
+      </div>
+    ),
+  }
+);
 
 // Reusable animated count-up card for survey statistics
 const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({ target, suffix = '%', desc }) => {
