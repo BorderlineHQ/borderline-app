@@ -2231,3 +2231,47 @@ body.dark-theme .about-floating-title {
 body.dark-theme .about-floating-link {
   color: #34D399;
 }
+
+/* Responsive Navigation Visibility Utilities */
+@media (min-width: 769px) {
+  .desktop-only {
+    display: flex !important;
+  }
+  .mobile-only-header-actions {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only-header-actions {
+    display: flex !important;
+  }
+  
+  /* Reset header container alignment on mobile to stay in a row */
+  .site-header .header-container {
+    flex-direction: row !important;
+    padding: 8px 16px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+}
+
+/* Mobile Nav Link Styles */
+.mobile-nav-item {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  display: block;
+}
+
+.mobile-nav-item:hover, .mobile-nav-item.active {
+  color: var(--color-accent);
+  background-color: var(--color-accent-subtle);
+  font-weight: 600;
+}

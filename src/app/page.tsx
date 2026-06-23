@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '../context/AppContext';
+import { HeroMap } from '../components/HeroMap';
+import { WhatsAppDemo } from '../components/WhatsAppDemo';
+import { VerificationVisualizer } from '../components/VerificationVisualizer';
 
 // Reusable animated count-up card for survey statistics
 const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({ target, suffix = '%', desc }) => {
@@ -247,8 +250,8 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
   return (
     <div className="landing-page">
       {/* Hero Section */}
-      <section className="hero-section" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'var(--spacing-xxxl) var(--spacing-md)' }}>
-        <div className="container" style={{ maxWidth: '850px', margin: '0 auto' }}>
+      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'var(--spacing-xxl) var(--spacing-md)' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '850px', margin: '0 auto' }}>
           <div className="hero-badge" id="hero-badge-container" style={{ margin: '0 auto var(--spacing-lg) auto', display: 'inline-flex', borderRadius: '9999px', padding: '6px 16px', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.03em', textTransform: 'none' }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', color: 'var(--color-accent)' }}>
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -256,12 +259,12 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
             <span>Pitching at Yango Fellowship Finals — September 17th</span>
           </div>
 
-          <h1 style={{ fontFamily: 'var(--font-serif), Georgia, serif', fontSize: '3.8rem', fontWeight: 700, lineHeight: 1.15, color: 'var(--color-text-primary)', marginBottom: 'var(--spacing-md)', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontFamily: 'var(--font-serif), Georgia, serif', fontSize: 'clamp(2.2rem, 6vw, 3.2rem)', fontWeight: 700, lineHeight: 1.15, color: 'var(--color-text-primary)', marginBottom: 'var(--spacing-md)', letterSpacing: '-0.02em' }}>
             The Trust Layer <br />
             <span style={{ color: 'var(--color-accent)', fontStyle: 'italic', fontWeight: '500', fontFamily: 'var(--font-serif), Georgia, serif' }}>for Africa's Tech & Creative Talent</span>
           </h1>
 
-          <p style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, maxWidth: '750px', margin: '0 auto var(--spacing-xl) auto' }}>
+          <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--color-text-secondary)', lineHeight: 1.6, maxWidth: '750px', margin: '0 auto var(--spacing-xl) auto' }}>
             BorderLine is the opportunity pipeline and skill verification system for Africa's technologists and creatives — compiling code repos, design portfolios, and creative work into verified, hire-ready profiles.
           </p>
 
@@ -280,15 +283,30 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: 'var(--spacing-xl)' }}>
             <Link href="/recruiter" className="btn btn-primary" id="btn-hero-recruiter" style={{ borderRadius: '9999px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
-              <span className="hero-cta-desktop">Contact Sales to Partner Your Organization</span>
-              <span className="hero-cta-mobile">Contact Sales to Partner</span>
+              <span className="hero-cta-desktop">Start Hiring</span>
+              <span className="hero-cta-mobile">Start Hiring  </span>
               <span style={{ marginLeft: '8px' }}>➔</span>
             </Link>
             <Link href="/talent" className="btn btn-secondary" id="btn-hero-talent" style={{ borderRadius: '9999px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600 }}>
               Create Your Profile
             </Link>
+          </div>
+
+          {/* Dedicated Map Viewport Section */}
+          <div className="hero-map-viewport" style={{
+            width: '100%',
+            maxWidth: '900px',
+            height: 'clamp(380px, 50vh, 520px)',
+            margin: 'var(--spacing-md) auto 0 auto',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}>
+            <HeroMap />
           </div>
         </div>
       </section>
@@ -635,6 +653,37 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
                 <div className="metric-card-num" style={{ fontSize: '1.2rem' }}>AI-Driven Discovery</div>
                 <div className="metric-card-label">Semantic search across the entire verified repository.</div>
               </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 'var(--spacing-xxxl)' }}>
+            <VerificationVisualizer />
+          </div>
+        </div>
+      </section>
+
+      {/* Low-Infrastructure Access Section */}
+      <section className="whatsapp-section scroll-reveal" style={{ backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)', padding: 'var(--spacing-xxl) 0' }}>
+        <div className="container">
+          <div className="split-features-grid" style={{ alignItems: 'center' }}>
+            {/* Phone mockup on the left/top */}
+            <div>
+              <WhatsAppDemo />
+            </div>
+            {/* Text on the right/bottom */}
+            <div>
+              <div className="feature-tag" style={{ color: 'var(--color-accent)' }}>
+                NO INFRASTRUCTURE REQUIRED
+              </div>
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: 'var(--spacing-md)', color: 'var(--color-text-primary)' }}>
+                Access global opportunities on a 2G connection.
+              </h2>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: 'var(--spacing-lg)' }}>
+                We built BorderLine for the realities of the African tech ecosystem. Not everyone has fiber internet or a high-end laptop open 24/7.
+              </p>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', lineHeight: 1.6 }}>
+                Once your portfolio is AI-verified, you can manage your entire career via WhatsApp. Receive micro-gig alerts, accept contracts, and track Mobile Money payouts with simple text commands.
+              </p>
             </div>
           </div>
         </div>
