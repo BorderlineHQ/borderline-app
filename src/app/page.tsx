@@ -10,8 +10,33 @@ import { VerificationVisualizer } from '../components/VerificationVisualizer';
 // Reusable animated count-up card for survey statistics
 const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({ target, suffix = '%', desc }) => {
   const [value, setValue] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const cardRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, [hasAnimated]);
+
+  useEffect(() => {
+    if (!hasAnimated) return;
+
     let start = 0;
     const duration = 1500; // Animation duration in milliseconds
     const frameRate = 1000 / 60; // 60 FPS
@@ -31,15 +56,37 @@ const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({
     }, frameRate);
 
     return () => clearInterval(timer);
-  }, [target]);
+  }, [hasAnimated, target]);
 
   return (
-    <div className="stat-card">
+    <div className="stat-card" ref={cardRef}>
       <div className="stat-number">
         {value}
         {suffix}
       </div>
       <p className="stat-desc">{desc}</p>
+    </div>
+  );
+};
+
+
+// Reusable partner logo component that fetches from Clearbit and falls back to text on load error
+const PartnerLogo: React.FC<{ domain: string; name: string }> = ({ domain, name }) => {
+  const [error, setError] = useState(false);
+  const logoUrl = `https://logo.clearbit.com/${domain}`;
+
+  return (
+    <div className="partner-logo-item" title={name}>
+      {!error ? (
+        <img
+          src={logoUrl}
+          alt={name}
+          onError={() => setError(true)}
+          className="partner-logo-img"
+        />
+      ) : (
+        <span className="partner-logo-text">{name}</span>
+      )}
     </div>
   );
 };
@@ -422,48 +469,44 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
       {/* Grayscale partner logos list */}
       <section className="scroll-reveal" style={{ borderTop: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', padding: 'var(--spacing-xl) 0' }}>
         <div className="container">
-          <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-tertiary)', textAlign: 'center', letterSpacing: '0.1em', marginBottom: 'var(--spacing-md)' }}>
-            Trusted by Teams from San Francisco to Lagos
+          <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-tertiary)', textAlign: 'center', letterSpacing: '0.15em', marginBottom: 'var(--spacing-md)' }}>
+            Trusted by Leading Teams & Academic Institutions from San Francisco to Lusaka
           </div>
-          <div className="partner-logos-grid">
-            {/* Telecel Logo */}
-            <svg className="partner-logo-svg logo-telecel" viewBox="0 0 90 24" width="90" stroke="currentColor">
-              <circle cx="12" cy="12" r="8" strokeWidth="2" fill="none" />
-              <path d="M12 7V17M9 10H15" strokeWidth="2" strokeLinecap="round" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="11" letterSpacing="-0.5px" stroke="none">telecel</text>
-            </svg>
-            {/* Flywheel Logo */}
-            <svg className="partner-logo-svg logo-flywheel" viewBox="0 0 95 24" width="95" stroke="currentColor">
-              <path d="M4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20C7.58 20 4 16.42 4 12Z" strokeWidth="1.5" fill="none" />
-              <path d="M12 4L12 20M4 12L20 12" strokeWidth="1" />
-              <text x="28" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="11" letterSpacing="-0.5px" stroke="none">flywheel</text>
-            </svg>
-            {/* Yango Logo */}
-            <svg className="partner-logo-svg logo-yango" viewBox="0 0 80 24" width="80" stroke="currentColor">
-              <polygon points="4,5 18,5 11,18" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="0.2px" stroke="none">YANGO</text>
-            </svg>
-            {/* KADA Mobility Logo */}
-            <svg className="partner-logo-svg logo-kada" viewBox="0 0 115 24" width="115" stroke="currentColor">
-              <path d="M4 4L12 12L4 20" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <path d="M9 4L17 12L9 20" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="11" letterSpacing="-0.5px" stroke="none">KADA mobility</text>
-            </svg>
-            {/* MTN Logo */}
-            <svg className="partner-logo-svg logo-mtn" viewBox="0 0 70 24" width="70" stroke="currentColor">
-              <ellipse cx="14" cy="12" rx="10" ry="7" strokeWidth="2" fill="none" />
-              <text x="30" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="-0.5px" stroke="none">MTN</text>
-            </svg>
-            {/* ALX Logo */}
-            <svg className="partner-logo-svg logo-alx" viewBox="0 0 70 24" width="70" stroke="currentColor">
-              <rect x="4" y="4" width="16" height="16" rx="3" strokeWidth="2.5" fill="none" />
-              <text x="28" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="-0.5px" stroke="none">alx</text>
-            </svg>
-            {/* Google Logo */}
-            <svg className="partner-logo-svg logo-google" viewBox="0 0 85 24" width="85" stroke="currentColor">
-              <path d="M12 12H19C19.2 10.9 18.8 9.8 18 9C16.8 7.8 14.8 7.3 13.2 7.8C11.6 8.3 10.3 9.7 10 11.4C9.6 13.5 10.6 15.6 12.5 16.5C14.3 17.3 16.5 16.8 17.8 15.4C18.4 14.8 18.8 14 18.9 13.2H14.5" strokeWidth="2" fill="none" />
-              <text x="26" y="16" fontFamily="var(--font-display)" fontWeight="800" fontSize="12" letterSpacing="-0.5px" stroke="none">Google</text>
-            </svg>
+          <div className="partner-logos-marquee">
+            <div className="partner-logos-track">
+              <div className="partner-logos-set">
+                {/* Tech Companies */}
+                <PartnerLogo domain="google.com" name="Google" />
+                <PartnerLogo domain="mtn.co.za" name="MTN" />
+                <PartnerLogo domain="yango.com" name="Yango" />
+                <PartnerLogo domain="telecel.com" name="Telecel" />
+                <PartnerLogo domain="flywheel.com" name="Flywheel" />
+                <PartnerLogo domain="alxafrica.com" name="ALX" />
+                <PartnerLogo domain="kadamobility.com" name="KADA Mobility" />
+
+                {/* Academic Institutions */}
+                <PartnerLogo domain="gctu.edu.gh" name="GCTU" />
+                <PartnerLogo domain="unza.zm" name="UNZA" />
+                <PartnerLogo domain="uem.mz" name="UEM" />
+                <PartnerLogo domain="inphb.ci" name="INPHB" />
+              </div>
+              <div className="partner-logos-set">
+                {/* Tech Companies */}
+                <PartnerLogo domain="google.com" name="Google" />
+                <PartnerLogo domain="mtn.co.za" name="MTN" />
+                <PartnerLogo domain="yango.com" name="Yango" />
+                <PartnerLogo domain="telecel.com" name="Telecel" />
+                <PartnerLogo domain="flywheel.com" name="Flywheel" />
+                <PartnerLogo domain="alxafrica.com" name="ALX" />
+                <PartnerLogo domain="kadamobility.com" name="KADA Mobility" />
+
+                {/* Academic Institutions */}
+                <PartnerLogo domain="gctu.edu.gh" name="GCTU" />
+                <PartnerLogo domain="unza.zm" name="UNZA" />
+                <PartnerLogo domain="uem.mz" name="UEM" />
+                <PartnerLogo domain="inphb.ci" name="INPHB" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -529,18 +572,40 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
               <div className="about-image-wrapper">
                 <div className="about-image-bg"></div>
                 <img 
-                  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=600" 
-                  alt="Kwame Mensah - Senior Developer"
+                  src="/green-coffee-borderline.jpeg" 
+                  alt="Keziah Tsepiso - Freelancer, Creative Leader"
                 />
                 <div className="about-floating-card">
-                  <span className="about-floating-name">Kwame M.</span>
-                  <span className="about-floating-title">Senior Developer</span>
-                  <a href="https://github.com/kwame-mensah" target="_blank" rel="noopener noreferrer" className="about-floating-link">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4M9 18c-4.51 2-5-2-7-2" />
-                    </svg>
-                    <span>GitHub Profile</span>
-                  </a>
+                  <span className="about-floating-name">Keziah Tsepiso</span>
+                  <span className="about-floating-title">Freelancer, Creative Leader</span>
+                  <div className="about-floating-links">
+                    <a href="https://figma.com/@keziah" target="_blank" rel="noopener noreferrer" className="about-floating-link">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/>
+                        <path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/>
+                        <path d="M12 9h3.5a3.5 3.5 0 1 1-3.5 3.5V9z"/>
+                        <path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/>
+                        <path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/>
+                      </svg>
+                      <span>Figma</span>
+                    </a>
+                    <a href="https://linkedin.com/in/keziah" target="_blank" rel="noopener noreferrer" className="about-floating-link">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                        <rect x="2" y="9" width="4" height="12"/>
+                        <circle cx="4" cy="4" r="2"/>
+                      </svg>
+                      <span>LinkedIn</span>
+                    </a>
+                    <a href="https://instagram.com/keziah" target="_blank" rel="noopener noreferrer" className="about-floating-link">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                      </svg>
+                      <span>Instagram</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
