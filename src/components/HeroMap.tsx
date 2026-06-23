@@ -395,7 +395,7 @@ export const HeroMap: React.FC = () => {
               <text
                 x={city.x + city.dx}
                 y={city.y + city.dy}
-                textAnchor={city.textAnchor}
+                textAnchor={city.textAnchor as "start" | "end" | "middle" | "inherit"}
                 className="hm-city-label"
               >
                 {city.label}
