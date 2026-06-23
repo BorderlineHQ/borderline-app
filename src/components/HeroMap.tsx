@@ -136,20 +136,8 @@ function arcPath(from: typeof cities[0], to: typeof cities[0]): string {
   return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
 }
 
-export const HeroMap: React.FC = () => {
+const PulseNodes = React.memo(() => {
   const [activeNodes, setActiveNodes] = useState<Set<number>>(new Set());
-  
-  // Interactive tooltips and zooming states
-  const [selectedCountry, setSelectedCountry] = useState<typeof countryData[string] | null>(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const [scale, setScale] = useState(1);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const touchStartDist = useRef<number | null>(null);
-  const touchStartScale = useRef<number>(1);
 
   // Stagger pulses so they feel organic and dynamic
   const pickRandomNodes = useCallback(() => {
@@ -168,80 +156,35 @@ export const HeroMap: React.FC = () => {
     return () => clearInterval(interval);
   }, [pickRandomNodes]);
 
-  // Zoom & Pan Handlers
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const zoomFactor = 1.1;
-    let newScale = scale;
-    if (e.deltaY < 0) {
-      newScale = Math.min(scale * zoomFactor, 5);
-    } else {
-      newScale = Math.max(scale / zoomFactor, 1);
-    }
-    setScale(newScale);
-    if (newScale === 1) {
-      setOffset({ x: 0, y: 0 });
-    }
-  };
+  return (
+    <>
+      {pulseNodes.map((node, idx) => {
+        const isActive = activeNodes.has(idx);
+        return (
+          <circle
+            key={`pulse-${idx}`}
+            cx={node.x}
+            cy={node.y}
+            r={isActive ? 4.5 : 2}
+            className={`hm-dot${isActive ? ' active' : ''}`}
+          />
+        );
+      })}
+    </>
+  );
+});
+PulseNodes.displayName = 'PulseNodes';
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale > 1) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y });
-    }
-  };
+export const HeroMap = React.memo(() => {
+  // Interactive tooltips states
+  const [selectedCountryId, setSelectedCountryId] = useState<string | null>(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && scale > 1) {
-      setOffset({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
-    }
-  };
+  const selectedCountry = selectedCountryId ? countryData[selectedCountryId] : null;
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // Touch Support for Zoom / Pan
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      touchStartDist.current = Math.sqrt(dx * dx + dy * dy);
-      touchStartScale.current = scale;
-    } else if (e.touches.length === 1 && scale > 1) {
-      setIsDragging(true);
-      setDragStart({ x: e.touches[0].clientX - offset.x, y: e.touches[0].clientY - offset.y });
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (e.touches.length === 2 && touchStartDist.current !== null) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const newScale = Math.max(1, Math.min(touchStartScale.current * (dist / touchStartDist.current), 5));
-      setScale(newScale);
-      if (newScale === 1) {
-        setOffset({ x: 0, y: 0 });
-      }
-    } else if (e.touches.length === 1 && isDragging && scale > 1) {
-      setOffset({
-        x: e.touches[0].clientX - dragStart.x,
-        y: e.touches[0].clientY - dragStart.y
-      });
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    touchStartDist.current = null;
-  };
-
-  // Tooltip position calculator
-  const triggerTooltip = (clientX: number, clientY: number, countryId: string) => {
+  // Tooltip position calculator (called once per click/tap, keeping position static)
+  const selectCountry = (clientX: number, clientY: number, countryId: string) => {
     const data = countryData[countryId];
     if (data) {
       if (containerRef.current) {
@@ -251,18 +194,23 @@ export const HeroMap: React.FC = () => {
           y: clientY - containerRect.top - 100, // Show pop-up slightly above the pointer
         });
       }
-      setSelectedCountry(data);
+      setSelectedCountryId(countryId);
     }
   };
 
-  const handleCountryInteraction = (e: React.MouseEvent<SVGPathElement> | React.TouchEvent<SVGPathElement>, countryId: string) => {
-    const clientX = 'clientX' in e ? e.clientX : e.touches[0].clientX;
-    const clientY = 'clientY' in e ? e.clientY : e.touches[0].clientY;
-    triggerTooltip(clientX, clientY, countryId);
+  const handleCountryClick = (e: React.MouseEvent<SVGPathElement>, countryId: string) => {
+    selectCountry(e.clientX, e.clientY, countryId);
   };
 
-  const handleMarkerInteraction = (e: React.MouseEvent<SVGGElement>, countryId: string) => {
-    triggerTooltip(e.clientX, e.clientY, countryId);
+  const handleCountryTouch = (e: React.TouchEvent<SVGPathElement>, countryId: string) => {
+    const touch = e.touches[0];
+    if (touch) {
+      selectCountry(touch.clientX, touch.clientY, countryId);
+    }
+  };
+
+  const handleMarkerClick = (e: React.MouseEvent<SVGGElement>, countryId: string) => {
+    selectCountry(e.clientX, e.clientY, countryId);
   };
 
   return (
@@ -271,6 +219,7 @@ export const HeroMap: React.FC = () => {
       className="hero-map-wrapper"
       style={{
         width: '100%',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -280,14 +229,6 @@ export const HeroMap: React.FC = () => {
       <div
         className="hero-map-container"
         aria-hidden="true"
-        onWheel={handleWheel}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
         style={{
           width: '100%',
           height: '100%',
@@ -296,9 +237,8 @@ export const HeroMap: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
-          cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
-          overflow: 'hidden',
-          touchAction: 'none',
+          overflow: 'visible',
+          touchAction: 'pan-y',
         }}
       >
         <style>{`
@@ -327,11 +267,18 @@ export const HeroMap: React.FC = () => {
           .hm-country-interactive {
             fill: transparent;
             cursor: pointer;
-            transition: fill 0.3s ease;
+            transition: fill 0.3s ease, stroke 0.3s ease, stroke-opacity 0.3s ease;
           }
           .hm-country-interactive:hover {
             fill: var(--color-accent);
             fill-opacity: 0.05;
+          }
+          .hm-country-interactive.selected {
+            fill: var(--color-accent);
+            fill-opacity: 0.12;
+            stroke: var(--color-accent);
+            stroke-width: 0.8px;
+            stroke-opacity: 0.6;
           }
 
           .hm-continent-outline {
@@ -464,94 +411,13 @@ export const HeroMap: React.FC = () => {
           .hero-map-viewport {
             animation: hm-fade-in-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           }
+          /* Mobile specific scale and shift to make map larger and slightly westward */
+          @media (max-width: 768px) {
+            .hero-map-viewport {
+              transform: translateX(-5%) scale(1.2);
+            }
+          }
         `}</style>
-
-        {/* Floating Zoom Controls */}
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '6px',
-          zIndex: 10,
-        }}>
-          <button
-            onClick={() => setScale(s => Math.min(s * 1.3, 5))}
-            style={{
-              width: '32px',
-              height: '32px',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '4px',
-              color: 'var(--color-text-primary)',
-              fontSize: '1.1rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(4px)',
-              transition: 'background-color 0.2s',
-            }}
-            title="Zoom In"
-          >
-            +
-          </button>
-          <button
-            onClick={() => {
-              const newScale = Math.max(scale / 1.3, 1);
-              setScale(newScale);
-              if (newScale === 1) setOffset({ x: 0, y: 0 });
-            }}
-            style={{
-              width: '32px',
-              height: '32px',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '4px',
-              color: 'var(--color-text-primary)',
-              fontSize: '1.1rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(4px)',
-              transition: 'background-color 0.2s',
-            }}
-            title="Zoom Out"
-          >
-            -
-          </button>
-          {scale > 1 && (
-            <button
-              onClick={() => {
-                setScale(1);
-                setOffset({ x: 0, y: 0 });
-              }}
-              style={{
-                width: '32px',
-                height: '32px',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '4px',
-                color: 'var(--color-text-primary)',
-                fontSize: '0.75rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backdropFilter: 'blur(4px)',
-                transition: 'background-color 0.2s',
-              }}
-              title="Reset Zoom"
-            >
-              ⟲
-            </button>
-          )}
-        </div>
 
         {/* Premium Statistics Card Tooltip/Pop-up */}
         {selectedCountry && (
@@ -576,7 +442,7 @@ export const HeroMap: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <span style={{ fontWeight: 'bold', color: 'white', fontSize: '0.95rem' }}>{selectedCountry.name}</span>
               <button
-                onClick={() => setSelectedCountry(null)}
+                onClick={() => setSelectedCountryId(null)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -599,7 +465,7 @@ export const HeroMap: React.FC = () => {
         )}
 
         <svg
-          viewBox="70 45 500 595"
+          viewBox="20 40 580 610"
           width="100%"
           height="100%"
           xmlns="http://www.w3.org/2000/svg"
@@ -620,8 +486,8 @@ export const HeroMap: React.FC = () => {
             </mask>
           </defs>
 
-          {/* Group containing all zoomable and pannable elements */}
-          <g transform={`translate(${offset.x}, ${offset.y}) scale(${scale})`} style={{ transformOrigin: '290px 305px', transition: isDragging ? 'none' : 'transform 0.15s ease-out' }}>
+          {/* Group containing all elements */}
+          <g style={{ transformOrigin: '290px 305px' }}>
             {/* Dotted grid representation of Africa continent */}
             <rect
               x="-5"
@@ -641,15 +507,18 @@ export const HeroMap: React.FC = () => {
 
             {/* Interactive invisible fill paths for hover/tap targeting */}
             <g>
-              {africaPaths.map((country) => (
-                <path
-                  key={`interactive-${country.id}`}
-                  d={country.d}
-                  className="hm-country-interactive"
-                  onMouseMove={(e) => handleCountryInteraction(e, country.id)}
-                  onTouchStart={(e) => handleCountryInteraction(e, country.id)}
-                />
-              ))}
+              {africaPaths.map((country) => {
+                const isSelected = selectedCountryId === country.id;
+                return (
+                  <path
+                    key={`interactive-${country.id}`}
+                    d={country.d}
+                    className={`hm-country-interactive${isSelected ? ' selected' : ''}`}
+                    onClick={(e) => handleCountryClick(e, country.id)}
+                    onTouchStart={(e) => handleCountryTouch(e, country.id)}
+                  />
+                );
+              })}
             </g>
 
             {/* Outer silhouette outline to define the continent shape clearly */}
@@ -659,19 +528,8 @@ export const HeroMap: React.FC = () => {
               ))}
             </g>
 
-            {/* Pulsing telemetry data nodes */}
-            {pulseNodes.map((node, idx) => {
-              const isActive = activeNodes.has(idx);
-              return (
-                <circle
-                  key={`pulse-${idx}`}
-                  cx={node.x}
-                  cy={node.y}
-                  r={isActive ? 4.5 : 2}
-                  className={`hm-dot${isActive ? ' active' : ''}`}
-                />
-              );
-            })}
+            {/* Pulsing telemetry data nodes (isolated state to prevent full SVG re-render) */}
+            <PulseNodes />
 
             {/* Connection arcs with travelling data dots */}
             {arcs.map(([fi, ti], idx) => {
@@ -700,7 +558,7 @@ export const HeroMap: React.FC = () => {
                 <g
                   key={city.name}
                   style={{ cursor: 'pointer' }}
-                  onMouseEnter={(e) => handleMarkerInteraction(e, city.countryId)}
+                  onClick={(e) => handleMarkerClick(e, city.countryId)}
                 >
                   {isYangoHub ? (
                     <>
@@ -749,44 +607,45 @@ export const HeroMap: React.FC = () => {
       <div style={{
         width: '100%',
         maxWidth: '700px',
-        marginTop: '20px',
-        padding: '15px var(--spacing-md)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        marginTop: '10px',
+        padding: '8px var(--spacing-md)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
-        gap: '12px'
+        gap: '6px'
       }}>
         {/* Subtle Dots Legend */}
         <div style={{
           display: 'flex',
-          gap: '24px',
+          gap: '16px',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '0.85rem',
-          color: 'var(--color-text-secondary)'
+          fontSize: '0.7rem',
+          color: 'var(--color-text-secondary)',
+          opacity: 0.8
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <span style={{
-              width: '8px',
-              height: '8px',
+              width: '5px',
+              height: '5px',
               borderRadius: '50%',
               backgroundColor: 'var(--color-accent)',
-              boxShadow: '0 0 8px var(--color-accent)',
+              boxShadow: '0 0 4px var(--color-accent)',
               display: 'inline-block',
               animation: 'hm-pulse 2s infinite'
             }} />
             <span>— BorderLine presence</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
             <span style={{
-              width: '6px',
-              height: '6px',
+              width: '4px',
+              height: '4px',
               borderRadius: '50%',
               backgroundColor: 'var(--color-text-secondary)',
-              opacity: 0.5,
+              opacity: 0.4,
               display: 'inline-block'
             }} />
             <span>— Planned expansion</span>
@@ -794,15 +653,16 @@ export const HeroMap: React.FC = () => {
         </div>
 
         {/* Vision & Action Prompt */}
-        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
-          <p style={{ color: 'var(--color-text-primary)', fontWeight: '500', marginBottom: '4px' }}>
-            Our vision is to empower cross-African work collaboration.
+        <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
+          <p style={{ color: 'var(--color-text-primary)', fontWeight: '500', marginBottom: '2px', opacity: 0.85 }}>
+            Our vision is to empower cross-African work and collaboration.
           </p>
-          <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+          <p style={{ fontSize: '0.65rem', opacity: 0.5 }}>
             Tap, zoom in and tap the countries to learn more.
           </p>
         </div>
       </div>
     </div>
   );
-};
+});
+HeroMap.displayName = 'HeroMap';

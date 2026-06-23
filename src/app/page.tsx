@@ -379,8 +379,8 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
           {/* Dedicated Map Viewport Section */}
           <div className="hero-map-viewport" style={{
             width: '100%',
-            maxWidth: '900px',
-            height: 'clamp(380px, 50vh, 520px)',
+            maxWidth: '1400px',
+            height: 'clamp(500px, 80vh, 900px)',
             margin: 'var(--spacing-md) auto 0 auto',
             position: 'relative',
             display: 'flex',
@@ -397,13 +397,13 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
       <section className="card-stack-section" style={{ backgroundColor: 'var(--color-surface)', borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container" style={{ width: '100%' }}>
           <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto var(--spacing-xl) auto' }}>
-            <span className="feature-tag" style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '0.8rem', letterSpacing: '0.05em' }}>
+            <span className="feature-tag" style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '0.75rem', letterSpacing: '0.05em' }}>
               PROOF OF WORK
             </span>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, marginTop: '8px', color: 'var(--color-text-primary)' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, marginTop: '8px', color: 'var(--color-text-primary)' }}>
               Meet Verified Builders & Creatives
             </h2>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', marginTop: '6px' }}>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.8rem', marginTop: '6px' }}>
               Scroll down to see real compiled portfolios — from full-stack engineers to brand designers — with automated verification audits and performance scores. Click a card to view their case studies.
             </p>
           </div>
