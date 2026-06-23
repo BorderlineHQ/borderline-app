@@ -1,28 +1,78 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { africaPaths } from './africaPaths';
 
-// City markers positioned exactly in the Highcharts map coordinate system
-// Note: Accra, Dakar, Abidjan, Lusaka, Maputo, and Addis Ababa are marked as (Yango) hubs
+// Detailed lookup for country info (Capital, Estimated Talent Population)
+const countryData: Record<string, { capital: string; talent: string; name: string }> = {
+  ug: { name: 'Uganda', capital: 'Kampala', talent: '150,000+' },
+  ng: { name: 'Nigeria', capital: 'Abuja', talent: '1,200,000+' },
+  tz: { name: 'Tanzania', capital: 'Dodoma', talent: '180,000+' },
+  ke: { name: 'Kenya', capital: 'Nairobi', talent: '350,000+' },
+  gh: { name: 'Ghana', capital: 'Accra', talent: '280,000+' },
+  sn: { name: 'Senegal', capital: 'Dakar', talent: '90,000+' },
+  za: { name: 'South Africa', capital: 'Pretoria', talent: '650,000+' },
+  eg: { name: 'Egypt', capital: 'Cairo', talent: '450,000+' },
+  ci: { name: 'Ivory Coast', capital: 'Abidjan', talent: '110,000+' },
+  zm: { name: 'Zambia', capital: 'Lusaka', talent: '80,000+' },
+  mz: { name: 'Mozambique', capital: 'Maputo', talent: '70,000+' },
+  et: { name: 'Ethiopia', capital: 'Addis Ababa', talent: '180,000+' },
+  ma: { name: 'Morocco', capital: 'Rabat', talent: '220,000+' },
+  dz: { name: 'Algeria', capital: 'Algiers', talent: '210,000+' },
+  tn: { name: 'Tunisia', capital: 'Tunis', talent: '95,000+' },
+  ly: { name: 'Libya', capital: 'Tripoli', talent: '40,000+' },
+  sd: { name: 'Sudan', capital: 'Khartoum', talent: '130,000+' },
+  ao: { name: 'Angola', capital: 'Luanda', talent: '115,000+' },
+  zw: { name: 'Zimbabwe', capital: 'Harare', talent: '85,000+' },
+  cm: { name: 'Cameroon', capital: 'Yaoundé', talent: '95,000+' },
+  mg: { name: 'Madagascar', capital: 'Antananarivo', talent: '60,000+' },
+  ml: { name: 'Mali', capital: 'Bamako', talent: '45,000+' },
+  mr: { name: 'Mauritania', capital: 'Nouakchott', talent: '30,000+' },
+  rw: { name: 'Rwanda', capital: 'Kigali', talent: '75,000+' },
+  so: { name: 'Somalia', capital: 'Mogadishu', talent: '35,000+' },
+  cg: { name: 'Congo', capital: 'Brazzaville', talent: '25,000+' },
+  cd: { name: 'DR Congo', capital: 'Kinshasa', talent: '240,000+' },
+  na: { name: 'Namibia', capital: 'Windhoek', talent: '35,000+' },
+  bw: { name: 'Botswana', capital: 'Gaborone', talent: '40,000+' },
+  sl: { name: 'Sierra Leone', capital: 'Freetown', talent: '30,000+' },
+  lr: { name: 'Liberia', capital: 'Monrovia', talent: '25,000+' },
+  gn: { name: 'Guinea', capital: 'Conakry', talent: '35,000+' },
+  gw: { name: 'Guinea-Bissau', capital: 'Bissau', talent: '15,000+' },
+  gm: { name: 'Gambia', capital: 'Banjul', talent: '12,000+' },
+  tg: { name: 'Togo', capital: 'Lomé', talent: '25,000+' },
+  bj: { name: 'Benin', capital: 'Porto-Novo', talent: '30,000+' },
+  bf: { name: 'Burkina Faso', capital: 'Ouagadougou', talent: '50,000+' },
+  ne: { name: 'Niger', capital: 'Niamey', talent: '35,000+' },
+  td: { name: 'Chad', capital: 'N\'Djamena', talent: '25,000+' },
+  cf: { name: 'Central African Republic', capital: 'Bangui', talent: '15,000+' },
+  gq: { name: 'Equatorial Guinea', capital: 'Malabo', talent: '10,000+' },
+  ga: { name: 'Gabon', capital: 'Libreville', talent: '20,000+' },
+  bi: { name: 'Burundi', capital: 'Gitega', talent: '20,000+' },
+  mw: { name: 'Malawi', capital: 'Lilongwe', talent: '45,000+' },
+  sz: { name: 'Eswatini', capital: 'Mbabane', talent: '15,000+' },
+  ls: { name: 'Lesotho', capital: 'Maseru', talent: '20,000+' },
+  er: { name: 'Eritrea', capital: 'Asmara', talent: '18,000+' },
+  dj: { name: 'Djibouti', capital: 'Djibouti', talent: '12,000+' },
+  ss: { name: 'South Sudan', capital: 'Juba', talent: '22,000+' },
+  st: { name: 'São Tomé and Príncipe', capital: 'São Tomé', talent: '5,000+' },
+};
+
+// City markers mapped to highcharts coordinate space
 const cities = [
-  { name: 'Cairo', x: 510, y: 78, label: 'Cairo', textAnchor: 'start', dx: 10, dy: 3 },
-  { name: 'Lagos', x: 245, y: 287, label: 'Lagos', textAnchor: 'start', dx: 10, dy: 3 },
-  { name: 'Accra', x: 205, y: 298, label: 'Accra (Yango)', textAnchor: 'start', dx: 10, dy: 7 },
-  { name: 'Nairobi', x: 535, y: 360, label: 'Nairobi', textAnchor: 'start', dx: 10, dy: 3 },
-  { name: 'Kigali', x: 468, y: 355, label: 'Kigali', textAnchor: 'end', dx: -10, dy: 3 },
-  { name: 'Dakar', x: 70, y: 210, label: 'Dakar (Yango)', textAnchor: 'end', dx: -10, dy: 3 },
-  { name: 'Kampala', x: 485, y: 340, label: 'Kampala', textAnchor: 'start', dx: 10, dy: -5 },
-  { name: 'Cape Town', x: 365, y: 630, label: 'Cape Town', textAnchor: 'start', dx: 10, dy: 3 },
-  
-  // Yango Fellowship Specific Hubs
-  { name: 'Abidjan', x: 185, y: 295, label: 'Abidjan (Yango)', textAnchor: 'end', dx: -10, dy: -6 },
-  { name: 'Lusaka', x: 445, y: 492, label: 'Lusaka (Yango)', textAnchor: 'end', dx: -10, dy: 3 },
-  { name: 'Maputo', x: 490, y: 563, label: 'Maputo (Yango)', textAnchor: 'start', dx: 10, dy: 3 },
-  { name: 'Addis Ababa', x: 535, y: 275, label: 'Addis Ababa (Yango)', textAnchor: 'start', dx: 10, dy: 3 },
+  { name: 'Cairo', x: 510, y: 78, label: 'Cairo', textAnchor: 'start', dx: 10, dy: 3, countryId: 'eg' },
+  { name: 'Lagos', x: 245, y: 287, label: 'Lagos', textAnchor: 'start', dx: 10, dy: 3, countryId: 'ng' },
+  { name: 'Accra', x: 205, y: 298, label: 'Accra (Yango)', textAnchor: 'start', dx: 10, dy: 7, countryId: 'gh' },
+  { name: 'Nairobi', x: 535, y: 360, label: 'Nairobi', textAnchor: 'start', dx: 10, dy: 3, countryId: 'ke' },
+  { name: 'Kigali', x: 468, y: 355, label: 'Kigali', textAnchor: 'end', dx: -10, dy: 3, countryId: 'rw' },
+  { name: 'Dakar', x: 70, y: 210, label: 'Dakar (Yango)', textAnchor: 'end', dx: -10, dy: 3, countryId: 'sn' },
+  { name: 'Kampala', x: 485, y: 340, label: 'Kampala', textAnchor: 'start', dx: 10, dy: -5, countryId: 'ug' },
+  { name: 'Cape Town', x: 365, y: 630, label: 'Cape Town', textAnchor: 'start', dx: 10, dy: 3, countryId: 'za' },
+  { name: 'Abidjan', x: 185, y: 295, label: 'Abidjan (Yango)', textAnchor: 'end', dx: -10, dy: -6, countryId: 'ci' },
+  { name: 'Lusaka', x: 445, y: 492, label: 'Lusaka (Yango)', textAnchor: 'end', dx: -10, dy: 3, countryId: 'zm' },
+  { name: 'Maputo', x: 490, y: 563, label: 'Maputo (Yango)', textAnchor: 'start', dx: 10, dy: 3, countryId: 'mz' },
+  { name: 'Addis Ababa', x: 535, y: 275, label: 'Addis Ababa (Yango)', textAnchor: 'start', dx: 10, dy: 3, countryId: 'et' },
 ];
 
-// Connection arcs between tech hubs
 const arcs: [number, number][] = [
   [0, 1],   // Cairo -> Lagos
   [1, 2],   // Lagos -> Accra
@@ -38,38 +88,36 @@ const arcs: [number, number][] = [
   [10, 7],  // Maputo -> Cape Town
 ];
 
-// Extra pulsing data nodes inside the continent to make the map feel alive
 const pulseNodes = [
-  { x: 510, y: 78 },   // Cairo
-  { x: 245, y: 287 },  // Lagos
-  { x: 205, y: 298 },  // Accra
-  { x: 535, y: 360 },  // Nairobi
-  { x: 468, y: 355 },  // Kigali
-  { x: 70,  y: 210 },  // Dakar
-  { x: 485, y: 340 },  // Kampala
-  { x: 365, y: 630 },  // Cape Town
-  { x: 185, y: 295 },  // Abidjan
-  { x: 445, y: 492 },  // Lusaka
-  { x: 490, y: 563 },  // Maputo
-  { x: 535, y: 275 },  // Addis Ababa
-  { x: 150, y: 150 },  // West Sahara/Mauritania area
-  { x: 220, y: 180 },  // Mali area
-  { x: 310, y: 140 },  // Algeria/Libya area
-  { x: 430, y: 110 },  // Egypt/Sudan border area
-  { x: 340, y: 220 },  // Niger area
-  { x: 390, y: 240 },  // Chad area
-  { x: 480, y: 220 },  // Sudan area
-  { x: 580, y: 270 },  // Somalia area
-  { x: 330, y: 330 },  // Gabon/Congo area
-  { x: 400, y: 350 },  // DRC area
-  { x: 440, y: 440 },  // Zambia area
-  { x: 480, y: 490 },  // Zimbabwe/Mozambique area
-  { x: 410, y: 550 },  // Botswana area
-  { x: 370, y: 500 },  // Namibia area
-  { x: 460, y: 590 },  // South Africa northeast area
+  { x: 510, y: 78, countryId: 'eg' },
+  { x: 245, y: 287, countryId: 'ng' },
+  { x: 205, y: 298, countryId: 'gh' },
+  { x: 535, y: 360, countryId: 'ke' },
+  { x: 468, y: 355, countryId: 'rw' },
+  { x: 70,  y: 210, countryId: 'sn' },
+  { x: 485, y: 340, countryId: 'ug' },
+  { x: 365, y: 630, countryId: 'za' },
+  { x: 185, y: 295, countryId: 'ci' },
+  { x: 445, y: 492, countryId: 'zm' },
+  { x: 490, y: 563, countryId: 'mz' },
+  { x: 535, y: 275, countryId: 'et' },
+  { x: 150, y: 150, countryId: 'mr' },
+  { x: 220, y: 180, countryId: 'ml' },
+  { x: 310, y: 140, countryId: 'dz' },
+  { x: 430, y: 110, countryId: 'ly' },
+  { x: 340, y: 220, countryId: 'ne' },
+  { x: 390, y: 240, countryId: 'td' },
+  { x: 480, y: 220, countryId: 'sd' },
+  { x: 580, y: 270, countryId: 'so' },
+  { x: 330, y: 330, countryId: 'cg' },
+  { x: 400, y: 350, countryId: 'cd' },
+  { x: 440, y: 440, countryId: 'zm' },
+  { x: 480, y: 490, countryId: 'zw' },
+  { x: 410, y: 550, countryId: 'bw' },
+  { x: 370, y: 500, countryId: 'na' },
+  { x: 460, y: 590, countryId: 'za' },
 ];
 
-// Build a quadratic bezier arc path between two cities
 function arcPath(from: typeof cities[0], to: typeof cities[0]): string {
   const x1 = from.x;
   const y1 = from.y;
@@ -82,7 +130,7 @@ function arcPath(from: typeof cities[0], to: typeof cities[0]): string {
   const len = Math.sqrt(dx * dx + dy * dy);
   const nx = -dy / len;
   const ny = dx / len;
-  const bulge = len * 0.22; // how much the arc bows out
+  const bulge = len * 0.22;
   const cx = mx + nx * bulge;
   const cy = my + ny * bulge;
   return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
@@ -90,10 +138,22 @@ function arcPath(from: typeof cities[0], to: typeof cities[0]): string {
 
 export const HeroMap: React.FC = () => {
   const [activeNodes, setActiveNodes] = useState<Set<number>>(new Set());
+  
+  // Interactive tooltips and zooming states
+  const [selectedCountry, setSelectedCountry] = useState<typeof countryData[string] | null>(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartDist = useRef<number | null>(null);
+  const touchStartScale = useRef<number>(1);
 
   // Stagger pulses so they feel organic and dynamic
   const pickRandomNodes = useCallback(() => {
-    const numActive = Math.floor(Math.random() * 5) + 4; // 4-8 active
+    const numActive = Math.floor(Math.random() * 5) + 4;
     const newActive = new Set<number>();
     for (let i = 0; i < numActive; i++) {
       const idx = Math.floor(Math.random() * pulseNodes.length);
@@ -108,302 +168,641 @@ export const HeroMap: React.FC = () => {
     return () => clearInterval(interval);
   }, [pickRandomNodes]);
 
+  // Zoom & Pan Handlers
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const zoomFactor = 1.1;
+    let newScale = scale;
+    if (e.deltaY < 0) {
+      newScale = Math.min(scale * zoomFactor, 5);
+    } else {
+      newScale = Math.max(scale / zoomFactor, 1);
+    }
+    setScale(newScale);
+    if (newScale === 1) {
+      setOffset({ x: 0, y: 0 });
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (scale > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - offset.x, y: e.clientY - offset.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging && scale > 1) {
+      setOffset({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Touch Support for Zoom / Pan
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchStartDist.current = Math.sqrt(dx * dx + dy * dy);
+      touchStartScale.current = scale;
+    } else if (e.touches.length === 1 && scale > 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX - offset.x, y: e.touches[0].clientY - offset.y });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && touchStartDist.current !== null) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const newScale = Math.max(1, Math.min(touchStartScale.current * (dist / touchStartDist.current), 5));
+      setScale(newScale);
+      if (newScale === 1) {
+        setOffset({ x: 0, y: 0 });
+      }
+    } else if (e.touches.length === 1 && isDragging && scale > 1) {
+      setOffset({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    touchStartDist.current = null;
+  };
+
+  // Tooltip position calculator
+  const triggerTooltip = (clientX: number, clientY: number, countryId: string) => {
+    const data = countryData[countryId];
+    if (data) {
+      if (containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        setTooltipPos({
+          x: clientX - containerRect.left,
+          y: clientY - containerRect.top - 100, // Show pop-up slightly above the pointer
+        });
+      }
+      setSelectedCountry(data);
+    }
+  };
+
+  const handleCountryInteraction = (e: React.MouseEvent<SVGPathElement> | React.TouchEvent<SVGPathElement>, countryId: string) => {
+    const clientX = 'clientX' in e ? e.clientX : e.touches[0].clientX;
+    const clientY = 'clientY' in e ? e.clientY : e.touches[0].clientY;
+    triggerTooltip(clientX, clientY, countryId);
+  };
+
+  const handleMarkerInteraction = (e: React.MouseEvent<SVGGElement>, countryId: string) => {
+    triggerTooltip(e.clientX, e.clientY, countryId);
+  };
+
   return (
     <div
-      className="hero-map-container"
-      aria-hidden="true"
+      ref={containerRef}
+      className="hero-map-wrapper"
       style={{
         width: '100%',
-        height: '100%',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
         position: 'relative',
       }}
     >
-      <style>{`
-        /* ---- repeating dots pattern ---- */
-        .hm-pattern-dot {
-          fill: var(--color-text-secondary);
-          opacity: 0.16;
-        }
-        body.light-theme .hm-pattern-dot {
-          fill: var(--color-text-primary);
-          opacity: 0.58;
-        }
-
-        /* ---- country outlines ---- */
-        .hm-country-border {
-          stroke: var(--color-accent);
-          stroke-width: 0.4px;
-          stroke-opacity: 0.08;
-          fill: none;
-        }
-        body.light-theme .hm-country-border {
-          stroke-opacity: 0.35;
-          stroke-width: 0.5px;
-        }
-
-        .hm-continent-outline {
-          stroke: var(--color-border);
-          stroke-width: 0.8px;
-          stroke-opacity: 0.28;
-          fill: none;
-        }
-        body.light-theme .hm-continent-outline {
-          stroke-opacity: 0.65;
-          stroke-width: 1px;
-        }
-
-        /* ---- pulse dots ---- */
-        .hm-dot {
-          fill: var(--color-accent);
-          opacity: 0.15;
-          transition: fill 0.6s ease, opacity 0.6s ease, r 0.6s ease;
-        }
-        body.light-theme .hm-dot {
-          opacity: 0.5;
-        }
-        .hm-dot.active {
-          fill: var(--color-accent);
-          opacity: 0.9;
-          animation: hm-pulse 2.5s ease-in-out infinite;
-        }
-        body.light-theme .hm-dot.active {
-          opacity: 0.95;
-        }
-        @keyframes hm-pulse {
-          0%, 100% { r: 2px; opacity: 0.35; }
-          50%      { r: 5px; opacity: 0.9; }
-        }
-
-        /* ---- city markers ---- */
-        .hm-city-ring {
-          fill: none;
-          stroke: var(--color-accent);
-          stroke-width: 1.2;
-          opacity: 0.6;
-          animation: hm-ring 3s ease-in-out infinite;
-        }
-        body.light-theme .hm-city-ring {
-          stroke-width: 1.4;
-          opacity: 0.85;
-        }
-        @keyframes hm-ring {
-          0%, 100% { r: 5; opacity: 0.6; }
-          50%      { r: 8; opacity: 0.22; }
-        }
-
-        /* ---- Yango Fellowship special markers ---- */
-        .hm-city-ring.yango-ring {
-          stroke: var(--color-accent);
-          stroke-width: 1.5;
-          animation: hm-yango-pulse 2.5s ease-in-out infinite;
-        }
-        .hm-city-ring.yango-ring-outer {
-          stroke: var(--color-accent);
-          stroke-width: 0.8;
-          opacity: 0.35;
-          animation: hm-yango-outer 3.5s ease-in-out infinite;
-        }
-        @keyframes hm-yango-pulse {
-          0%, 100% { r: 5; opacity: 0.8; }
-          50%      { r: 9; opacity: 0.3; }
-        }
-        @keyframes hm-yango-outer {
-          0%, 100% { r: 8; opacity: 0.35; }
-          50%      { r: 14; opacity: 0.05; }
-        }
-
-        .hm-city-core {
-          fill: var(--color-accent);
-        }
-        .hm-city-core.yango-core {
-          filter: drop-shadow(0 0 2px var(--color-accent));
-        }
-        .hm-city-label {
-          fill: var(--color-text-secondary);
-          font-family: var(--font-body), sans-serif;
-          font-size: 9.5px;
-          font-weight: 600;
-          letter-spacing: 0.04em;
-          opacity: 0.85;
-          pointer-events: none;
-        }
-        body.light-theme .hm-city-label {
-          fill: var(--color-text-primary);
-          font-weight: 700;
-          opacity: 0.95;
-        }
-
-        /* ---- arcs ---- */
-        .hm-arc {
-          fill: none;
-          stroke: var(--color-accent);
-          stroke-width: 1;
-          opacity: 0.14;
-          stroke-dasharray: 4 4;
-          animation: hm-dash 25s linear infinite;
-        }
-        body.light-theme .hm-arc {
-          opacity: 0.28;
-          stroke-width: 1.1;
-        }
-        @keyframes hm-dash {
-          to { stroke-dashoffset: -200; }
-        }
-
-        /* ---- travelling dot along arcs ---- */
-        .hm-traveller {
-          fill: var(--color-accent);
-          opacity: 0.9;
-          filter: drop-shadow(0 0 2px var(--color-accent));
-        }
-
-        /* ---- smooth map viewport entrance animation ---- */
-        @keyframes hm-fade-in-up {
-          from {
-            opacity: 0;
-            transform: scale(0.96) translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-        .hero-map-viewport {
-          animation: hm-fade-in-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-      `}</style>
-
-      <svg
-        viewBox="50 35 580 610"
-        width="100%"
-        height="100%"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ overflow: 'visible', maxWidth: '100%', maxHeight: '100%', display: 'block', margin: 'auto' }}
+      <div
+        className="hero-map-container"
+        aria-hidden="true"
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          width: '100%',
+          height: '100%',
+          minHeight: '380px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
+          overflow: 'hidden',
+          touchAction: 'none',
+        }}
       >
-        <defs>
-          {/* Hardware-accelerated repeating dot grid pattern */}
-          <pattern id="map-dot-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
-            <circle cx="5" cy="5" r="1.15" className="hm-pattern-dot" />
-          </pattern>
-          
-          {/* Mask containing all country borders to limit dots exactly to land mass */}
-          <mask id="map-africa-mask">
-            <rect x="-10" y="-10" width="730" height="750" fill="#000000" />
-            <g fill="#ffffff">
+        <style>{`
+          /* ---- repeating dots pattern ---- */
+          .hm-pattern-dot {
+            fill: var(--color-text-secondary);
+            opacity: 0.16;
+          }
+          body.light-theme .hm-pattern-dot {
+            fill: var(--color-text-primary);
+            opacity: 0.58;
+          }
+
+          /* ---- country outlines ---- */
+          .hm-country-border {
+            stroke: var(--color-accent);
+            stroke-width: 0.4px;
+            stroke-opacity: 0.08;
+            fill: none;
+          }
+          body.light-theme .hm-country-border {
+            stroke-opacity: 0.35;
+            stroke-width: 0.5px;
+          }
+
+          .hm-country-interactive {
+            fill: transparent;
+            cursor: pointer;
+            transition: fill 0.3s ease;
+          }
+          .hm-country-interactive:hover {
+            fill: var(--color-accent);
+            fill-opacity: 0.05;
+          }
+
+          .hm-continent-outline {
+            stroke: var(--color-border);
+            stroke-width: 0.8px;
+            stroke-opacity: 0.28;
+            fill: none;
+          }
+          body.light-theme .hm-continent-outline {
+            stroke-opacity: 0.65;
+            stroke-width: 1px;
+          }
+
+          /* ---- pulse dots ---- */
+          .hm-dot {
+            fill: var(--color-accent);
+            opacity: 0.15;
+            transition: fill 0.6s ease, opacity 0.6s ease, r 0.6s ease;
+          }
+          body.light-theme .hm-dot {
+            opacity: 0.5;
+          }
+          .hm-dot.active {
+            fill: var(--color-accent);
+            opacity: 0.9;
+            animation: hm-pulse 2.5s ease-in-out infinite;
+          }
+          body.light-theme .hm-dot.active {
+            opacity: 0.95;
+          }
+          @keyframes hm-pulse {
+            0%, 100% { r: 2px; opacity: 0.35; }
+            50%      { r: 5px; opacity: 0.9; }
+          }
+
+          /* ---- city markers ---- */
+          .hm-city-ring {
+            fill: none;
+            stroke: var(--color-accent);
+            stroke-width: 1.2;
+            opacity: 0.6;
+            animation: hm-ring 3s ease-in-out infinite;
+          }
+          body.light-theme .hm-city-ring {
+            stroke-width: 1.4;
+            opacity: 0.85;
+          }
+          @keyframes hm-ring {
+            0%, 100% { r: 5; opacity: 0.6; }
+            50%      { r: 8; opacity: 0.22; }
+          }
+
+          /* ---- Yango Fellowship special markers ---- */
+          .hm-city-ring.yango-ring {
+            stroke: var(--color-accent);
+            stroke-width: 1.5;
+            animation: hm-yango-pulse 2.5s ease-in-out infinite;
+          }
+          .hm-city-ring.yango-ring-outer {
+            stroke: var(--color-accent);
+            stroke-width: 0.8;
+            opacity: 0.35;
+            animation: hm-yango-outer 3.5s ease-in-out infinite;
+          }
+          @keyframes hm-yango-pulse {
+            0%, 100% { r: 5; opacity: 0.8; }
+            50%      { r: 9; opacity: 0.3; }
+          }
+          @keyframes hm-yango-outer {
+            0%, 100% { r: 8; opacity: 0.35; }
+            50%      { r: 14; opacity: 0.05; }
+          }
+
+          .hm-city-core {
+            fill: var(--color-accent);
+          }
+          .hm-city-core.yango-core {
+            filter: drop-shadow(0 0 2px var(--color-accent));
+          }
+          .hm-city-label {
+            fill: var(--color-text-secondary);
+            font-family: var(--font-body), sans-serif;
+            font-size: 9.5px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            opacity: 0.85;
+            pointer-events: none;
+          }
+          body.light-theme .hm-city-label {
+            fill: var(--color-text-primary);
+            font-weight: 700;
+            opacity: 0.95;
+          }
+
+          /* ---- arcs ---- */
+          .hm-arc {
+            fill: none;
+            stroke: var(--color-accent);
+            stroke-width: 1;
+            opacity: 0.14;
+            stroke-dasharray: 4 4;
+            animation: hm-dash 25s linear infinite;
+          }
+          body.light-theme .hm-arc {
+            opacity: 0.28;
+            stroke-width: 1.1;
+          }
+          @keyframes hm-dash {
+            to { stroke-dashoffset: -200; }
+          }
+
+          /* ---- travelling dot along arcs ---- */
+          .hm-traveller {
+            fill: var(--color-accent);
+            opacity: 0.9;
+            filter: drop-shadow(0 0 2px var(--color-accent));
+          }
+
+          /* ---- smooth map viewport entrance animation ---- */
+          @keyframes hm-fade-in-up {
+            from {
+              opacity: 0;
+              transform: scale(0.96) translateY(12px);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+          }
+          .hero-map-viewport {
+            animation: hm-fade-in-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+        `}</style>
+
+        {/* Floating Zoom Controls */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+          zIndex: 10,
+        }}>
+          <button
+            onClick={() => setScale(s => Math.min(s * 1.3, 5))}
+            style={{
+              width: '32px',
+              height: '32px',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '4px',
+              color: 'var(--color-text-primary)',
+              fontSize: '1.1rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backdropFilter: 'blur(4px)',
+              transition: 'background-color 0.2s',
+            }}
+            title="Zoom In"
+          >
+            +
+          </button>
+          <button
+            onClick={() => {
+              const newScale = Math.max(scale / 1.3, 1);
+              setScale(newScale);
+              if (newScale === 1) setOffset({ x: 0, y: 0 });
+            }}
+            style={{
+              width: '32px',
+              height: '32px',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '4px',
+              color: 'var(--color-text-primary)',
+              fontSize: '1.1rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backdropFilter: 'blur(4px)',
+              transition: 'background-color 0.2s',
+            }}
+            title="Zoom Out"
+          >
+            -
+          </button>
+          {scale > 1 && (
+            <button
+              onClick={() => {
+                setScale(1);
+                setOffset({ x: 0, y: 0 });
+              }}
+              style={{
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '4px',
+                color: 'var(--color-text-primary)',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backdropFilter: 'blur(4px)',
+                transition: 'background-color 0.2s',
+              }}
+              title="Reset Zoom"
+            >
+              ⟲
+            </button>
+          )}
+        </div>
+
+        {/* Premium Statistics Card Tooltip/Pop-up */}
+        {selectedCountry && (
+          <div
+            style={{
+              position: 'absolute',
+              left: `${Math.max(10, Math.min(tooltipPos.x - 100, (containerRef.current?.getBoundingClientRect().width || 600) - 210))}px`,
+              top: `${Math.max(10, Math.min(tooltipPos.y, (containerRef.current?.getBoundingClientRect().height || 500) - 150))}px`,
+              width: '200px',
+              backgroundColor: 'rgba(10, 20, 15, 0.92)',
+              border: '1.5px solid var(--color-accent)',
+              borderRadius: '8px',
+              padding: '12px',
+              color: 'white',
+              boxShadow: '0 8px 32px rgba(0, 255, 102, 0.12)',
+              backdropFilter: 'blur(8px)',
+              zIndex: 100,
+              pointerEvents: 'auto',
+              animation: 'hm-fade-in-up 0.2s ease-out forwards',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontWeight: 'bold', color: 'white', fontSize: '0.95rem' }}>{selectedCountry.name}</span>
+              <button
+                onClick={() => setSelectedCountry(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem',
+                  padding: '2px',
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '4px' }}>
+              Capital: <strong style={{ color: 'white' }}>{selectedCountry.capital}</strong>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+              Est. Talent: <strong style={{ color: 'var(--color-accent)' }}>{selectedCountry.talent}</strong>
+            </div>
+          </div>
+        )}
+
+        <svg
+          viewBox="70 45 500 595"
+          width="100%"
+          height="100%"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ overflow: 'visible', maxWidth: '100%', maxHeight: '100%', display: 'block', margin: 'auto' }}
+        >
+          <defs>
+            <pattern id="map-dot-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+              <circle cx="5" cy="5" r="1.15" className="hm-pattern-dot" />
+            </pattern>
+            
+            <mask id="map-africa-mask">
+              <rect x="-10" y="-10" width="730" height="750" fill="#000000" />
+              <g fill="#ffffff">
+                {africaPaths.map((country) => (
+                  <path key={country.id} d={country.d} />
+                ))}
+              </g>
+            </mask>
+          </defs>
+
+          {/* Group containing all zoomable and pannable elements */}
+          <g transform={`translate(${offset.x}, ${offset.y}) scale(${scale})`} style={{ transformOrigin: '290px 305px', transition: isDragging ? 'none' : 'transform 0.15s ease-out' }}>
+            {/* Dotted grid representation of Africa continent */}
+            <rect
+              x="-5"
+              y="-5"
+              width="720"
+              height="740"
+              fill="url(#map-dot-pattern)"
+              mask="url(#map-africa-mask)"
+            />
+
+            {/* Subtle, glowing geopolitical country outlines */}
+            <g className="hm-country-border">
               {africaPaths.map((country) => (
-                <path key={country.id} d={country.d} />
+                <path key={`border-${country.id}`} d={country.d} />
               ))}
             </g>
-          </mask>
-        </defs>
 
-        {/* Dotted grid representation of Africa continent */}
-        <rect
-          x="-5"
-          y="-5"
-          width="720"
-          height="740"
-          fill="url(#map-dot-pattern)"
-          mask="url(#map-africa-mask)"
-        />
-
-        {/* Subtle, glowing geopolitical country outlines */}
-        <g className="hm-country-border">
-          {africaPaths.map((country) => (
-            <path key={`border-${country.id}`} d={country.d} />
-          ))}
-        </g>
-
-        {/* Outer silhouette outline to define the continent shape clearly */}
-        <g className="hm-continent-outline">
-          {africaPaths.map((country) => (
-            <path key={`outline-${country.id}`} d={country.d} />
-          ))}
-        </g>
-
-        {/* Pulsing telemetry data nodes */}
-        {pulseNodes.map((node, idx) => {
-          const isActive = activeNodes.has(idx);
-          return (
-            <circle
-              key={`pulse-${idx}`}
-              cx={node.x}
-              cy={node.y}
-              r={isActive ? 4.5 : 2}
-              className={`hm-dot${isActive ? ' active' : ''}`}
-            />
-          );
-        })}
-
-        {/* Connection arcs with travelling data dots */}
-        {arcs.map(([fi, ti], idx) => {
-          const from = cities[fi];
-          const to = cities[ti];
-          const d = arcPath(from, to);
-          const pathId = `arc-${idx}`;
-          return (
-            <g key={pathId}>
-              <path id={pathId} d={d} className="hm-arc" />
-              <circle r="3" className="hm-traveller">
-                <animateMotion
-                  dur={`${4.5 + idx * 0.8}s`}
-                  repeatCount="indefinite"
-                  path={d}
+            {/* Interactive invisible fill paths for hover/tap targeting */}
+            <g>
+              {africaPaths.map((country) => (
+                <path
+                  key={`interactive-${country.id}`}
+                  d={country.d}
+                  className="hm-country-interactive"
+                  onMouseMove={(e) => handleCountryInteraction(e, country.id)}
+                  onTouchStart={(e) => handleCountryInteraction(e, country.id)}
                 />
-              </circle>
+              ))}
             </g>
-          );
-        })}
 
-        {/* City markers & custom label alignments */}
-        {cities.map((city) => {
-          const isYangoHub = city.label.includes('Yango');
-          return (
-            <g key={city.name}>
-              {isYangoHub ? (
-                <>
-                  {/* Double pulsing rings for Yango hubs */}
-                  <circle
-                    cx={city.x}
-                    cy={city.y}
-                    className="hm-city-ring yango-ring"
-                    style={{ animationDelay: `${Math.random() * 2}s` }}
-                  />
-                  <circle
-                    cx={city.x}
-                    cy={city.y}
-                    className="hm-city-ring yango-ring-outer"
-                    style={{ animationDelay: `${Math.random() * 2}s` }}
-                  />
-                  <circle cx={city.x} cy={city.y} r={2.5} className="hm-city-core yango-core" />
-                </>
-              ) : (
-                <>
-                  <circle
-                    cx={city.x}
-                    cy={city.y}
-                    r={5}
-                    className="hm-city-ring"
-                    style={{ animationDelay: `${Math.random() * 2}s` }}
-                  />
-                  <circle cx={city.x} cy={city.y} r={2.5} className="hm-city-core" />
-                </>
-              )}
-              <text
-                x={city.x + city.dx}
-                y={city.y + city.dy}
-                textAnchor={city.textAnchor as "start" | "end" | "middle" | "inherit"}
-                className="hm-city-label"
-              >
-                {city.label}
-              </text>
+            {/* Outer silhouette outline to define the continent shape clearly */}
+            <g className="hm-continent-outline">
+              {africaPaths.map((country) => (
+                <path key={`outline-${country.id}`} d={country.d} />
+              ))}
             </g>
-          );
-        })}
-      </svg>
+
+            {/* Pulsing telemetry data nodes */}
+            {pulseNodes.map((node, idx) => {
+              const isActive = activeNodes.has(idx);
+              return (
+                <circle
+                  key={`pulse-${idx}`}
+                  cx={node.x}
+                  cy={node.y}
+                  r={isActive ? 4.5 : 2}
+                  className={`hm-dot${isActive ? ' active' : ''}`}
+                />
+              );
+            })}
+
+            {/* Connection arcs with travelling data dots */}
+            {arcs.map(([fi, ti], idx) => {
+              const from = cities[fi];
+              const to = cities[ti];
+              const d = arcPath(from, to);
+              const pathId = `arc-${idx}`;
+              return (
+                <g key={pathId}>
+                  <path id={pathId} d={d} className="hm-arc" />
+                  <circle r="3" className="hm-traveller">
+                    <animateMotion
+                      dur={`${4.5 + idx * 0.8}s`}
+                      repeatCount="indefinite"
+                      path={d}
+                    />
+                  </circle>
+                </g>
+              );
+            })}
+
+            {/* City markers & custom label alignments */}
+            {cities.map((city) => {
+              const isYangoHub = city.label.includes('Yango');
+              return (
+                <g
+                  key={city.name}
+                  style={{ cursor: 'pointer' }}
+                  onMouseEnter={(e) => handleMarkerInteraction(e, city.countryId)}
+                >
+                  {isYangoHub ? (
+                    <>
+                      <circle
+                        cx={city.x}
+                        cy={city.y}
+                        className="hm-city-ring yango-ring"
+                        style={{ animationDelay: `${Math.random() * 2}s` }}
+                      />
+                      <circle
+                        cx={city.x}
+                        cy={city.y}
+                        className="hm-city-ring yango-ring-outer"
+                        style={{ animationDelay: `${Math.random() * 2}s` }}
+                      />
+                      <circle cx={city.x} cy={city.y} r={2.5} className="hm-city-core yango-core" />
+                    </>
+                  ) : (
+                    <>
+                      <circle
+                        cx={city.x}
+                        cy={city.y}
+                        r={5}
+                        className="hm-city-ring"
+                        style={{ animationDelay: `${Math.random() * 2}s` }}
+                      />
+                      <circle cx={city.x} cy={city.y} r={2.5} className="hm-city-core" />
+                    </>
+                  )}
+                  <text
+                    x={city.x + city.dx}
+                    y={city.y + city.dy}
+                    textAnchor={city.textAnchor as "start" | "end" | "middle" | "inherit"}
+                    className="hm-city-label"
+                  >
+                    {city.label}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+      </div>
+
+      {/* Map Legend and Collaboration Prompt Section */}
+      <div style={{
+        width: '100%',
+        maxWidth: '700px',
+        marginTop: '20px',
+        padding: '15px var(--spacing-md)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        gap: '12px'
+      }}>
+        {/* Subtle Dots Legend */}
+        <div style={{
+          display: 'flex',
+          gap: '24px',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '0.85rem',
+          color: 'var(--color-text-secondary)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--color-accent)',
+              boxShadow: '0 0 8px var(--color-accent)',
+              display: 'inline-block',
+              animation: 'hm-pulse 2s infinite'
+            }} />
+            <span>— BorderLine presence</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--color-text-secondary)',
+              opacity: 0.5,
+              display: 'inline-block'
+            }} />
+            <span>— Planned expansion</span>
+          </div>
+        </div>
+
+        {/* Vision & Action Prompt */}
+        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+          <p style={{ color: 'var(--color-text-primary)', fontWeight: '500', marginBottom: '4px' }}>
+            Our vision is to empower cross-African work collaboration.
+          </p>
+          <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+            Tap, zoom in and tap the countries to learn more.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
