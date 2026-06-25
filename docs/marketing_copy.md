@@ -34,10 +34,10 @@ This section uses our survey statistics to validate the problem statement and ho
 
 ## 3. Block 3: The BorderLine Solution (Feature Copy)
 
-### Feature 1: The AI Portfolio Builder
-* **Headline**: **"AI-verified portfolios that prove capability, not credentials."**
+### Feature 1: The AI & Peer-Verified Portfolio Builder
+* **Headline**: **"AI-audited & peer-verified portfolios that prove capability, not credentials."**
 * **Description**: 
-  - *No more generic text descriptions. Paste your GitHub repo or upload your project notes. Our AI parsing engine analyzes your files, tags your verified technical skills, and structures your code into a professional case study highlighting role responsibilities and technical impact.*
+  - *No more generic text descriptions or empty claims. Paste your GitHub repo or upload your project notes. Our AI parsing engine analyzes your files, tags your technical skills, and structures your work into a professional case study. Once published, your peers and fellow platform developers review and endorse your project, securing a combined trust seal that employers can rely on.*
 
 ### Feature 2: Low-Data WhatsApp Assistant
 * **Headline**: **"Stay connected to opportunity — even on 2G."**
@@ -49,11 +49,12 @@ This section uses our survey statistics to validate the problem statement and ho
 ## 4. Block 4: Target Personas Value Props
 
 ### 👥 For Technologists (Students & Junior Freelancers)
-* **Turn projects into proof**: AI converts your work into structured case studies employers trust.
+* **Turn projects into proof**: AI + peer reviews convert your work into structured, validated case studies employers trust.
+* **Proactive AI Applications**: Let our AI agent match and apply to relevant micro-gigs on your behalf in real-time, meaning you never miss an opportunity.
 * **Access without infrastructure**: Update your profile, receive matches, and get paid via WhatsApp and Mobile Money.
 * **Earn from day one**: Connect with micro-gigs, startup contracts, and global remote roles.
 
 ### 🏢 For Recruiters & Startups
-* **Verified capability, zero vetting overhead**: AI-structured case studies replace unformatted repos and text resumes.
+* **Verified capability, zero vetting overhead**: AI-structured and peer-vouched case studies replace unformatted repos and text resumes.
 * **Hire cross-border, compliantly**: Localized payments, contract templates, and compliance built in.
 * **Tap a pipeline traditional platforms miss**: 70% of Africa's digital workforce has zero presence on legacy hiring platforms.

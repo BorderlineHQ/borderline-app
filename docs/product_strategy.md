@@ -16,15 +16,17 @@ We will scale in three distinct phases:
 
 ## 2. Core Feature Set (MVP & Beyond)
 
-### 🚀 AI-Driven Portfolio Builder (MVP Priority)
-Bridges the gap for early-career talent by providing proof of skill.
+### 🚀 AI & Peer-Verified Portfolio Builder (MVP Priority)
+Bridges the gap for early-career talent by providing robust proof of skill.
 * **Project Aggregation**: Users input class projects, hackathon code repositories, side hustles, or design concepts.
 * **AI Contextualizer**: A cloud-hosted Large Language Model (LLM) analyzes their raw input and automatically structures it into professional, result-oriented case studies. It highlights technical competencies, role responsibilities, and project impact.
+* **Dual-Engine Trust Verification**: Skills are not just validated by automated AI audits. Once compiled, projects enter a community-driven peer-review network where other verified users on the platform review, test, and endorse the code/design assets to award a combined AI & Peer-Verified trust stamp.
 * **Proof-of-Skill Generation**: Generates dynamic, shareable digital portfolios that visually emphasize what the user can build rather than where they have previously worked.
 
 ### 🧠 Cloud-Powered Intelligence Infrastructure
 * **Smart Skill Extraction**: The AI parses text, code, or design uploads to automatically tag users with verified skill sets.
 * **Dynamic Smart-Matching**: A cloud-based recommendation engine aligns talent profiles with targeted micro-tasks, local startup projects, and global remote entry-level roles.
+* **Proactive AI Job Applications**: The recommendation engine doesn't just display matching gigs — it proactively submits applicant portfolios to recruiters on the builder's behalf whenever a high-percentile match is detected, guaranteeing talent never misses an opportunity.
 
 ### 💬 The WhatsApp Extension Layer
 Acts as a critical accessibility bridge for users under strict local mobile data boundaries:

@@ -105,23 +105,11 @@ const StatCard: React.FC<{ target: number; suffix?: string; desc: string }> = ({
 };
 
 
-// Reusable partner logo component that fetches from Clearbit and falls back to text on load error
-const PartnerLogo: React.FC<{ domain: string; name: string }> = ({ domain, name }) => {
-  const [error, setError] = useState(false);
-  const logoUrl = `https://logo.clearbit.com/${domain}`;
-
+// Reusable partner logo component that displays the text name of the partner
+const PartnerLogo: React.FC<{ domain: string; name: string }> = ({ name }) => {
   return (
     <div className="partner-logo-item" title={name}>
-      {!error ? (
-        <img
-          src={logoUrl}
-          alt={name}
-          onError={() => setError(true)}
-          className="partner-logo-img"
-        />
-      ) : (
-        <span className="partner-logo-text">{name}</span>
-      )}
+      <span className="partner-logo-text">{name}</span>
     </div>
   );
 };
@@ -134,126 +122,132 @@ export default function Home() {
 
   const showcaseProfiles = [
     {
-      id: 'kwame',
-      fullName: 'Kwame Mensah',
-      avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150',
-      country: 'Ghana',
-      techFocus: 'Senior Software Engineer',
-      skills: ['React', 'Node.js', 'AWS', 'System Architecture'],
-      percentile: '98th Percentile',
-      buildScore: '2,480',
-      projectsCount: '14 Verified',
-      bio: 'Experienced full-stack engineer specializing in cloud systems design and reliable fintech APIs. Leading development teams across Accra.',
+      id: 'chidi',
+      fullName: 'Chidi Chikwe',
+      avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=200',
+      country: 'Nigeria',
+      techFocus: 'Junior Frontend Developer',
+      skills: ['React', 'TypeScript', 'TailwindCSS', 'Vite', 'HTML5', 'CSS3'],
+      percentile: '92nd Percentile',
+      buildScore: '1,240',
+      projectsCount: '3 Verified',
+      peerVouched: '8 Vouched',
+      bio: 'Computer Science sophomore at UNN building lightweight, responsive web apps. Focused on optimizing bundle sizes and page performance for low-bandwidth networks.',
       projects: [
         {
-          id: 'kwame-momo',
-          title: 'Enterprise Payment Ledger',
+          id: 'chidi-rideshare',
+          title: 'Campus RideShare Dashboard',
           isAudited: true,
-          verifiedSkills: ['AWS', 'Node.js', 'PostgreSQL', 'API Design'],
-          githubUrl: 'https://github.com/kwame-mensah/payment-ledger',
+          verifiedSkills: ['React', 'TypeScript', 'TailwindCSS', 'Vite'],
+          githubUrl: 'https://github.com/chidi-chikwe/campus-rideshare',
           aiSummary: `### Project Overview
-An enterprise-grade payment reconciliation ledger designed for pan-African merchant corridors. It aggregates transaction statuses from MTN, Vodafone, and Airtel Money APIs in real-time.
+A lightweight, mobile-first web dashboard designed for university students to coordinate ride-sharing and fuel splits on campus. Optimized for low-end mobile viewports and spotty campus networks.
 
-### Architecture & Technology Choices
-* **AWS Serverless**: Utilizes Lambda and API Gateway for zero-idle hosting costs and automated scale triggers.
-* **PostgreSQL (RDS)**: Implements database row-locking for absolute transactional consistency.
+### Technology & Architecture
+* **Vite + React**: Chosen for lightning-fast build speeds, hot module replacement, and ultra-lightweight client bundles.
+* **Local Storage Caching**: Keeps the user's active ride history available offline to survive campus Wi-Fi dropouts.
 
 ### Role & Individual Impact
-* Architected the distributed queue parsing system for webhook payloads.
-* Designed the database indexes to support fast query times during monthly audits.`
+* Engineered the responsive grid layouts and search filter controls.
+* Handled local state management, decreasing redundant server data requests by 45%.`
         }
       ]
     },
     {
-      id: 'godwin',
-      fullName: 'Godwin Asante',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
-      country: 'Ghana',
-      techFocus: 'Full-Stack Developer',
-      skills: ['React', 'Node.js', 'Express', 'PostgreSQL'],
-      percentile: '94th Percentile',
-      buildScore: '1,950',
-      projectsCount: '8 Verified',
-      bio: 'Self-taught software engineer and systems builder. Focused on building high-performance APIs and interactive web experiences for regional fintech setups.',
-      projects: [
-        {
-          id: 'godwin-escrow',
-          title: 'Momo Escrow API',
-          isAudited: true,
-          verifiedSkills: ['Node.js', 'Express', 'PostgreSQL', 'API Design'],
-          githubUrl: 'https://github.com/godwin-asante/momo-escrow',
-          aiSummary: `### Project Overview
-A secure, transactional escrow server specifically tailored for Mobile Money (MoMo) corridors in West Africa. It prevents buyer/seller fraud by locking transaction funds in a secure pool.
-
-### Architecture & Technology Choices
-* **Express & Node.js**: Chosen for lightweight execution to keep hosting costs minimal.
-* **PostgreSQL**: Implements strict ACID transactions to ensure zero record loss.
-
-### Role & Individual Impact
-* Engineered the core database ledger schema and transaction locking state machine.
-* Optimized API payload sizes to enable reliable response parsing on 2G/3G client applications.`
-        }
-      ]
-    },
-    {
-      id: 'titos',
-      fullName: 'Titos Kibet',
-      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
-      country: 'Kenya',
-      techFocus: 'UI/UX Designer',
-      skills: ['Figma', 'UI/UX Design', 'Design Systems', 'React'],
+      id: 'naledi',
+      fullName: 'Naledi Dube',
+      avatarUrl: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=200',
+      country: 'South Africa',
+      techFocus: 'Junior UI/UX Designer',
+      skills: ['Figma', 'UI/UX Design', 'User Research', 'Wireframing', 'Prototyping'],
       percentile: '95th Percentile',
-      buildScore: '2,120',
-      projectsCount: '6 Verified',
-      bio: 'Passionate about mobile-first layouts, local design patterns, and micro-interactions. Designing experiences that work on low-spec screens and bright sunlight.',
+      buildScore: '1,310',
+      projectsCount: '3 Verified',
+      peerVouched: '14 Vouched',
+      bio: 'Information Systems student at UCT. Passionate about accessible mobile interfaces, high-contrast usability, and icon-driven layouts for informal retail merchants.',
       projects: [
         {
-          id: 'titos-boda',
-          title: 'BodaSafe Driver UI',
+          id: 'naledi-merchant',
+          title: 'MoMo Merchant App Design',
           isAudited: true,
-          verifiedSkills: ['Figma', 'UI/UX Design', 'Accessibility'],
-          figmaUrl: 'https://figma.com/file/bodasafe-mockup',
+          verifiedSkills: ['Figma', 'UI/UX Design', 'User Research'],
+          figmaUrl: 'https://figma.com/file/momo-merchant-design',
           aiSummary: `### Project Overview
-A high-contrast mobile driver interface designed for Boda Boda (motorcycle) logistics operators. The application UI optimizes speed and safety.
+A clean, high-contrast mobile app prototype designed for small informal merchants to track mobile money cashouts and stock levels at their kiosks.
 
-### Design & Technology Choices
-* **Figma UI Kit**: Crafted with a rigid 8px grid and component variables.
-* **Ultra-High Contrast Palette**: Optimized to prevent glare readability loss under direct sunlight.
+### Design & UX Decisions
+* **High-Contrast Palette**: Optimized for readability on low-cost LCD screens under bright outdoor sunlight.
+* **Frictionless Tap Targets**: Custom buttons designed at a minimum of 56px to ensure easy selection on the move.
+* **Icon-Driven Navigation**: Minimizes language barriers for non-tech-savvy shop owners.
 
 ### Role & Individual Impact
-* Led the user research phase, interviewing 12 riders at Nairobi transit hubs.
-* Formulated the custom component library and mobile prototype flow.`
+* Conducted user research interviews with 5 local shop owners in Cape Town to identify layout blockers.
+* Designed the complete high-fidelity mobile prototype, custom icons, and wireframe flows in Figma.`
         }
       ]
     },
     {
-      id: 'amina',
-      fullName: 'Amina Diallo',
+      id: 'kofi',
+      fullName: 'Kofi Boateng',
+      avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200',
+      country: 'Ghana',
+      techFocus: 'Junior Backend Developer',
+      skills: ['Node.js', 'Express', 'SQLite', 'Git', 'REST APIs', 'SQL'],
+      percentile: '88th Percentile',
+      buildScore: '1,050',
+      projectsCount: '4 Verified',
+      peerVouched: '9 Vouched',
+      bio: 'Self-taught backend builder and junior systems engineer. Focused on writing clean, self-contained Express APIs and lightweight database layers for local commerce.',
+      projects: [
+        {
+          id: 'kofi-market',
+          title: 'Campus Marketplace API',
+          isAudited: true,
+          verifiedSkills: ['Node.js', 'Express', 'SQLite', 'API Design'],
+          githubUrl: 'https://github.com/kofi-boateng/campus-market-api',
+          aiSummary: `### Project Overview
+A lightweight, self-contained REST API powering a student-to-student marketplace for buying and selling textbooks, electronics, and dorm items.
+
+### Technology & Architecture
+* **Node.js & Express**: Provides a fast, minimal backend server with minimal memory footprint.
+* **SQLite**: A self-contained, serverless database requiring zero-configuration, ideal for lightweight, low-cost hosting.
+* **Joi Validation**: Strictly validates request body formats to prevent database injection or malformed data records.
+
+### Role & Individual Impact
+* Designed the database schema and implemented item CRUD endpoints.
+* Wrote custom input validation middleware to block malformed requests, securing user submissions.`
+        }
+      ]
+    },
+    {
+      id: 'fatou',
+      fullName: 'Fatoumata Bah',
       avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=200',
       country: 'Senegal',
-      techFocus: 'Brand Designer & Creative Director',
-      skills: ['Branding', 'Illustration', 'After Effects', 'Figma'],
-      percentile: '96th Percentile',
-      buildScore: '2,260',
-      projectsCount: '10 Verified',
-      bio: 'Multidisciplinary creative specializing in African-forward brand identities, motion design, and visual storytelling for startups and NGOs across Francophone West Africa.',
+      techFocus: 'Junior Full-Stack Developer',
+      skills: ['React', 'JavaScript', 'MongoDB', 'CSS3', 'Node.js', 'Express'],
+      percentile: '90th Percentile',
+      buildScore: '1,180',
+      projectsCount: '5 Verified',
+      peerVouched: '11 Vouched',
+      bio: 'Recent software engineering bootcamp graduate. Enjoys building interactive web portals, structured NoSQL schemas, and clean user-matching logic.',
       projects: [
         {
-          id: 'amina-brand',
-          title: 'Dakar Fintech Rebrand',
+          id: 'fatou-buddy',
+          title: 'Study Buddy Matcher',
           isAudited: true,
-          verifiedSkills: ['Branding', 'Illustration', 'Motion Design', 'Figma'],
-          figmaUrl: 'https://figma.com/file/dakar-fintech-rebrand',
+          verifiedSkills: ['React', 'JavaScript', 'MongoDB', 'CSS'],
+          githubUrl: 'https://github.com/fatou-bah/study-buddy',
           aiSummary: `### Project Overview
-A complete visual identity overhaul for a Series A fintech startup, encompassing logo system, typography hierarchy, brand guidelines, and animated social media kit.
+A full-stack web application that helps students form peer study groups based on course codes, availability, and language preferences.
 
-### Design & Technology Choices
-* **Figma + Illustrator**: Built a modular token-based design system supporting both French and English locales.
-* **After Effects**: Produced 12 branded motion loops for social campaigns reaching 1.2M impressions.
+### Technology & Architecture
+* **React Frontend**: Offers a dynamic, single-page interface for finding and matching peers.
+* **MongoDB**: A flexible NoSQL database to store dynamic user profiles and group preferences.
 
 ### Role & Individual Impact
-* Directed the creative vision from concept through final delivery across 40+ brand assets.
-* Increased brand recognition scores by 38% within 3 months of launch according to client survey data.`
+* Built the interactive group matching card deck and search filters.
+* Structured the MongoDB collections and handled API integration for matching queries.`
         }
       ]
     }
@@ -332,29 +326,27 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
   return (
     <div className="landing-page">
       {/* Hero Section */}
-      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'var(--spacing-xxl) var(--spacing-md)' }}>
+      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'var(--spacing-lg) var(--spacing-md)' }}>
         <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '850px', margin: '0 auto' }}>
-          <div className="hero-badge" id="hero-badge-container" style={{ margin: '0 auto var(--spacing-lg) auto', display: 'inline-flex', borderRadius: '9999px', padding: '6px 16px', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.03em', textTransform: 'none' }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px', color: 'var(--color-accent)' }}>
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-            <span>Pitching at Yango Fellowship Finals — September 17th</span>
-          </div>
 
-          <h1 style={{ fontFamily: 'var(--font-serif), Georgia, serif', fontSize: 'clamp(2.2rem, 6vw, 3.2rem)', fontWeight: 700, lineHeight: 1.15, color: 'var(--color-text-primary)', marginBottom: 'var(--spacing-md)', letterSpacing: '-0.02em' }}>
-            The Trust Layer <br />
-            <span style={{ color: 'var(--color-accent)', fontStyle: 'italic', fontWeight: '500', fontFamily: 'var(--font-serif), Georgia, serif' }}>for Africa's Tech & Creative Talent</span>
+
+          <h1 style={{ fontFamily: 'var(--font-serif), Georgia, serif', fontSize: 'clamp(0.95rem, 5vw, 3.5rem)', fontWeight: 700, lineHeight: 1.15, color: 'var(--color-text-primary)', marginBottom: 'var(--spacing-md)', letterSpacing: '-0.02em' }}>
+            Connecting Africa's Top Talent
+            <br />
+            <span style={{ color: 'var(--color-accent)', fontSize: '0.55em', fontStyle: 'normal', fontWeight: '600', fontFamily: 'var(--font-body), system-ui, sans-serif' }}>
+              Create and verify your portfolio easily. Get hired by top African companies and StartUps.
+            </span>
           </h1>
 
-          <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--color-text-secondary)', lineHeight: 1.6, maxWidth: '750px', margin: '0 auto var(--spacing-xl) auto' }}>
-            BorderLine is the opportunity pipeline and skill verification system for Africa's technologists and creatives — compiling code repos, design portfolios, and creative work into verified, hire-ready profiles.
+          <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--color-text-primary)', lineHeight: 1.6, maxWidth: '750px', margin: '0 auto var(--spacing-xl) auto' }}>
+            Africa has the talent and the demand, yet collaboration is at an all-time low. Borderline is building the trust layer for Africa's tech and creative talent, using AI to verify skills and making recruitment easier. Build your startup and hire teams, continentally.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', margin: '0 auto var(--spacing-xl) auto' }}>
             {[
-              'Auto-verify portfolios',
-              'Tech & creative talent',
-              'HR-as-a-Service'
+              'Access to borderless opportunities',
+              'AI powered Skill verification',
+              'Apply and get hired easily'
             ].map((text, idx) => (
               <div key={idx} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -366,12 +358,12 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: 'var(--spacing-xl)' }}>
-            <Link href="/recruiter" className="btn btn-primary" id="btn-hero-recruiter" style={{ borderRadius: '9999px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
+            <Link href="/recruiter" className="btn btn-primary" id="btn-hero-recruiter" style={{ borderRadius: '8px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
               <span className="hero-cta-desktop">Start Hiring</span>
               <span className="hero-cta-mobile">Start Hiring  </span>
               <span style={{ marginLeft: '8px' }}>➔</span>
             </Link>
-            <Link href="/talent" className="btn btn-secondary" id="btn-hero-talent" style={{ borderRadius: '9999px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600 }}>
+            <Link href="/talent" className="btn btn-secondary" id="btn-hero-talent" style={{ borderRadius: '8px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600 }}>
               Create Your Profile
             </Link>
           </div>
@@ -425,12 +417,12 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 11 2 2 4-4"/>
                     </svg>
-                    Verified Profile
+                    AI & Peer-Verified
                   </span>
                   
                   {/* Small avatar group on top right */}
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {['https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=40', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=40', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=40'].map((url, idx) => (
+                    {['https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=40', 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=40', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=40'].map((url, idx) => (
                       <img 
                         key={idx} 
                         src={url} 
@@ -476,23 +468,27 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
                 {/* Progress bar */}
                 <div className="capability-bar-container">
                   <div className="capability-bar-label">
-                    <span>Proof of Capability</span>
+                    <span>AI & Peer-Verified Capability</span>
                     <span style={{ color: 'var(--color-accent)' }}>{profile.percentile}</span>
                   </div>
                   <div className="capability-bar-track">
-                    <div className="capability-bar-fill" style={{ width: profile.percentile.includes('98') ? '98%' : profile.percentile.includes('95') ? '95%' : '94%' }}></div>
+                    <div className="capability-bar-fill" style={{ width: `${profile.percentile.replace(/\D/g, '') || '90'}%` }}></div>
                   </div>
                 </div>
 
                 {/* Stats columns */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
-                  <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '10px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Build Score</div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: '2px' }}>{profile.buildScore}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '16px' }}>
+                  <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Build Score</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-text-primary)', marginTop: '2px' }}>{profile.buildScore}</div>
                   </div>
-                  <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '10px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Projects</div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-accent)', marginTop: '2px' }}>{profile.projectsCount}</div>
+                  <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Peer Reviews</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-accent-secondary)', marginTop: '2px' }}>{profile.peerVouched || '8 Vouched'}</div>
+                  </div>
+                  <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.6rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Projects</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-accent)', marginTop: '2px' }}>{profile.projectsCount}</div>
                   </div>
                 </div>
               </div>
@@ -555,11 +551,11 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
               <span className="feature-tag" style={{ color: 'var(--color-accent-secondary)' }}>
                 About Borderline
               </span>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginTop: '8px', marginBottom: '16px', lineHeight: 1.2, color: 'var(--color-text-primary)' }}>
-                Bridging the gap between raw capability and global opportunity.
+              <h2 style={{ fontSize: '2.0rem', fontWeight: 800, marginTop: '8px', marginBottom: '16px', lineHeight: 1.2, color: 'var(--color-text-primary)' }}>
+                Bridging the gap between capability and Pan-African opportunity.
               </h2>
               <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '24px' }}>
-                We believe capability is evenly distributed, but trust and infrastructure are not. Borderline builds the trust network that enables pan-African talent to thrive internationally.
+                We believe capability is evenly distributed across Africa, but trust and infrastructure are not. Borderline builds the trust network that enables pan-African talent to thrive continentally. Access Job opportunities, Hire teams from anywhere, and transact seamlessly across borders.
               </p>
 
               <ul className="about-checklist">
@@ -570,7 +566,7 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
                     </svg>
                   </div>
                   <div className="about-checklist-text">
-                    <strong>Hire verified talent across the continent:</strong> Vetted code repos, live deployments, and verified creative portfolios ready to deploy.
+                    <strong>Hire verified talent across the continent:</strong> Vetted code repos, live deployments, and verified creative portfolios ensuring that you get to work with only the most qualified individuals.
                   </div>
                 </li>
                 <li className="about-checklist-item">
@@ -591,6 +587,16 @@ A complete visual identity overhaul for a Series A fintech startup, encompassing
                   </div>
                   <div className="about-checklist-text">
                     <strong>Partnerships with leaders:</strong> Backed by key academic hubs, tech ecosystems, and regional companies to build long-term pipelines.
+                  </div>
+                </li>
+                <li className="about-checklist-item">
+                  <div className="about-checklist-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div className="about-checklist-text">
+                    <strong>AI Proactive Applications:</strong> Our platform's AI matches your validated capabilities to active micro-gigs and automatically applies on your behalf, guaranteeing you never miss an opening.
                   </div>
                 </li>
               </ul>

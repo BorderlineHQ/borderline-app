@@ -48,16 +48,16 @@ graph TD
     User -->|Role| Recruiter[Recruiter / Startup]
     User -->|Role| Admin[Platform Admin]
     
-    Talent -->|Builds| Portfolios[AI Portfolios]
+    Talent -->|Builds & Endorses| Portfolios[AI & Peer Portfolios]
     Recruiter -->|Views| Portfolios
     Recruiter -->|Creates| Gigs[Gigs / Tasks]
-    Admin -->|Verifies| Portfolios
+    Admin -->|Audits & Verifies| Portfolios
     Admin -->|Manages| System[System Audit Log]
 ```
 
 ### 1. Talent (Students & Freelancers)
-* **Capabilities**: Create profile, link GitHub/Figma, input raw project notes, trigger AI case-study generation, view matching gigs, and apply for work.
-* **UI Scope**: Mobile-friendly Portfolio builder dashboard, job application status feeds.
+* **Capabilities**: Create profile, link GitHub/Figma, input raw project notes, trigger AI case-study generation, review and endorse peer projects, view matching gigs, and apply for work.
+* **UI Scope**: Mobile-friendly Portfolio builder dashboard, peer portfolio verification hub, job application status feeds.
 
 ### 2. Recruiters (African Startups & Global Employers)
 * **Capabilities**: Create organization profile, post micro-gigs/entry-level contracts, search verified portfolios, view AI-generated project case studies, and message candidates.

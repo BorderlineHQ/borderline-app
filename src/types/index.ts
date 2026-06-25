@@ -33,6 +33,7 @@ export interface Profile {
   isVerified: boolean;
   projects: Project[];
   createdAt: string;
+  peerVouched?: string;
 }
 
 export interface RecruiterProfile {

@@ -9,7 +9,7 @@ Whenever major architectural changes, new schema definitions, or design decision
 ## 1. Project Core Vision
 BorderLine is an AI-powered economic infrastructure that verifies, connects, and monetises the continent's emerging builders (ages 18–26).
 * **The Problem**: Traditional job networks (LinkedIn, Upwork) rely on text-based resumes and historical platform ratings. This excludes early-career builders who lack corporate work history but have practical skills.
-* **The Solution**: An AI-driven "Trust Layer" that converts raw class projects, offline hackathon repos, and design concepts into professional, result-oriented case studies.
+* **The Solution**: A hybrid AI-driven and peer-verified "Trust Layer" that converts raw class projects, offline hackathon repos, and design concepts into professional, result-oriented case studies, backed by automated codebase audits and collaborative peer validations from the developer community.
 * **Key Access Strategy**: A lightweight WhatsApp chatbot extension that allows cash-constrained users to update profiles, receive matches, and check jobs without loading heavy, data-intensive web pages.
 
 ---

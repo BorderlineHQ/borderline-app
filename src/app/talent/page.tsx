@@ -145,7 +145,7 @@ export default function TalentPortal() {
         <aside className="profile-sidebar">
           <div className="profile-avatar-wrap">
             <img 
-              src={currentProfile.avatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200'} 
+              src={currentProfile.avatarUrl || 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=200'} 
               alt={currentProfile.fullName}
               className="profile-avatar"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -382,7 +382,7 @@ export default function TalentPortal() {
                 Matches Feed
               </div>
               <p className="phone-subtitle" style={{ fontSize: '0.7rem' }}>
-                Simulating how matches are rendered on a mobile client. Updates instantly as you add projects.
+                Simulating your matches. Our AI proactively matches your verified skills and applies on your behalf.
               </p>
 
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>

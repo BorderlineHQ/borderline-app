@@ -9,6 +9,8 @@ const Header: React.FC = () => {
   const pathname = usePathname();
   const { theme, setTheme, resetDatabase, mounted } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [platformDropdownOpen, setPlatformDropdownOpen] = useState(false);
+  const [techDropdownOpen, setTechDropdownOpen] = useState(false);
 
   if (!mounted) return null;
 
@@ -21,7 +23,7 @@ const Header: React.FC = () => {
     <header className={`site-header ${mobileMenuOpen ? 'mobile-open' : ''}`}>
       <div className="header-container">
         {/* Logo */}
-        <Link href="/" className="logo-link" style={{ fontFamily: 'var(--font-serif), Georgia, serif', fontWeight: 700, fontSize: '1.3rem', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Link href="/" className="logo-link">
           <div className="logo-icon" style={{ display: 'flex', alignItems: 'center' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fillRule="evenodd" clipRule="evenodd" d="M6 3h7c2.76 0 5 2.24 5 5 0 1.83-1 3.43-2.5 4.25 1.5.82 2.5 2.42 2.5 4.25 0 2.76-2.24 5-5 5H6V3zm4 3v4h3c1.1 0 2-.9 2-2s-.9-2-2-2h-3zm0 7v4h3c1.1 0 2-.9 2-2s-.9-2-2-2h-3z" fill="currentColor"/>
@@ -36,15 +38,111 @@ const Header: React.FC = () => {
           <Link href="/" className={`nav-item ${isActive('/') ? 'active' : ''}`}>
             Home
           </Link>
-          <Link href="/recruiter" className={`nav-item ${isActive('/recruiter') ? 'active' : ''}`}>
-            Recruiter Feed
-          </Link>
-          <Link href="/talent" className={`nav-item ${isActive('/talent') ? 'active' : ''}`}>
-            Talent Portal
-          </Link>
-          <Link href="/whatsapp" className={`nav-item ${isActive('/whatsapp') ? 'active' : ''} spec-sandbox`}>
-            Try our Whatsapp Bot
-          </Link>
+          
+          {/* Platform Dropdown */}
+          <div className="nav-dropdown" style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setPlatformDropdownOpen(!platformDropdownOpen)}
+              className={`nav-item dropdown-trigger ${isActive('/recruiter') || isActive('/talent') ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              Platform
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ transform: platformDropdownOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {platformDropdownOpen && (
+              <div className="dropdown-menu" style={{ 
+                position: 'absolute', 
+                top: '100%', 
+                left: 0, 
+                backgroundColor: 'var(--color-surface)', 
+                border: '1px solid var(--color-border)',
+                borderRadius: '8px',
+                minWidth: '180px',
+                marginTop: '8px',
+                zIndex: 1001,
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
+              }}>
+                <Link href="/recruiter" onClick={() => setPlatformDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  borderBottom: '1px solid var(--color-border)',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                }}>
+                  Recruiter Feed
+                </Link>
+                <Link href="/talent" onClick={() => setPlatformDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                }}>
+                  Talent Portal
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Technology Dropdown */}
+          <div className="nav-dropdown" style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setTechDropdownOpen(!techDropdownOpen)}
+              className={`nav-item dropdown-trigger ${isActive('/whatsapp') ? 'active' : ''} spec-sandbox`}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              Technology
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ transform: techDropdownOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {techDropdownOpen && (
+              <div className="dropdown-menu" style={{ 
+                position: 'absolute', 
+                top: '100%', 
+                left: 0, 
+                backgroundColor: 'var(--color-surface)', 
+                border: '1px dashed var(--color-accent-secondary)',
+                borderRadius: '8px',
+                minWidth: '180px',
+                marginTop: '8px',
+                zIndex: 1001,
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
+              }}>
+                <Link href="/whatsapp" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-accent-secondary)',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                }}>
+                  WhatsApp Bot
+                </Link>
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Desktop Actions */}
@@ -82,22 +180,31 @@ const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Premium call to action pills */}
-          <Link href="/recruiter" className="btn btn-secondary btn-header-login" style={{ borderRadius: '9999px', padding: '6px 14px', fontSize: '0.8rem', fontWeight: 600 }}>
-            Login
-          </Link>
-          <Link href="/recruiter" className="btn btn-primary btn-header-cta" style={{ borderRadius: '9999px', padding: '6px 16px', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
-            <span className="cta-long">Contact Sales to Partner Your Organization</span>
-            <span className="cta-medium">Contact Sales to Partner</span>
-            <span className="cta-short">Contact Sales</span>
+          {/* Partner with Us link */}
+          <Link href="/recruiter" className="btn btn-secondary btn-header-partner" style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.8rem', fontWeight: 600 }}>
+            Partner with Us
           </Link>
         </div>
 
         {/* Mobile Header Actions */}
         <div className="mobile-header-actions mobile-only">
-          <Link href="/recruiter" className="btn btn-primary" style={{ borderRadius: '9999px', padding: '6px 14px', fontSize: '0.75rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
-            Contact Sales
-          </Link>
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="theme-toggle"
+            aria-label="Toggle Theme"
+            style={{ width: '32px', height: '32px', padding: 0 }}
+          >
+            {theme === 'dark' ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+              </svg>
+            )}
+          </button>
           
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -127,24 +234,26 @@ const Header: React.FC = () => {
             <Link href="/" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/') ? 'active' : ''}`}>
               Home
             </Link>
-            <Link href="/recruiter" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/recruiter') ? 'active' : ''}`}>
+            <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
+              Platform
+            </div>
+            <Link href="/recruiter" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/recruiter') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               Recruiter Feed
             </Link>
-            <Link href="/talent" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/talent') ? 'active' : ''}`}>
+            <Link href="/talent" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/talent') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               Talent Portal
             </Link>
-            <Link href="/whatsapp" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/whatsapp') ? 'active' : ''} spec-sandbox`}>
-              Try our Whatsapp Bot
+            <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
+              Technology
+            </div>
+            <Link href="/whatsapp" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/whatsapp') ? 'active' : ''} spec-sandbox`} style={{ paddingLeft: '24px' }}>
+              WhatsApp Bot
             </Link>
           </nav>
 
           <div className="mobile-drawer-divider"></div>
 
           <div className="mobile-drawer-footer">
-            <Link href="/recruiter" onClick={() => setMobileMenuOpen(false)} className="btn btn-secondary mobile-login-btn">
-              Login
-            </Link>
-            
             <div className="mobile-drawer-tools">
               <button 
                 onClick={() => { resetDatabase(); setMobileMenuOpen(false); }} 
@@ -156,7 +265,7 @@ const Header: React.FC = () => {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                 </svg>
-                <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>Reset DB</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>Reset DB</span>
               </button>
               
               <button
@@ -171,14 +280,14 @@ const Header: React.FC = () => {
                       <circle cx="12" cy="12" r="4"/>
                       <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
                     </svg>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>Light Mode</span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>Light Mode</span>
                   </>
                 ) : (
                   <>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
                     </svg>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>Dark Mode</span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--color-text-primary)' }}>Dark Mode</span>
                   </>
                 )}
               </button>
