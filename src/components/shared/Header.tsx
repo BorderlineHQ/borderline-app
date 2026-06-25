@@ -144,6 +144,7 @@ const Header: React.FC = () => {
                   padding: '10px 16px', 
                   color: 'var(--color-text-secondary)',
                   fontSize: '0.9rem',
+                  borderBottom: '1px solid var(--color-border)',
                   transition: 'all 0.15s'
                 }}
                 onMouseEnter={(e) => {
@@ -155,6 +156,23 @@ const Header: React.FC = () => {
                   e.currentTarget.style.color = 'var(--color-text-secondary)';
                 }}>
                   WhatsApp Bot
+                </Link>
+                <Link href="/manifesto" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                }}>
+                  Our Manifesto
                 </Link>
               </div>
             )}
@@ -393,6 +411,9 @@ const Header: React.FC = () => {
             </div>
             <Link href="/whatsapp" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/whatsapp') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               WhatsApp Bot
+            </Link>
+            <Link href="/manifesto" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/manifesto') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+              Our Manifesto
             </Link>
             <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
               Resources

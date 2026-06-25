@@ -922,7 +922,7 @@ A full-stack web application that helps students form peer study groups based on
               <h4>Company</h4>
               <div className="footer-col-links">
                 <Link href="/development">About Us</Link>
-                <Link href="/development">The Manifesto</Link>
+                <Link href="/manifesto">Our Manifesto</Link>
                 <Link href="/development">Careers</Link>
                 <Link href="/development">Newsroom</Link>
               </div>
