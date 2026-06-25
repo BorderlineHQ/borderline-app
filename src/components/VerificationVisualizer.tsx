@@ -13,7 +13,7 @@ export const VerificationVisualizer: React.FC = () => {
   const [buildScore, setBuildScore] = useState(0);
 
   const rawCodeSnippets = [
-    '> Analyzing repository: /payment-ledger...',
+    '> Analyzing repository: /asset-compliance-db...',
     '> Fetching commit history (243 commits found)',
     '> Scanning architecture patterns...',
     '  - Detected: Node.js (Express)',
@@ -22,8 +22,8 @@ export const VerificationVisualizer: React.FC = () => {
     '> Running dependency audit...',
     '  - AWS SDK (Lambda, API Gateway)',
     '> Evaluating code complexity (Cyclomatic score: 14)',
-    '> Cross-referencing against standard payment logic...',
-    '> PASS: Row-level database locking verified.',
+    '> Cross-referencing against asset compliance rules...',
+    '> PASS: Database schema validation verified.',
     '> Generating verified case study...'
   ];
 
@@ -199,6 +199,16 @@ export const VerificationVisualizer: React.FC = () => {
         }
       `}</style>
 
+      {/* Introductory Context Header especially helpful for mobile */}
+      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '12px', letterSpacing: '-0.02em' }}>
+          See our AI verification system at work
+        </h3>
+        <p style={{ fontSize: '1rem', color: 'var(--color-text-secondary)', maxWidth: '640px', margin: '0 auto', lineHeight: 1.5 }}>
+          Watch how our engine parses raw repository data, evaluates commits, audits system architecture, and builds a verified talent profile in real-time.
+        </p>
+      </div>
+
       <div className="visualizer-grid">
         {/* Left Pane: Terminal */}
         <div className="terminal-pane">
@@ -233,7 +243,7 @@ export const VerificationVisualizer: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
              <div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '4px' }}>VERIFIED CASE STUDY</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>Enterprise Payment Ledger</div>
+                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>Asset Compliance Database</div>
              </div>
              <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Build Score</div>
@@ -257,9 +267,9 @@ export const VerificationVisualizer: React.FC = () => {
           <div style={{ marginTop: 'auto', borderTop: '1px solid var(--color-border)', paddingTop: '16px' }}>
              <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
                {terminalLines.length >= 12 ? (
-                 <span className="animated-badge">
-                   <strong>AI Summary:</strong> Analyzed 243 commits. Verified ACID transaction compliance in PostgreSQL and distributed queue architecture in AWS. Ready for enterprise matching.
-                 </span>
+                  <span className="animated-badge">
+                    <strong>AI Summary:</strong> Analyzed 243 commits. Verified ACID transaction compliance in PostgreSQL and schema integrity in AWS. Compliance database verified.
+                  </span>
                ) : (
                  <span style={{ color: 'var(--color-text-tertiary)' }}>Generating human-readable summary from codebase...</span>
                )}

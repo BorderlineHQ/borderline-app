@@ -11,6 +11,7 @@ const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [platformDropdownOpen, setPlatformDropdownOpen] = useState(false);
   const [techDropdownOpen, setTechDropdownOpen] = useState(false);
+  const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
 
   if (!mounted) return null;
 
@@ -40,7 +41,12 @@ const Header: React.FC = () => {
           </Link>
           
           {/* Platform Dropdown */}
-          <div className="nav-dropdown" style={{ position: 'relative' }}>
+          <div 
+            className="nav-dropdown" 
+            style={{ position: 'relative' }}
+            onMouseEnter={() => setPlatformDropdownOpen(true)}
+            onMouseLeave={() => setPlatformDropdownOpen(false)}
+          >
             <button 
               onClick={() => setPlatformDropdownOpen(!platformDropdownOpen)}
               className={`nav-item dropdown-trigger ${isActive('/recruiter') || isActive('/talent') ? 'active' : ''}`}
@@ -104,10 +110,15 @@ const Header: React.FC = () => {
           </div>
 
           {/* Technology Dropdown */}
-          <div className="nav-dropdown" style={{ position: 'relative' }}>
+          <div 
+            className="nav-dropdown" 
+            style={{ position: 'relative' }}
+            onMouseEnter={() => setTechDropdownOpen(true)}
+            onMouseLeave={() => setTechDropdownOpen(false)}
+          >
             <button 
               onClick={() => setTechDropdownOpen(!techDropdownOpen)}
-              className={`nav-item dropdown-trigger ${isActive('/whatsapp') ? 'active' : ''} spec-sandbox`}
+              className={`nav-item dropdown-trigger ${isActive('/whatsapp') ? 'active' : ''}`}
               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               Technology
@@ -121,7 +132,7 @@ const Header: React.FC = () => {
                 top: '100%', 
                 left: 0, 
                 backgroundColor: 'var(--color-surface)', 
-                border: '1px dashed var(--color-accent-secondary)',
+                border: '1px solid var(--color-border)',
                 borderRadius: '8px',
                 minWidth: '180px',
                 marginTop: '8px',
@@ -131,14 +142,148 @@ const Header: React.FC = () => {
                 <Link href="/whatsapp" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
                   display: 'block', 
                   padding: '10px 16px', 
-                  color: 'var(--color-accent-secondary)',
+                  color: 'var(--color-text-secondary)',
                   fontSize: '0.9rem',
                   transition: 'all 0.15s'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
                 }}>
                   WhatsApp Bot
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Resources Dropdown */}
+          <div 
+            className="nav-dropdown" 
+            style={{ position: 'relative' }}
+            onMouseEnter={() => setResourcesDropdownOpen(true)}
+            onMouseLeave={() => setResourcesDropdownOpen(false)}
+          >
+            <button 
+              onClick={() => setResourcesDropdownOpen(!resourcesDropdownOpen)}
+              className={`nav-item dropdown-trigger ${isActive('/development') ? 'active' : ''}`}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              Resources
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ transform: resourcesDropdownOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {resourcesDropdownOpen && (
+              <div className="dropdown-menu" style={{ 
+                position: 'absolute', 
+                top: '100%', 
+                left: 0, 
+                backgroundColor: 'var(--color-surface)', 
+                border: '1px solid var(--color-border)',
+                borderRadius: '8px',
+                minWidth: '220px',
+                marginTop: '8px',
+                zIndex: 1001,
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+                overflow: 'hidden'
+              }}>
+                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  borderBottom: '1px solid var(--color-border)',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-text-muted)';
+                }}>
+                  <div style={{ fontWeight: 600 }}>Upskill & Grow</div>
+                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Programs to grow your career</div>
+                </Link>
+
+                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  borderBottom: '1px solid var(--color-border)',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-text-muted)';
+                }}>
+                  <div style={{ fontWeight: 600 }}>Communities</div>
+                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Join peer developer circles</div>
+                </Link>
+
+                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  borderBottom: '1px solid var(--color-border)',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-text-muted)';
+                }}>
+                  <div style={{ fontWeight: 600 }}>Blog & Insights</div>
+                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Latest updates and guides</div>
+                </Link>
+
+                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                  display: 'block', 
+                  padding: '10px 16px', 
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                  e.currentTarget.style.color = 'var(--color-accent)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
+                  if (desc) desc.style.color = 'var(--color-text-muted)';
+                }}>
+                  <div style={{ fontWeight: 600 }}>Foundation</div>
+                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>BorderLine social impact</div>
                 </Link>
               </div>
             )}
@@ -246,8 +391,23 @@ const Header: React.FC = () => {
             <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
               Technology
             </div>
-            <Link href="/whatsapp" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/whatsapp') ? 'active' : ''} spec-sandbox`} style={{ paddingLeft: '24px' }}>
+            <Link href="/whatsapp" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/whatsapp') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               WhatsApp Bot
+            </Link>
+            <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
+              Resources
+            </div>
+            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+              Upskill & Grow
+            </Link>
+            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+              Communities
+            </Link>
+            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+              Blog & Insights
+            </Link>
+            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+              Foundation
             </Link>
           </nav>
 

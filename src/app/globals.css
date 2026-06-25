@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* Layout Spacing */
   --spacing-xs: 4px;
@@ -2490,7 +2494,7 @@ body.light-theme .mobile-drawer-content {
 }
 
 .mobile-nav-item {
-  font-size: 1.05rem;
+  font-size: 0.92rem;
   font-weight: 500;
   color: var(--color-text-primary);
   padding: 10px 16px;

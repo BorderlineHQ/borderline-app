@@ -59,3 +59,16 @@ We borrow the frictionless logistics of **Uber**, the elite talent-empowerment e
 | **Andela** | Mid-to-senior engineers (135+ countries) | Enterprise-grade "human compute layer" for AI teams | High barrier to entry; vacated junior space |
 | **LinkedIn / Jobberman** | Established Professionals | Text-based corporate summaries and chronological histories | Requires existing network and corporate titles |
 | **BorderLine (Our Sweet Spot)** | **Africa's early-career digital builders** | **AI-verified trust layer + WhatsApp-native access = the infrastructure Andela left behind** | **Must prove AI verification quality at scale** |
+
+---
+
+## 5. Strategic Manifesto & The Career Lifecycle
+BorderLine operates on a pan-African, intra-continental vision: **Africans hiring other Africans**. By bridging the cross-border payment, trust, and escrow gap on the continent, we enable friction-free, high-speed regional remote hiring.
+
+Our talent scaling model is governed by the **Gig-to-Career Lifecycle**:
+1. **Low-Risk Gigs & Internships**: Enables cash-constrained startups to hire junior talent with zero-risk and low-cost for small tasks or 3-month trials.
+2. **Build Score Credibility**: Every successful delivery dynamically increases the developer's Build Score.
+3. **Try-Before-You-Buy Conversion**: Startups naturally convert successful junior builders into long-term retainers and full-time employees, building a resilient talent network across tech hubs.
+
+Read the full, in-depth manifesto at [docs/manifesto.md](file:///c:/Users/gokro/Documents/GitHub/borderline/docs/manifesto.md).
+

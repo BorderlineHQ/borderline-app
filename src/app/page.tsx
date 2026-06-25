@@ -698,7 +698,7 @@ A full-stack web application that helps students form peer study groups based on
                 Solving trust at the protocol level
               </h2>
               <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: 'var(--spacing-lg)' }}>
-                Traditional CVs are failing the modern global market. BorderLine replaces subjective resumes with immutable proof of work.
+                Traditional work platforms are failing the modern African market. BorderLine gives inexperienced but skilled talents a chance to prove themselves.
               </p>
 
               <div className="feature-bullet-list">
@@ -709,8 +709,8 @@ A full-stack web application that helps students form peer study groups based on
                     </svg>
                   </div>
                   <div className="feature-bullet-text">
-                    <h4>Proof of Build (PoB)</h4>
-                    <p>Our AI engine analyzes GitHub repositories, commits, and project architecture to verify technical depth automatically.</p>
+                    <h4>Proof of Skill (PoS)</h4>
+                    <p>Our AI engine analyzes GitHub repositories, commits, designs and projects to verify technical and creative ability and assign a confidence score.</p>
                   </div>
                 </div>
 
@@ -743,16 +743,16 @@ A full-stack web application that helps students form peer study groups based on
             {/* Right side metrics cards stack */}
             <div className="metrics-grid">
               <div className="metric-card-box">
-                <div className="metric-card-num">10k+</div>
-                <div className="metric-card-label"><strong>Verified Builders</strong>. Active engineers across 12 African nations.</div>
+                <div className="metric-card-num">10M+</div>
+                <div className="metric-card-label"><strong>Potential Talents</strong>. Emerging digital builders across the continent.</div>
               </div>
               <div className="metric-card-box">
-                <div className="metric-card-num green">$4M+</div>
-                <div className="metric-card-label"><strong>Talent Earnings</strong> generated through regional and global contracts.</div>
+                <div className="metric-card-num green">$4B+</div>
+                <div className="metric-card-label"><strong>Potential Earnings</strong>. Estimated addressable opportunity in the African digital economy.</div>
               </div>
               <div className="metric-card-box">
                 <div className="metric-card-num">24h</div>
-                <div className="metric-card-label"><strong>Avg. Match Time</strong> between job posting and candidate review.</div>
+                <div className="metric-card-label"><strong>Estimated Match Time</strong> between job posting and candidate review.</div>
               </div>
               <div className="metric-card-box">
                 <div className="metric-card-icon">
@@ -786,7 +786,7 @@ A full-stack web application that helps students form peer study groups based on
                 NO INFRASTRUCTURE REQUIRED
               </div>
               <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: 'var(--spacing-md)', color: 'var(--color-text-primary)' }}>
-                Access global opportunities on a 2G connection.
+                Access global opportunities even on a 2G connection.
               </h2>
               <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: 'var(--spacing-lg)' }}>
                 We built BorderLine for the realities of the African tech ecosystem. Not everyone has fiber internet or a high-end laptop open 24/7.
@@ -911,9 +911,9 @@ A full-stack web application that helps students form peer study groups based on
               <h4>Product</h4>
               <div className="footer-col-links">
                 <Link href="/recruiter">Talent Discovery</Link>
-                <Link href="/">Verification Protocol</Link>
+                <Link href="/development">Verification Protocol</Link>
                 <Link href="/admin">Compliance Engine</Link>
-                <Link href="/recruiter">API for Hiring</Link>
+                <Link href="/development">API for Hiring</Link>
               </div>
             </div>
 
@@ -921,10 +921,10 @@ A full-stack web application that helps students form peer study groups based on
             <div className="footer-col">
               <h4>Company</h4>
               <div className="footer-col-links">
-                <a href="#">About Us</a>
-                <a href="#">The Manifesto</a>
-                <a href="#">Careers</a>
-                <a href="#">Newsroom</a>
+                <Link href="/development">About Us</Link>
+                <Link href="/development">The Manifesto</Link>
+                <Link href="/development">Careers</Link>
+                <Link href="/development">Newsroom</Link>
               </div>
             </div>
 
@@ -951,9 +951,9 @@ A full-stack web application that helps students form peer study groups based on
               © 2026 BorderLine Technologies Inc. All rights reserved.
             </div>
             <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Cookies</a>
+              <Link href="/development">Privacy Policy</Link>
+              <Link href="/development">Terms of Service</Link>
+              <Link href="/development">Cookies</Link>
             </div>
           </div>
         </div>
