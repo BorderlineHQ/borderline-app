@@ -1,5 +1,40 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Pan-African Tech Talent Survey Report 2026",
+  description: "A strategic report summarizing our research with 37 tech and creative students across Zambia, Ghana, South Africa, and Nigeria, uncovering systemic hiring bottlenecks and proposing solutions.",
+  keywords: [
+    "BorderLine survey report",
+    "African developer survey",
+    "tech talent research Africa",
+    "skills verification study",
+  ],
+  alternates: {
+    canonical: "/report",
+  },
+  openGraph: {
+    type: "article",
+    url: "https://borderline.africa/report",
+    title: "Pan-African Tech Talent Survey Report 2026 | BorderLine",
+    description: "Read the comprehensive survey report analyzing systemic choke points for emerging African builders.",
+    images: [
+      {
+        url: "/borderline_talent_cafe.png",
+        width: 1200,
+        height: 630,
+        alt: "BorderLine Tech Talent Survey Report",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pan-African Tech Talent Survey Report 2026 | BorderLine",
+    description: "Read the comprehensive survey report analyzing systemic choke points for emerging African builders.",
+    images: ["/borderline_talent_cafe.png"],
+  },
+};
 
 export default function Report() {
   return (

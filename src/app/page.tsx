@@ -491,6 +491,16 @@ A full-stack web application that helps students form peer study groups based on
                     <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-accent)', marginTop: '2px' }}>{profile.projectsCount}</div>
                   </div>
                 </div>
+                {/* Crawlable link to the public profile for SEO optimization */}
+                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--color-border)', paddingTop: '12px' }}>
+                  <Link 
+                    href={`/in/${profile.id}`} 
+                    style={{ fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: 'var(--color-accent)' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    View Public Profile <span style={{ marginLeft: '2px' }}>➔</span>
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
@@ -981,10 +991,26 @@ A full-stack web application that helps students form peer study groups based on
               <div style={{ textAlign: 'left' }}>
                 <h3 style={{ fontSize: '1.25rem' }} id="drawer-candidate-name">{selectedProfile.fullName}</h3>
                 <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{selectedProfile.techFocus}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }} id="drawer-candidate-contact">
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }} id="drawer-candidate-contact">
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                   <span>{selectedProfile.country}</span>
                 </p>
+                {/* Dynamic crawlable public link in the drawer */}
+                <Link 
+                  href={`/in/${selectedProfile.id}`}
+                  style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '4px', 
+                    fontSize: '0.75rem', 
+                    color: 'var(--color-accent)', 
+                    fontWeight: 600,
+                    textDecoration: 'none'
+                  }}
+                  id={`link-view-public-profile-${selectedProfile.id}`}
+                >
+                  View Public Profile <span style={{ marginLeft: '2px' }}>➔</span>
+                </Link>
               </div>
             </div>
 
