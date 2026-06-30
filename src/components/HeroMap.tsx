@@ -183,34 +183,46 @@ export const HeroMap = React.memo(() => {
 
   const selectedCountry = selectedCountryId ? countryData[selectedCountryId] : null;
 
-  // Tooltip position calculator (called once per click/tap, keeping position static)
-  const selectCountry = (clientX: number, clientY: number, countryId: string) => {
+  // Tooltip position calculator
+  const showTooltip = (clientX: number, clientY: number, countryId: string) => {
     const data = countryData[countryId];
     if (data) {
       if (containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
         setTooltipPos({
           x: clientX - containerRect.left,
-          y: clientY - containerRect.top - 100, // Show pop-up slightly above the pointer
+          y: clientY - containerRect.top - 110,
         });
       }
       setSelectedCountryId(countryId);
     }
   };
 
+  const handleCountryHover = (e: React.MouseEvent<SVGPathElement>, countryId: string) => {
+    showTooltip(e.clientX, e.clientY, countryId);
+  };
+
+  const handleMapLeave = () => {
+    setSelectedCountryId(null);
+  };
+
   const handleCountryClick = (e: React.MouseEvent<SVGPathElement>, countryId: string) => {
-    selectCountry(e.clientX, e.clientY, countryId);
+    showTooltip(e.clientX, e.clientY, countryId);
   };
 
   const handleCountryTouch = (e: React.TouchEvent<SVGPathElement>, countryId: string) => {
     const touch = e.touches[0];
     if (touch) {
-      selectCountry(touch.clientX, touch.clientY, countryId);
+      showTooltip(touch.clientX, touch.clientY, countryId);
     }
   };
 
+  const handleMarkerHover = (e: React.MouseEvent<SVGGElement>, countryId: string) => {
+    showTooltip(e.clientX, e.clientY, countryId);
+  };
+
   const handleMarkerClick = (e: React.MouseEvent<SVGGElement>, countryId: string) => {
-    selectCountry(e.clientX, e.clientY, countryId);
+    showTooltip(e.clientX, e.clientY, countryId);
   };
 
   return (
@@ -267,18 +279,21 @@ export const HeroMap = React.memo(() => {
           .hm-country-interactive {
             fill: transparent;
             cursor: pointer;
-            transition: fill 0.3s ease, stroke 0.3s ease, stroke-opacity 0.3s ease;
+            transition: fill 0.2s ease, fill-opacity 0.2s ease, stroke 0.2s ease, stroke-opacity 0.2s ease;
           }
           .hm-country-interactive:hover {
             fill: var(--color-accent);
-            fill-opacity: 0.05;
+            fill-opacity: 0.18;
+            stroke: var(--color-accent);
+            stroke-width: 1px;
+            stroke-opacity: 0.5;
           }
           .hm-country-interactive.selected {
             fill: var(--color-accent);
-            fill-opacity: 0.12;
+            fill-opacity: 0.28;
             stroke: var(--color-accent);
-            stroke-width: 0.8px;
-            stroke-opacity: 0.6;
+            stroke-width: 1px;
+            stroke-opacity: 0.75;
           }
 
           .hm-continent-outline {
@@ -419,46 +434,33 @@ export const HeroMap = React.memo(() => {
           }
         `}</style>
 
-        {/* Premium Statistics Card Tooltip/Pop-up */}
+        {/* Tooltip — pointerEvents:none so it never blocks SVG hover */}
         {selectedCountry && (
           <div
             style={{
               position: 'absolute',
-              left: `${Math.max(10, Math.min(tooltipPos.x - 100, (containerRef.current?.getBoundingClientRect().width || 600) - 210))}px`,
-              top: `${Math.max(10, Math.min(tooltipPos.y, (containerRef.current?.getBoundingClientRect().height || 500) - 150))}px`,
+              left: `${Math.max(10, Math.min(tooltipPos.x - 100, (containerRef.current?.getBoundingClientRect().width || 600) - 220))}px`,
+              top: `${Math.max(10, tooltipPos.y)}px`,
               width: '200px',
-              backgroundColor: 'rgba(10, 20, 15, 0.92)',
+              backgroundColor: 'rgba(8, 18, 12, 0.94)',
               border: '1.5px solid var(--color-accent)',
-              borderRadius: '8px',
-              padding: '12px',
+              borderRadius: '10px',
+              padding: '12px 14px',
               color: 'white',
-              boxShadow: '0 8px 32px rgba(0, 255, 102, 0.12)',
-              backdropFilter: 'blur(8px)',
+              boxShadow: '0 8px 32px rgba(0, 255, 102, 0.18)',
+              backdropFilter: 'blur(12px)',
               zIndex: 100,
-              pointerEvents: 'auto',
-              animation: 'hm-fade-in-up 0.2s ease-out forwards',
+              pointerEvents: 'none',
+              animation: 'hm-fade-in-up 0.15s ease-out forwards',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontWeight: 'bold', color: 'white', fontSize: '0.95rem' }}>{selectedCountry.name}</span>
-              <button
-                onClick={() => setSelectedCountryId(null)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'rgba(255, 255, 255, 0.4)',
-                  cursor: 'pointer',
-                  fontSize: '0.8rem',
-                  padding: '2px',
-                }}
-              >
-                ✕
-              </button>
+            <div style={{ fontWeight: 700, color: 'var(--color-accent)', fontSize: '0.95rem', marginBottom: '6px', borderBottom: '1px solid rgba(52,211,153,0.2)', paddingBottom: '6px' }}>
+              {selectedCountry.name}
             </div>
-            <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '4px' }}>
+            <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.65)', marginBottom: '4px' }}>
               Capital: <strong style={{ color: 'white' }}>{selectedCountry.capital}</strong>
             </div>
-            <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+            <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.65)' }}>
               Est. Talent: <strong style={{ color: 'var(--color-accent)' }}>{selectedCountry.talent}</strong>
             </div>
           </div>
@@ -470,6 +472,7 @@ export const HeroMap = React.memo(() => {
           height="100%"
           xmlns="http://www.w3.org/2000/svg"
           style={{ overflow: 'visible', maxWidth: '100%', maxHeight: '100%', display: 'block', margin: 'auto' }}
+          onMouseLeave={handleMapLeave}
         >
           <defs>
             <pattern id="map-dot-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
@@ -514,6 +517,7 @@ export const HeroMap = React.memo(() => {
                     key={`interactive-${country.id}`}
                     d={country.d}
                     className={`hm-country-interactive${isSelected ? ' selected' : ''}`}
+                    onMouseEnter={(e) => handleCountryHover(e, country.id)}
                     onClick={(e) => handleCountryClick(e, country.id)}
                     onTouchStart={(e) => handleCountryTouch(e, country.id)}
                   />
@@ -558,6 +562,7 @@ export const HeroMap = React.memo(() => {
                 <g
                   key={city.name}
                   style={{ cursor: 'pointer' }}
+                  onMouseEnter={(e) => handleMarkerHover(e, city.countryId)}
                   onClick={(e) => handleMarkerClick(e, city.countryId)}
                 >
                   {isYangoHub ? (
@@ -658,7 +663,7 @@ export const HeroMap = React.memo(() => {
             Our vision is to empower cross-African work and collaboration.
           </p>
           <p style={{ fontSize: '0.65rem', opacity: 0.5 }}>
-            Tap, zoom in and tap the countries to learn more.
+            Hover or tap the countries to learn more.
           </p>
         </div>
       </div>

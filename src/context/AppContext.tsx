@@ -35,7 +35,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [recruiters, setRecruiters] = useState<RecruiterProfile[]>([]);
-  const [theme, setThemeState] = useState<'dark' | 'light'>('dark');
+  const [theme, setThemeState] = useState<'dark' | 'light'>('light');
   const [activeProfileId, setActiveProfileId] = useState<string>('talent-chidi');
   const [activeRecruiterId, setActiveRecruiterId] = useState<string>('recruiter-susupay');
   const [whatsappMessages, setWhatsappMessages] = useState<WhatsAppMessage[]>([]);
@@ -51,7 +51,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Load theme
     const savedTheme = localStorage.getItem('borderline_theme') as 'dark' | 'light';
-    const initialTheme = savedTheme || 'dark';
+    const initialTheme = savedTheme || 'light';
     setThemeState(initialTheme);
     document.body.className = `${initialTheme}-theme`;
 

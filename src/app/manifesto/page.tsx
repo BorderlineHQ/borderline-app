@@ -332,9 +332,17 @@ export default function ManifestoPage() {
               The Pan-African Market Projection
             </h3>
             <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-primary)' }}>
-              Africa&apos;s digital economy is projected to reach{' '}
-              <strong>$180 Billion by 2025</strong> and scale to{' '}
-              <strong>$712 Billion by 2050</strong>. Over{' '}
+              Africa&apos;s digital economy surpassed{' '}
+              <strong>$180 Billion by 2025</strong> and is projected to reach{' '}
+              <a
+                href="https://www.mastercard.com/news/eemea/en/newsroom/press-releases/en/2025-1/march/digital-payments-economy-in-africa-expected-to-reach-1-5-trillion-by-2030-according-to-new-report/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-link"
+              >
+                <strong>$1.5 Trillion by 2030</strong>
+              </a>
+              . Over{' '}
               <strong>5 million high-capability builders</strong> will enter the regional tech pipeline over the next
               decade. BorderLine is the transactional protocol connecting this human capital with continental startups,
               ensuring wealth and opportunity remain within Africa.

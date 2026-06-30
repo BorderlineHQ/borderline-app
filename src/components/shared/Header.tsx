@@ -42,8 +42,7 @@ const Header: React.FC = () => {
           
           {/* Platform Dropdown */}
           <div 
-            className="nav-dropdown" 
-            style={{ position: 'relative' }}
+            className="nav-dropdown"
             onMouseEnter={() => setPlatformDropdownOpen(true)}
             onMouseLeave={() => setPlatformDropdownOpen(false)}
           >
@@ -58,61 +57,58 @@ const Header: React.FC = () => {
               </svg>
             </button>
             {platformDropdownOpen && (
-              <div className="dropdown-menu" style={{ 
-                position: 'absolute', 
-                top: '100%', 
-                left: 0, 
-                backgroundColor: 'var(--color-surface)', 
-                border: '1px solid var(--color-border)',
-                borderRadius: '8px',
-                minWidth: '180px',
-                marginTop: '8px',
-                zIndex: 1001,
-                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
-              }}>
-                <Link href="/recruiter" onClick={() => setPlatformDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  borderBottom: '1px solid var(--color-border)',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+              <div className="dropdown-menu-wrapper">
+                <div style={{ 
+                  backgroundColor: 'var(--color-surface)', 
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '8px',
+                  minWidth: '180px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
                 }}>
-                  Recruiter Feed
-                </Link>
-                <Link href="/talent" onClick={() => setPlatformDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                }}>
-                  Talent Portal
-                </Link>
+                  <Link href="/recruiter" onClick={() => setPlatformDropdownOpen(false)} className="dropdown-item" style={{ 
+                    display: 'block', 
+                    padding: '10px 16px', 
+                    color: 'var(--color-text-secondary)',
+                    fontSize: '0.9rem',
+                    borderBottom: '1px solid var(--color-border)',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                    e.currentTarget.style.color = 'var(--color-accent)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  }}>
+                    Recruiter Feed
+                  </Link>
+                  <Link href="/talent" onClick={() => setPlatformDropdownOpen(false)} className="dropdown-item" style={{ 
+                    display: 'block', 
+                    padding: '10px 16px', 
+                    color: 'var(--color-text-secondary)',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                    e.currentTarget.style.color = 'var(--color-accent)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  }}>
+                    Talent Portal
+                  </Link>
+                </div>
               </div>
             )}
           </div>
 
           {/* Technology Dropdown */}
           <div 
-            className="nav-dropdown" 
-            style={{ position: 'relative' }}
+            className="nav-dropdown"
             onMouseEnter={() => setTechDropdownOpen(true)}
             onMouseLeave={() => setTechDropdownOpen(false)}
           >
@@ -127,61 +123,58 @@ const Header: React.FC = () => {
               </svg>
             </button>
             {techDropdownOpen && (
-              <div className="dropdown-menu" style={{ 
-                position: 'absolute', 
-                top: '100%', 
-                left: 0, 
-                backgroundColor: 'var(--color-surface)', 
-                border: '1px solid var(--color-border)',
-                borderRadius: '8px',
-                minWidth: '180px',
-                marginTop: '8px',
-                zIndex: 1001,
-                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
-              }}>
-                <Link href="/whatsapp" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  borderBottom: '1px solid var(--color-border)',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
+              <div className="dropdown-menu-wrapper">
+                <div style={{ 
+                  backgroundColor: 'var(--color-surface)', 
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '8px',
+                  minWidth: '180px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
                 }}>
-                  WhatsApp Bot
-                </Link>
-                <Link href="/manifesto" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                }}>
-                  Our Manifesto
-                </Link>
+                  <Link href="/whatsapp" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
+                    display: 'block', 
+                    padding: '10px 16px', 
+                    color: 'var(--color-text-secondary)',
+                    fontSize: '0.9rem',
+                    borderBottom: '1px solid var(--color-border)',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                    e.currentTarget.style.color = 'var(--color-accent)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  }}>
+                    WhatsApp Bot
+                  </Link>
+                  <Link href="/manifesto" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
+                    display: 'block', 
+                    padding: '10px 16px', 
+                    color: 'var(--color-text-secondary)',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                    e.currentTarget.style.color = 'var(--color-accent)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  }}>
+                    Our Manifesto
+                  </Link>
+                </div>
               </div>
             )}
           </div>
 
           {/* Resources Dropdown */}
           <div 
-            className="nav-dropdown" 
-            style={{ position: 'relative' }}
+            className="nav-dropdown"
             onMouseEnter={() => setResourcesDropdownOpen(true)}
             onMouseLeave={() => setResourcesDropdownOpen(false)}
           >
@@ -196,18 +189,14 @@ const Header: React.FC = () => {
               </svg>
             </button>
             {resourcesDropdownOpen && (
-              <div className="dropdown-menu" style={{ 
-                position: 'absolute', 
-                top: '100%', 
-                left: 0, 
+              <div className="dropdown-menu-wrapper">
+              <div style={{ 
                 backgroundColor: 'var(--color-surface)', 
                 border: '1px solid var(--color-border)',
                 borderRadius: '8px',
                 minWidth: '220px',
-                marginTop: '8px',
-                zIndex: 1001,
-                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
               }}>
                 <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
                   display: 'block', 
@@ -303,6 +292,7 @@ const Header: React.FC = () => {
                   <div style={{ fontWeight: 600 }}>Foundation</div>
                   <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>BorderLine social impact</div>
                 </Link>
+              </div>
               </div>
             )}
           </div>

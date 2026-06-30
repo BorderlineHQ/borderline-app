@@ -104,7 +104,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${dmSans.variable} ${inter.variable} ${jetbrainsMono.variable} ${lora.variable}`}>
-      <body>
+      <body className="light-theme">
         <AppProvider>
           <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             <Header />
