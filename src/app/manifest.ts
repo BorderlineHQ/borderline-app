@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     background_color: "#030712", // Aligns with --color-bg in dark theme
-    theme_color: "#22C55E",      // Aligns with --color-accent
+    theme_color: "#030712",      // Dark so Safari status bar is not green
     icons: [
       {
         src: "/icon.png",

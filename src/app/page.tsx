@@ -378,7 +378,7 @@ A full-stack web application that helps students form peer study groups based on
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            overflow: 'hidden',
+            overflow: 'visible',
           }}>
             <HeroMap />
           </div>

@@ -159,12 +159,12 @@ export default function ManifestoPage() {
               lineHeight: 1.1,
               letterSpacing: '-0.04em',
               marginBottom: 'var(--spacing-md)',
-              background:
-                theme === 'dark'
-                  ? 'linear-gradient(135deg, #FFFFFF 40%, var(--color-text-secondary) 100%)'
-                  : 'var(--color-text-primary)',
-              WebkitBackgroundClip: theme === 'dark' ? 'text' : undefined,
-              WebkitTextFillColor: theme === 'dark' ? 'transparent' : undefined,
+              color: 'var(--color-text-primary)',
+              ...(theme === 'dark' ? {
+                background: 'linear-gradient(135deg, #FFFFFF 40%, var(--color-text-secondary) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              } : {}),
             }}
           >
             Africans Hiring Africans
@@ -200,8 +200,7 @@ export default function ManifestoPage() {
             }}
           >
             <em>
-              Our 2026 BorderLine survey of 37 tech and creative students across Zambia, Ghana, South Africa, and
-              Nigeria uncovered three systemic choke points.
+              Our 2026 BorderLine survey of tech and creative students across Zambia, Ghana, Mozambique, and Ivory Coast uncovered three systemic choke points.
             </em>
           </p>
           <div className="stats-grid">
