@@ -275,8 +275,12 @@ export const HeroMap = React.memo(() => {
         const panX = (g.startX - cx) * (g.startVB.w / rect.width);
         const panY = (g.startY - cy) * (g.startVB.h / rect.height);
 
-        const newX = focusSvgX - (focusSvgX - g.startVB.x) * (newW / g.startVB.w) + panX;
-        const newY = focusSvgY - (focusSvgY - g.startVB.y) * (newH / g.startVB.h) + panY;
+        let newX = focusSvgX - (focusSvgX - g.startVB.x) * (newW / g.startVB.w) + panX;
+        let newY = focusSvgY - (focusSvgY - g.startVB.y) * (newH / g.startVB.h) + panY;
+
+        // Clamp to prevent infinite scrolling
+        newX = Math.max(-40, Math.min(740 - newW, newX));
+        newY = Math.max(-40, Math.min(760 - newH, newY));
 
         updateVb({ x: newX, y: newY, w: newW, h: newH });
 
@@ -286,7 +290,15 @@ export const HeroMap = React.memo(() => {
         if (Math.abs(dx) < 1.5 && Math.abs(dy) < 1.5) return;
         // Prevent page scroll only when map is actually panning
         e.preventDefault();
-        updateVb({ x: g.startVB.x + dx, y: g.startVB.y + dy, w: g.startVB.w, h: g.startVB.h });
+        
+        let newX = g.startVB.x + dx;
+        let newY = g.startVB.y + dy;
+
+        // Clamp to prevent infinite scrolling
+        newX = Math.max(-40, Math.min(740 - g.startVB.w, newX));
+        newY = Math.max(-40, Math.min(760 - g.startVB.h, newY));
+
+        updateVb({ x: newX, y: newY, w: g.startVB.w, h: g.startVB.h });
       }
     };
 
