@@ -108,11 +108,10 @@ export default function CourseCard({
             <h3 style={{
               fontSize: '1.25rem', 
               fontWeight: 800, 
-              color: 'var(--color-text-primary)',
               lineHeight: 1.3, 
               marginBottom: '10px',
               transition: 'color var(--transition-fast)',
-              color: isHovered || isExpanded ? 'var(--color-text-primary)' : 'var(--color-text-primary)'
+              color: isHovered || isExpanded ? 'var(--color-accent)' : 'var(--color-text-primary)'
             }}>
               {course.title}
             </h3>
