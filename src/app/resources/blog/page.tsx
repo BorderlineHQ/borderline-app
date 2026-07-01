@@ -23,9 +23,9 @@ const mockPosts: BlogPost[] = [
     date: 'June 28, 2026',
     readTime: '5 min read',
     author: {
-      name: 'Nii Odoi',
+      name: 'Godwin Okronipa',
       role: 'Founder, BorderLine',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100'
+      avatar: '/godwin_okronipa.jpg'
     },
     excerpt: 'Traditional hiring systems favor legacy credentials. Here\'s how verifiable proof-of-work is enabling early-career talent across Africa to secure gigs they actually deserve.',
     image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800',
@@ -50,8 +50,8 @@ const mockPosts: BlogPost[] = [
     date: 'June 22, 2026',
     readTime: '6 min read',
     author: {
-      name: 'Naledi Dube',
-      role: 'UI Designer & Researcher',
+      name: 'Titos',
+      role: 'Design & Validation, BorderLine',
       avatar: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=100'
     },
     excerpt: 'Your beautiful glassmorphism UI is invisible at noon in Makola Market. Here\'s what we learned about designing for real conditions.',
@@ -78,8 +78,8 @@ const mockPosts: BlogPost[] = [
     date: 'June 18, 2026',
     readTime: '8 min read',
     author: {
-      name: 'Kwesi Mensah',
-      role: 'API Engineer',
+      name: 'Luse',
+      role: 'Core Systems & APIs, BorderLine',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100'
     },
     excerpt: 'Over 400 million Africans still rely on feature phones. Here\'s how we connect USSD menus to modern React dashboards.',
@@ -108,8 +108,8 @@ const mockPosts: BlogPost[] = [
     date: 'June 14, 2026',
     readTime: '4 min read',
     author: {
-      name: 'Amina Osei',
-      role: 'Engineering Lead',
+      name: 'Braima',
+      role: 'Product & Research, BorderLine',
       avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=100'
     },
     excerpt: 'Cross-border freelancing without trust is impossible. Here\'s how Mobile Money escrow protects both builders and clients.',

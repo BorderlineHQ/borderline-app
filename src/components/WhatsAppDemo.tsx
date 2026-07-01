@@ -179,7 +179,7 @@ export const WhatsAppDemo: React.FC = () => {
 
           <div className="msg system msg-3">
             Application sent! ✅<br/><br/>
-            Your verified BorderLine profile and build score have been securely forwarded to Yango's HR. We'll text you when they review it.
+            Your verified BorderLine profile and build score have been securely forwarded to Yango&apos;s HR. We&apos;ll text you when they review it.
             <div className="msg-time">09:43</div>
           </div>
         </div>

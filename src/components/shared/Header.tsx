@@ -82,7 +82,7 @@ const Header: React.FC = () => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
-                    Recruiter Feed
+                    For Recruiters
                   </Link>
                   <Link href="/talent" onClick={() => setPlatformDropdownOpen(false)} className="dropdown-item" style={{ 
                     display: 'block', 
@@ -99,7 +99,7 @@ const Header: React.FC = () => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
-                    Talent Portal
+                    Find Work
                   </Link>
                 </div>
               </div>
@@ -408,10 +408,10 @@ const Header: React.FC = () => {
               Platform
             </div>
             <Link href="/recruiter" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/recruiter') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
-              Recruiter Feed
+              For Recruiters
             </Link>
             <Link href="/talent" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/talent') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
-              Talent Portal
+              Find Work
             </Link>
             <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
               Technology

@@ -3,7 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { useApp } from '../context/AppContext';
+import { mockCourses } from '../data/coursesData';
+import CourseCard from '../components/CourseCard';
 
 // Lazy-load heavy interactive components to improve First Contentful Paint (FCP)
 const HeroMap = dynamic(
@@ -116,6 +119,8 @@ const PartnerLogo: React.FC<{ domain: string; name: string }> = ({ name }) => {
 
 export default function Home() {
   const { theme, mounted } = useApp();
+  const router = useRouter();
+  const featuredCourses = mockCourses.slice(0, 3);
 
   const [selectedProfile, setSelectedProfile] = useState<any>(null);
   const [activeProject, setActiveProject] = useState<any>(null);
@@ -859,10 +864,72 @@ A full-stack web application that helps students form peer study groups based on
                 </li>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <span><strong> Jobs & Internships:</strong> Build companies, hire verified talent, and access potential direct hiring channels.</span>
+                  <span><strong> Jobs & Internships:</strong> Fill roles with vetted, high-calibre talent ready to deliver immediate value.</span>
                 </li>
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Courses Section */}
+      <section className="stats-section scroll-reveal" style={{ backgroundColor: 'var(--color-bg)', borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-xl)' }}>
+            <span className="feature-tag" style={{ color: 'var(--color-accent)', display: 'inline-block', margin: '0 auto var(--spacing-xs) auto' }}>
+              UPSKILL & GROW
+            </span>
+            <h2 className="section-title" style={{ marginTop: '8px', marginBottom: 'var(--spacing-md)' }}>
+              Peer-Led Programs for African Builders
+            </h2>
+            <p style={{
+              fontSize: '1.05rem', color: 'var(--color-text-secondary)', lineHeight: 1.6,
+              maxWidth: '640px', margin: '0 auto'
+            }}>
+              Master production-level skills in engineering, design, and business. Learn from experts, build verified portfolios, and showcase your firepower to global recruiters.
+            </p>
+          </div>
+
+          <div className="features-grid" style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+            gap: 'var(--spacing-lg)',
+            marginBottom: 'var(--spacing-xl)'
+          }}>
+            {featuredCourses.map((course) => (
+              <CourseCard
+                key={course.id}
+                course={course}
+                mode="preview"
+                onClickPreview={() => router.push(`/resources/upskill?course=${course.id}`)}
+              />
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center' }}>
+            <Link 
+              href="/resources/upskill" 
+              className="btn btn-primary"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 28px',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-accent)',
+                color: '#000000',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                textDecoration: 'none',
+                transition: 'all var(--transition-fast)'
+              }}
+            >
+              Explore All Courses
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>

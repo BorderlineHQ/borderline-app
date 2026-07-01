@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/purity */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Profile, Gig, Application, RecruiterProfile, WhatsAppMessage, Project } from '../types';

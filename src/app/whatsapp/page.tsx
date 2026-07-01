@@ -75,7 +75,7 @@ export default function WhatsAppSandbox() {
                   className={`btn ${p.id === activeProfileId ? 'btn-primary' : 'btn-secondary'}`}
                   style={{ padding: '6px 12px', fontSize: '0.8rem' }}
                 >
-                  {p.fullName.split(' ')[0]}'s Phone
+                  {p.fullName.split(' ')[0]}&apos;s Phone
                 </button>
               ))}
             </div>
@@ -92,7 +92,7 @@ export default function WhatsAppSandbox() {
             Quick Command Scripts
           </h3>
           <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: 'var(--spacing-md)' }}>
-            Click any card below to instantly transmit the text command from the developer's phone:
+            Click any card below to instantly transmit the text command from the developer&apos;s phone:
           </p>
 
           <div className="quick-trigger-grid">

@@ -70,3 +70,24 @@ export interface WhatsAppMessage {
   body: string;
   timestamp: string;
 }
+
+export interface Module {
+  id: string;
+  title: string;
+  duration: string;
+  description: string;
+  lessons: string[];
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  category: 'Tech' | 'Creativity' | 'Business';
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  duration: string;
+  instructor: string;
+  description: string;
+  skillsAcquired: string[];
+  modules: Module[];
+}
+
