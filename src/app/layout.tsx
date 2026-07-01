@@ -3,6 +3,7 @@ import { DM_Sans, Inter, JetBrains_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "../context/AppContext";
 import Header from "../components/shared/Header";
+import Footer from "../components/shared/Footer";
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
@@ -112,6 +113,7 @@ export default function RootLayout({
             <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
               {children}
             </main>
+            <Footer />
           </div>
         </AppProvider>
         <Analytics />

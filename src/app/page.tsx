@@ -859,7 +859,7 @@ A full-stack web application that helps students form peer study groups based on
                 </li>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <span><strong>Yango Jobs & Pipelines:</strong> Build companies, hire verified talent, and access potential direct hiring channels.</span>
+                  <span><strong> Jobs & Internships:</strong> Build companies, hire verified talent, and access potential direct hiring channels.</span>
                 </li>
               </ul>
             </div>

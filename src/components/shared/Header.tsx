@@ -180,7 +180,7 @@ const Header: React.FC = () => {
           >
             <button 
               onClick={() => setResourcesDropdownOpen(!resourcesDropdownOpen)}
-              className={`nav-item dropdown-trigger ${isActive('/development') ? 'active' : ''}`}
+              className={`nav-item dropdown-trigger ${isActive('/resources') ? 'active' : ''}`}
               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               Resources
@@ -198,7 +198,7 @@ const Header: React.FC = () => {
                 overflow: 'hidden',
                 boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
               }}>
-                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                <Link href="/resources/upskill" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
                   display: 'block', 
                   padding: '10px 16px', 
                   color: 'var(--color-text-secondary)',
@@ -222,7 +222,7 @@ const Header: React.FC = () => {
                   <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Programs to grow your career</div>
                 </Link>
 
-                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                <Link href="/resources/communities" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
                   display: 'block', 
                   padding: '10px 16px', 
                   color: 'var(--color-text-secondary)',
@@ -246,7 +246,7 @@ const Header: React.FC = () => {
                   <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Join peer developer circles</div>
                 </Link>
 
-                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                <Link href="/resources/blog" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
                   display: 'block', 
                   padding: '10px 16px', 
                   color: 'var(--color-text-secondary)',
@@ -270,7 +270,7 @@ const Header: React.FC = () => {
                   <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Latest updates and guides</div>
                 </Link>
 
-                <Link href="/development" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
+                <Link href="/resources/foundation" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
                   display: 'block', 
                   padding: '10px 16px', 
                   color: 'var(--color-text-secondary)',
@@ -333,6 +333,20 @@ const Header: React.FC = () => {
             </button>
           </div>
 
+          {/* Sign In link */}
+          <Link href="/talent/login" style={{ 
+            fontSize: '0.8rem', 
+            color: 'var(--color-text-secondary)', 
+            fontWeight: 600, 
+            textDecoration: 'none',
+            marginRight: '6px',
+            transition: 'color var(--transition-fast)'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-secondary)'}>
+            Sign In
+          </Link>
+
           {/* Partner with Us link */}
           <Link href="/recruiter" className="btn btn-secondary btn-header-partner" style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.8rem', fontWeight: 600 }}>
             Partner with Us
@@ -387,6 +401,9 @@ const Header: React.FC = () => {
             <Link href="/" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/') ? 'active' : ''}`}>
               Home
             </Link>
+            <Link href="/talent/login" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/talent/login') || isActive('/recruiter/login') ? 'active' : ''}`} style={{ fontWeight: 600, color: 'var(--color-accent)' }}>
+              Sign In
+            </Link>
             <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
               Platform
             </div>
@@ -408,16 +425,16 @@ const Header: React.FC = () => {
             <div style={{ paddingLeft: '12px', color: 'var(--color-text-primary)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', paddingTop: '12px', paddingBottom: '8px', marginTop: '8px', borderTop: '1px solid var(--color-border)' }}>
               Resources
             </div>
-            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+            <Link href="/resources/upskill" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/resources/upskill') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               Upskill & Grow
             </Link>
-            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+            <Link href="/resources/communities" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/resources/communities') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               Communities
             </Link>
-            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+            <Link href="/resources/blog" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/resources/blog') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               Blog & Insights
             </Link>
-            <Link href="/development" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/development') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+            <Link href="/resources/foundation" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/resources/foundation') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               Foundation
             </Link>
           </nav>
