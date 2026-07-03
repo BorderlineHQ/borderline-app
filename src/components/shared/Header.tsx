@@ -13,8 +13,6 @@ const Header: React.FC = () => {
   const [techDropdownOpen, setTechDropdownOpen] = useState(false);
   const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
 
-  if (!mounted) return null;
-
   const isActive = (path: string) => {
     if (path === '/' && pathname !== '/') return false;
     return pathname?.startsWith(path);
@@ -23,12 +21,11 @@ const Header: React.FC = () => {
   return (
     <header className={`site-header ${mobileMenuOpen ? 'mobile-open' : ''}`}>
       <div className="header-container">
-        {/* Logo */}
         <Link href="/" className="logo-link">
           <div className="logo-icon" style={{ display: 'flex', alignItems: 'center' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" clipRule="evenodd" d="M6 3h7c2.76 0 5 2.24 5 5 0 1.83-1 3.43-2.5 4.25 1.5.82 2.5 2.42 2.5 4.25 0 2.76-2.24 5-5 5H6V3zm4 3v4h3c1.1 0 2-.9 2-2s-.9-2-2-2h-3zm0 7v4h3c1.1 0 2-.9 2-2s-.9-2-2-2h-3z" fill="currentColor"/>
-              <rect x="5" y="21" width="14" height="2.5" rx="1.25" fill="var(--color-accent)"/>
+              <path fillRule="evenodd" clipRule="evenodd" d="M5 2h9c3 0 5 2 5 4.5 0 2.5-2 3.5-5 3.5 3 0 5 1 5 3.5 0 2.5-2 4.5-5 4.5H5V2zm4 3v4h4c1.2 0 2-.8 2-2s-.8-2-2-2H9zm0 6v4h4c1.2 0 2-.8 2-2s-.8-2-2-2H9z" fill="currentColor"/>
+              <rect x="4" y="21" width="16" height="2.5" rx="1.25" fill="var(--color-accent)"/>
             </svg>
           </div>
           <span className="logo-text">Border<span style={{ color: 'var(--color-accent)' }}>Line</span></span>

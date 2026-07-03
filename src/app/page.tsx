@@ -125,6 +125,64 @@ export default function Home() {
   const [selectedProfile, setSelectedProfile] = useState<any>(null);
   const [activeProject, setActiveProject] = useState<any>(null);
 
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [activeDot, setActiveDot] = useState(0);
+
+  const checkScroll = () => {
+    if (carouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+      
+      const children = carouselRef.current.children;
+      let closestIdx = 0;
+      let minDiff = Infinity;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i] as HTMLElement;
+        const diff = Math.abs(child.offsetLeft - scrollLeft - carouselRef.current.offsetLeft);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = i;
+        }
+      }
+      setActiveDot(closestIdx);
+    }
+  };
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (el) {
+      el.addEventListener('scroll', checkScroll);
+      // Wait a moment for layout sizing before checking scroll
+      const timer = setTimeout(checkScroll, 100);
+      window.addEventListener('resize', checkScroll);
+      return () => {
+        el.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+        clearTimeout(timer);
+      };
+    }
+  }, []);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const { clientWidth } = carouselRef.current;
+      const scrollAmount = direction === 'left' ? -clientWidth : clientWidth;
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToCard = (index: number) => {
+    if (carouselRef.current) {
+      const children = carouselRef.current.children;
+      if (children[index]) {
+        children[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+      }
+    }
+  };
+
   const showcaseProfiles = [
     {
       id: 'chidi',
@@ -326,8 +384,6 @@ A full-stack web application that helps students form peer study groups based on
     };
   }, []);
 
-  if (!mounted) return null;
-
   return (
     <div className="landing-page">
       {/* Hero Section */}
@@ -355,7 +411,7 @@ A full-stack web application that helps students form peer study groups based on
             ].map((text, idx) => (
               <div key={idx} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <polyline points="20 6 9 17 4 12"/>
+                  <polyline points="20 6 9 17 4 12" />
                 </svg>
                 <span>{text}</span>
               </div>
@@ -407,9 +463,9 @@ A full-stack web application that helps students form peer study groups based on
 
           <div className="card-stack-container">
             {showcaseProfiles.map((profile) => (
-              <div 
-                key={profile.id} 
-                className="sticky-stacked-card" 
+              <div
+                key={profile.id}
+                className="sticky-stacked-card"
                 onClick={() => {
                   setSelectedProfile(profile);
                   setActiveProject(profile.projects[0]);
@@ -420,19 +476,19 @@ A full-stack web application that helps students form peer study groups based on
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <span className="badge badge-verified" style={{ fontSize: '0.7rem', padding: '4px 8px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center' }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 11 2 2 4-4"/>
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 11 2 2 4-4" />
                     </svg>
                     AI & Peer-Verified
                   </span>
-                  
+
                   {/* Small avatar group on top right */}
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     {['https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=40', 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=40', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=40'].map((url, idx) => (
-                      <img 
-                        key={idx} 
-                        src={url} 
-                        alt="Auditor Avatar" 
-                        style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--color-surface-elevated)', marginLeft: idx > 0 ? '-6px' : '0', objectFit: 'cover' }} 
+                      <img
+                        key={idx}
+                        src={url}
+                        alt="Auditor Avatar"
+                        style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--color-surface-elevated)', marginLeft: idx > 0 ? '-6px' : '0', objectFit: 'cover' }}
                       />
                     ))}
                   </div>
@@ -440,8 +496,8 @@ A full-stack web application that helps students form peer study groups based on
 
                 {/* Avatar and name */}
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '16px' }}>
-                  <img 
-                    src={profile.avatarUrl} 
+                  <img
+                    src={profile.avatarUrl}
                     alt={profile.fullName}
                     style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '1px solid var(--color-border)' }}
                   />
@@ -449,12 +505,12 @@ A full-stack web application that helps students form peer study groups based on
                     <div style={{ fontWeight: '800', fontSize: '1.05rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       {profile.fullName}
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 11 2 2 4-4"/>
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 11 2 2 4-4" />
                       </svg>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center' }}>
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
-                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" />
                       </svg>
                       {profile.country} • {profile.techFocus}
                     </div>
@@ -498,8 +554,8 @@ A full-stack web application that helps students form peer study groups based on
                 </div>
                 {/* Crawlable link to the public profile for SEO optimization */}
                 <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--color-border)', paddingTop: '12px' }}>
-                  <Link 
-                    href={`/in/${profile.id}`} 
+                  <Link
+                    href={`/in/${profile.id}`}
                     style={{ fontSize: '0.8rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: 'var(--color-accent)' }}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -627,8 +683,8 @@ A full-stack web application that helps students form peer study groups based on
             <div>
               <div className="about-image-wrapper">
                 <div className="about-image-bg"></div>
-                <img 
-                  src="/green-coffee-borderline.jpeg" 
+                <img
+                  src="/green-coffee-borderline.jpeg"
                   alt="Keziah Tsepiso - Freelancer, Creative Leader"
                 />
                 <div className="about-floating-card">
@@ -637,27 +693,27 @@ A full-stack web application that helps students form peer study groups based on
                   <div className="about-floating-links">
                     <a href="https://figma.com/@keziah" target="_blank" rel="noopener noreferrer" className="about-floating-link">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/>
-                        <path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/>
-                        <path d="M12 9h3.5a3.5 3.5 0 1 1-3.5 3.5V9z"/>
-                        <path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/>
-                        <path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/>
+                        <path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z" />
+                        <path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z" />
+                        <path d="M12 9h3.5a3.5 3.5 0 1 1-3.5 3.5V9z" />
+                        <path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z" />
+                        <path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z" />
                       </svg>
                       <span>Figma</span>
                     </a>
                     <a href="https://linkedin.com/in/keziah" target="_blank" rel="noopener noreferrer" className="about-floating-link">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
-                        <rect x="2" y="9" width="4" height="12"/>
-                        <circle cx="4" cy="4" r="2"/>
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                        <rect x="2" y="9" width="4" height="12" />
+                        <circle cx="4" cy="4" r="2" />
                       </svg>
                       <span>LinkedIn</span>
                     </a>
                     <a href="https://instagram.com/keziah" target="_blank" rel="noopener noreferrer" className="about-floating-link">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                       </svg>
                       <span>Instagram</span>
                     </a>
@@ -681,12 +737,12 @@ A full-stack web application that helps students form peer study groups based on
             <span style={{ color: 'var(--color-accent)' }}>Africa’s talent pool is booming, but the ecosystem can’t keep up.</span>
           </h2>
           <p style={{ maxWidth: '700px', margin: '0 auto var(--spacing-lg)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
-            <em>Our 2026 BorderLine survey of 100+ tech and creative students across 6 African nations uncovered three systemic choke points that hinder growth.</em> 
+            <em>Our 2026 BorderLine survey of 100+ tech and creative students across 6 African nations uncovered three systemic choke points that hinder growth.</em>
           </p>
           <div className="stats-grid">
             <StatCard
               target={70}
-              desc="excluded by arbitrary years-of-experience requirements"
+              desc="excluded by unreasonable years-of-experience requirements"
             />
             <StatCard
               target={92}
@@ -720,7 +776,7 @@ A full-stack web application that helps students form peer study groups based on
                 <div className="feature-bullet-item">
                   <div className="feature-bullet-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 11 2 2 4-4"/>
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 11 2 2 4-4" />
                     </svg>
                   </div>
                   <div className="feature-bullet-text">
@@ -732,7 +788,7 @@ A full-stack web application that helps students form peer study groups based on
                 <div className="feature-bullet-item">
                   <div className="feature-bullet-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
                     </svg>
                   </div>
                   <div className="feature-bullet-text">
@@ -744,7 +800,7 @@ A full-stack web application that helps students form peer study groups based on
                 <div className="feature-bullet-item">
                   <div className="feature-bullet-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                     </svg>
                   </div>
                   <div className="feature-bullet-text">
@@ -772,7 +828,7 @@ A full-stack web application that helps students form peer study groups based on
               <div className="metric-card-box">
                 <div className="metric-card-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '8px', color: 'var(--color-accent)' }}>
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
                 </div>
                 <div className="metric-card-num" style={{ fontSize: '1.2rem' }}>AI-Driven Discovery</div>
@@ -825,21 +881,21 @@ A full-stack web application that helps students form peer study groups based on
             <div className="card">
               <h3 style={{ fontSize: '1.4rem', color: 'var(--color-accent)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-accent)' }}>
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                 </svg>
                 For Technologists, Creatives & Students
               </h3>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent)' }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent)' }}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                   <span><strong>Turn projects into proof:</strong> AI converts your code repos, design files, and creative portfolios into structured case studies employers trust.</span>
                 </li>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent)' }}><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent)' }}><circle cx="12" cy="12" r="2" /><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" /></svg>
                   <span><strong>Access without infrastructure:</strong> Update your profile, receive matches, and check payout stats via text.</span>
                 </li>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent)' }}><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent)' }}><rect x="2" y="4" width="20" height="16" rx="2" ry="2" /><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
                   <span><strong>Earn from day one:</strong> Instantly apply to verified regional micro-gigs and global remote contracts.</span>
                 </li>
               </ul>
@@ -849,21 +905,21 @@ A full-stack web application that helps students form peer study groups based on
             <div className="card">
               <h3 style={{ fontSize: '1.4rem', color: 'var(--color-accent-secondary)', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-accent-secondary)' }}>
-                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="16"/><line x1="15" y1="22" x2="15" y2="16"/><path d="M9 16h6"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01"/>
+                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2" /><line x1="9" y1="22" x2="9" y2="16" /><line x1="15" y1="22" x2="15" y2="16" /><path d="M9 16h6" /><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01" />
                 </svg>
                 For Recruiters & Startups
               </h3>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 11 2 2 4-4"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 11 2 2 4-4" /></svg>
                   <span><strong>Zero vetting overhead:</strong> View AI-structured summaries and automated codebase audits directly on candidate cards.</span>
                 </li>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><circle cx="12" cy="12" r="10" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /><path d="M2 12h20" /></svg>
                   <span><strong>HR as a Service:</strong> Cross-border compliance, remote contracts, and micro-payments supporting Mobile Money.</span>
                 </li>
                 <li style={{ fontSize: '0.95rem', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: '3px', flexShrink: 0, color: 'var(--color-accent-secondary)' }}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                   <span><strong> Jobs & Internships:</strong> Fill roles with vetted, high-calibre talent ready to deliver immediate value.</span>
                 </li>
               </ul>
@@ -890,25 +946,124 @@ A full-stack web application that helps students form peer study groups based on
             </p>
           </div>
 
-          <div className="features-grid" style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-            gap: 'var(--spacing-lg)',
-            marginBottom: 'var(--spacing-xl)'
-          }}>
-            {featuredCourses.map((course) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                mode="preview"
-                onClickPreview={() => router.push(`/resources/upskill?course=${course.id}`)}
-              />
-            ))}
+          {/* Carousel container */}
+          <div className="course-carousel-wrapper" style={{ position: 'relative', width: '100%', marginBottom: 'var(--spacing-xl)' }}>
+            
+            {/* Scroll Track */}
+            <div 
+              ref={carouselRef}
+              className="course-carousel-track"
+              style={{
+                display: 'flex',
+                gap: 'var(--spacing-lg)',
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                scrollBehavior: 'smooth',
+                WebkitOverflowScrolling: 'touch',
+                padding: '12px 4px', // padding for card hover translate and shadow
+                margin: '0 -4px',
+              }}
+            >
+              {featuredCourses.map((course) => (
+                <div 
+                  key={course.id}
+                  className="course-carousel-slide"
+                  style={{
+                    scrollSnapAlign: 'start',
+                  }}
+                >
+                  <CourseCard
+                    course={course}
+                    mode="preview"
+                    onClickPreview={() => router.push(`/resources/upskill?course=${course.id}`)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Left Control Arrow */}
+            {canScrollLeft && (
+              <button
+                onClick={() => scroll('left')}
+                className="carousel-arrow-btn left"
+                aria-label="Scroll left"
+                style={{
+                  position: 'absolute',
+                  left: '-20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 10,
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+            )}
+
+            {/* Right Control Arrow */}
+            {canScrollRight && (
+              <button
+                onClick={() => scroll('right')}
+                className="carousel-arrow-btn right"
+                aria-label="Scroll right"
+                style={{
+                  position: 'absolute',
+                  right: '-20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 10,
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            )}
           </div>
 
+          {/* Dots Indicator */}
+          {(canScrollLeft || canScrollRight) && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: 'var(--spacing-xl)' }}>
+              {featuredCourses.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => scrollToCard(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  style={{
+                    width: activeDot === idx ? '24px' : '8px',
+                    height: '8px',
+                    borderRadius: '4px',
+                    backgroundColor: activeDot === idx ? 'var(--color-accent)' : 'var(--color-border)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    transition: 'all 0.3s ease',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
           <div style={{ textAlign: 'center' }}>
-            <Link 
-              href="/resources/upskill" 
+            <Link
+              href="/resources/upskill"
               className="btn btn-primary"
               style={{
                 display: 'inline-flex',
@@ -962,8 +1117,8 @@ A full-stack web application that helps students form peer study groups based on
             <div className="footer-col">
               <div className="footer-logo" style={{ justifyContent: 'flex-start', margin: 0 }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M6 3h7c2.76 0 5 2.24 5 5 0 1.83-1 3.43-2.5 4.25 1.5.82 2.5 2.42 2.5 4.25 0 2.76-2.24 5-5 5H6V3zm4 3v4h3c1.1 0 2-.9 2-2s-.9-2-2-2h-3zm0 7v4h3c1.1 0 2-.9 2-2s-.9-2-2-2h-3z" fill="currentColor"/>
-                  <rect x="5" y="21" width="14" height="2.5" rx="1.25" fill="var(--color-accent)"/>
+                  <path fillRule="evenodd" clipRule="evenodd" d="M5 2h9c3 0 5 2 5 4.5 0 2.5-2 3.5-5 3.5 3 0 5 1 5 3.5 0 2.5-2 4.5-5 4.5H5V2zm4 3v4h4c1.2 0 2-.8 2-2s-.8-2-2-2H9zm0 6v4h4c1.2 0 2-.8 2-2s-.8-2-2-2H9z" fill="currentColor" />
+                  <rect x="4" y="21" width="16" height="2.5" rx="1.25" fill="var(--color-accent)" />
                 </svg>
                 <span className="logo-text" style={{ fontSize: '1.25rem' }}>Border<span>Line</span></span>
               </div>
@@ -972,13 +1127,13 @@ A full-stack web application that helps students form peer study groups based on
               </p>
               <div className="footer-socials" style={{ display: 'flex', gap: '8px' }}>
                 <a href="#" className="footer-social-icon" aria-label="GitHub">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
                 </a>
                 <a href="#" className="footer-social-icon" aria-label="Twitter">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" /></svg>
                 </a>
                 <a href="#" className="footer-social-icon" aria-label="LinkedIn">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
                 </a>
               </div>
             </div>
@@ -1012,10 +1167,10 @@ A full-stack web application that helps students form peer study groups based on
                 Get the latest updates on the African tech ecosystem and the future of global work.
               </p>
               <form onSubmit={(e) => e.preventDefault()} className="newsletter-form">
-                <input 
-                  type="email" 
-                  className="newsletter-input" 
-                  placeholder="name@company.com" 
+                <input
+                  type="email"
+                  className="newsletter-input"
+                  placeholder="name@company.com"
                   required
                 />
                 <button type="submit" className="newsletter-submit">Subscribe</button>
@@ -1043,15 +1198,15 @@ A full-stack web application that helps students form peer study groups based on
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button className="drawer-close" id="btn-close-candidate-drawer" onClick={() => setSelectedProfile(null)}>✕</button>
               <span className="badge badge-verified" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
                 AI-Verified Portfolio
               </span>
             </div>
 
             <div style={{ display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--spacing-md)', marginTop: '10px' }}>
-              <img 
-                src={selectedProfile.avatarUrl} 
-                alt={selectedProfile.fullName} 
+              <img
+                src={selectedProfile.avatarUrl}
+                alt={selectedProfile.fullName}
                 style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }}
                 id="drawer-candidate-avatar"
               />
@@ -1059,18 +1214,18 @@ A full-stack web application that helps students form peer study groups based on
                 <h3 style={{ fontSize: '1.25rem' }} id="drawer-candidate-name">{selectedProfile.fullName}</h3>
                 <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>{selectedProfile.techFocus}</p>
                 <p style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }} id="drawer-candidate-contact">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
                   <span>{selectedProfile.country}</span>
                 </p>
                 {/* Dynamic crawlable public link in the drawer */}
-                <Link 
+                <Link
                   href={`/in/${selectedProfile.id}`}
-                  style={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '4px', 
-                    fontSize: '0.75rem', 
-                    color: 'var(--color-accent)', 
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.75rem',
+                    color: 'var(--color-accent)',
                     fontWeight: 600,
                     textDecoration: 'none'
                   }}
@@ -1098,7 +1253,7 @@ A full-stack web application that helps students form peer study groups based on
             {/* Case Studies */}
             <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-md)', marginTop: '20px', textAlign: 'left' }} id="drawer-case-studies-block">
               <h4 className="switcher-title" style={{ marginBottom: '10px' }}>AI-Verified Case Studies</h4>
-              
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }} id="drawer-case-studies-container">
                 <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }} id="drawer-projects-tabs">
                   {selectedProfile.projects.map((p: any) => (

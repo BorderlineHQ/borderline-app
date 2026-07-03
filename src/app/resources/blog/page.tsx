@@ -186,6 +186,113 @@ const mockPosts: BlogPost[] = [
       'Today, Chidi freelances part-time while finishing his degree. He\'s earned more from code than most of his professors earn from teaching.',
       '*Your campus project isn\'t just coursework. It\'s your ticket.*'
     ]
+  },
+  {
+    id: 'post-7',
+    title: 'How to Build with LLMs: A Guide for African Developers',
+    category: 'Tech',
+    date: 'May 20, 2026',
+    readTime: '6 min read',
+    author: {
+      name: 'Luse',
+      role: 'Core Systems & APIs, BorderLine',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100'
+    },
+    excerpt: 'Building AI features when API credits cost dollars and networks are slow. Practical strategies for efficient prompt engineering and light integrations.',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&q=80&w=800',
+    content: [
+      'In San Francisco, developers spin up LangChain flows that make 20 sequential LLM calls per click. They don\'t worry about latency, and they certainly don\'t worry about a $0.15 API cost per user query.',
+      'For an engineer in Nairobi or Lagos building an app for local merchants, that architecture is dead on arrival.',
+      '## The Latency & Cost Problem',
+      'API queries to OpenAI or Anthropic travel over international undersea cables, adding 300ms of base latency. Combine that with local 3G networks and heavy agentic loops, and your chatbot takes 12 seconds to respond. At the same time, dollar-denominated API bills eat up your margins.',
+      'Here\'s how we build AI apps that are fast, cheap, and reliable for the African market.',
+      '## 1. Zero-Shot is Better Than Chain-of-Thought',
+      'Avoid multi-step reasoning loops on the client path. Instead, design single-shot prompt architectures that request structured JSON payloads. Keep system prompts short; you pay for every token in and out.',
+      '## 2. Aggressive Caching at the Gateway',
+      'Most user questions follow a power law. 80% of merchants ask the same 10 questions about invoicing or delivery. We cache LLM responses using Redis. If a query matches a cached pattern, we serve it in 10ms at zero API cost.',
+      '## 3. Light Embeddings for Local Search',
+      'Don\'t call an LLM for search. Use lightweight vector models to build a semantic search index of your documentation, and serve it directly. It\'s fast, private, and works offline-first.',
+      '## Start Light',
+      'AI shouldn\'t be a bloated layer. Use LLMs to structure messy inputs or summarize case studies, then rely on standard logic to do the heavy lifting.'
+    ]
+  },
+  {
+    id: 'post-8',
+    title: 'Sound Design in African Apps: Enhancing UX with Local Beats',
+    category: 'Product',
+    date: 'May 12, 2026',
+    readTime: '5 min read',
+    author: {
+      name: 'Titos',
+      role: 'Design & Validation, BorderLine',
+      avatar: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=100'
+    },
+    excerpt: 'Most UI sound effects are generic clicks. Here\'s how using rhythmic and cultural audio cues can improve comprehension and retention in mobile apps.',
+    image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&q=80&w=800',
+    content: [
+      'Why does every mobile application use the same flat, robotic clicks and whistles for button taps and success notifications? Those sounds are designed for Western desktop interfaces, not noisy outdoor environments.',
+      'When designing BorderLine\'s audio cues, we turned to rhythmic soundscapes that resonate locally.',
+      '## The Ambient Noise Challenge',
+      'A delivery driver navigating traffic in Kampala or a shopkeeper in a busy market cannot rely on visual cues alone. Screen glare and quick tasks mean they miss popup alerts. Typical high-frequency app beeps get drowned out by ambient street noise.',
+      '## Designing Cultural Audio Cues',
+      '**1. Low-frequency rhythmic beats.** We replaced the default success chime with a warm, double-beat drum cue resembling local percussion. Low frequencies cut through ambient high-frequency din much better.',
+      '**2. Call-and-response feedback.** For complex workflows (like escrow funding confirmation), we use a short melodic progression. An upward sequence denotes progress, while a resolved chord denotes finality.',
+      '**3. Audio-assisted accessibility.** Sound isn\'t just aesthetic; it\'s accessibility. Users with low literacy can navigate entire USSD and mobile money flows guided by clear, rhythmic audio signals.',
+      '## Sound Is Part of UI',
+      'Don\'t leave audio design as an afterthought. A cohesive sound profile makes your app feel familiar, reliable, and deeply integrated into the user\'s daily sensory environment.'
+    ]
+  },
+  {
+    id: 'post-9',
+    title: 'Data Analytics for African Retail: Informal Market Patterns',
+    category: 'Insights',
+    date: 'April 28, 2026',
+    readTime: '7 min read',
+    author: {
+      name: 'Braima',
+      role: 'Product & Research, BorderLine',
+      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=100'
+    },
+    excerpt: 'Informal retail drives 80% of consumer spending in Africa. How collecting and analyzing transaction logs reveals hidden economic trends.',
+    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800',
+    content: [
+      'Walk into any shop in Accra, Nairobi, or Dakar. You won\'t see barcode scanners or inventory software. You will see a physical paper ledger tracking credit, stock, and cash sales.',
+      'This informal sector constitutes the backbone of Africa\'s economy, yet it remains a data black box.',
+      '## The Ledger Opportunity',
+      'By digitizing these ledger logs (whether via simple web forms, WhatsApp bots, or SMS entries), we can capture micro-transaction data at the source. Once stored, standard statistical analysis reveals powerful seasonal trends, credit risk structures, and demand curves.',
+      '## Analyzing Informal Datasets',
+      '**1. Micro-Credit Modeling.** Analyzing transaction velocities and repayment frequencies allows us to compute realistic creditworthiness scores for merchants without standard credit reports.',
+      '**2. Supply Chain Orchestration.** Matching local vendor inventory logs with wholesale supply schedules reduces stock-outs and optimizes logistics routes.',
+      '**3. Cash Flow Forecasting.** Seasonal cycles in market traffic dictate cash liquidity demands. Analytics help vendors prepare for low-traffic months and inventory surges before holidays.',
+      '## Data Drives Trust',
+      'Data analytics isn\'t just for corporate boardrooms. Providing simple, visual insights back to market vendors empowers them to make smarter business decisions and unlock formal capital.'
+    ]
+  },
+  {
+    id: 'post-10',
+    title: 'Navigating Cross-Border Escrow: How to Handle Invoicing',
+    category: 'Growth',
+    date: 'April 15, 2026',
+    readTime: '5 min read',
+    author: {
+      name: 'Amina Osei',
+      role: 'Business Strategist',
+      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100'
+    },
+    excerpt: 'Getting paid internationally without high bank fees or payment delays. Best practices for African freelancers setting up contracts.',
+    image: 'https://images.unsplash.com/photo-1533750516457-a7f992034fec?auto=format&fit=crop&q=80&w=800',
+    content: [
+      'You just landed a remote consulting contract with a startup in New York. The deal is signed. Now comes the hard part: getting the money from their US bank account into your local mobile money wallet.',
+      'Wire transfers take days and eat up to 8% in hidden currency conversion margins and intermediary fees. Here is how to set up your invoicing pipeline efficiently.',
+      '## 1. Always Use Milestone-Based Escrow',
+      'Never agree to a 100% payout at the end of a project. Break the work down into weekly milestones, and require the client to fund each milestone in advance into a verified escrow system.',
+      '## 2. Invoices Should Match Local Regulations',
+      'Ensure your invoices clearly state the foreign source of income, service description, and intermediate routing details. This prevents local commercial banks from flagging the inward remittance.',
+      '## 3. Leverage Mobile Money Rails',
+      'Whenever possible, invoice in stablecoins or through payment aggregators that settle directly into Mobile Money (MTN MoMo, AirtelTigo, M-Pesa). Settlement is instant, and conversion fees are transparent.',
+      '## Value Your Work',
+      'Setting up a professional payment pipeline isn\'t just about convenience — it signals to international clients that you are a serious, organized builder who values their craft.'
+    ]
   }
 ];
 

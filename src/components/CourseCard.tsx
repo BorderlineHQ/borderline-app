@@ -29,370 +29,270 @@ export default function CourseCard({
   const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
   const isExpandable = mode === 'expandable';
 
+  // Extract instructor name (before comma)
+  const instructorName = course.instructor.split(',')[0].trim();
+  const instructorRole = course.instructor.includes(',') ? course.instructor.split(',').slice(1).join(',').trim() : '';
+
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={isExpandable ? onToggle : onClickPreview}
+      className="course-card-clean"
       style={{
         backgroundColor: 'var(--color-surface)',
         border: isExpanded 
           ? '1px solid var(--color-accent)' 
-          : isHovered 
-            ? '1px solid var(--color-accent-secondary)' 
-            : '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-lg)',
+          : '1px solid var(--color-border)',
+        borderRadius: '12px',
         overflow: 'hidden',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: isExpanded 
-          ? 'var(--color-accent-glow)' 
-          : isHovered 
-            ? '0 10px 25px -5px rgba(52, 211, 153, 0.08), 0 8px 10px -6px rgba(52, 211, 153, 0.05)'
-            : 'none',
+        boxShadow: isHovered 
+          ? '0 12px 32px -8px rgba(0,0,0,0.12)' 
+          : '0 1px 3px rgba(0,0,0,0.04)',
         transform: isHovered && !isExpanded ? 'translateY(-4px)' : 'none',
         cursor: 'pointer',
         position: 'relative',
+        ...(isExpanded ? { gridColumn: '1 / -1' } : {}),
       }}
     >
-      {/* Course Header / Main card click area */}
-      <div style={{ padding: '24px' }}>
-        {/* Top Row: category and level badges */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-          <span style={{
-            fontSize: '0.68rem', 
-            fontWeight: 700, 
-            padding: '4px 12px', 
-            borderRadius: '20px',
-            backgroundColor: cc.bg, 
-            color: cc.text, 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.05em',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}>
-            <span>{catEmoji[course.category]}</span>
-            {course.category}
-          </span>
-          
-          <span style={{
-            fontSize: '0.68rem', 
-            fontWeight: 600, 
-            padding: '3px 10px', 
-            borderRadius: '20px',
-            backgroundColor: 'var(--color-surface-elevated)', 
-            border: '1px solid var(--color-border)',
-            color: 'var(--color-text-secondary)',
-          }}>
-            {course.level}
-          </span>
-          
-          <span style={{
-            fontSize: '0.68rem', 
-            fontWeight: 700, 
-            padding: '3px 10px', 
-            borderRadius: '20px',
-            backgroundColor: 'rgba(245, 158, 11, 0.08)', 
-            color: '#f59e0b',
-            border: '1px solid rgba(245, 158, 11, 0.15)',
-            textTransform: 'uppercase', 
-            letterSpacing: '0.04em',
-          }}>
-            ⏳ Coming Soon
-          </span>
-        </div>
-
-        {/* Title + Description */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-          <div style={{ flex: 1 }}>
-            <h3 style={{
-              fontSize: '1.25rem', 
-              fontWeight: 800, 
-              lineHeight: 1.3, 
-              marginBottom: '10px',
-              transition: 'color var(--transition-fast)',
-              color: isHovered || isExpanded ? 'var(--color-accent)' : 'var(--color-text-primary)'
-            }}>
-              {course.title}
-            </h3>
-            <p style={{
-              fontSize: '0.88rem', 
-              color: 'var(--color-text-secondary)', 
-              lineHeight: 1.6, 
-              margin: 0,
-            }}>
-              {course.description}
-            </p>
-          </div>
-          
-          {isExpandable && (
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: isExpanded ? 'var(--color-accent-subtle)' : 'var(--color-surface-elevated)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: isExpanded ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
-              flexShrink: 0,
-              marginTop: '2px',
-              transition: 'all var(--transition-fast)'
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                style={{
-                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)', 
-                  transition: 'transform 0.25s ease',
-                  color: isExpanded ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
-                }}
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
-          )}
-        </div>
-
-        {/* Meta Info Row */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '24px', 
-          marginTop: '20px', 
-          flexWrap: 'wrap',
-          borderTop: '1px solid var(--color-border)',
-          paddingTop: '16px'
+      {/* Thumbnail Image */}
+      <div style={{
+        width: '100%',
+        height: isExpanded ? '220px' : '180px',
+        overflow: 'hidden',
+        position: 'relative',
+        backgroundColor: 'var(--color-surface-elevated)',
+      }}>
+        <img
+          src={course.thumbnail}
+          alt={course.title}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transition: 'transform 0.4s ease',
+            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+          }}
+        />
+        {/* Category badge floating on image */}
+        <span style={{
+          position: 'absolute',
+          top: '12px',
+          left: '12px',
+          fontSize: '0.68rem', 
+          fontWeight: 700, 
+          padding: '4px 10px', 
+          borderRadius: '6px',
+          backgroundColor: 'rgba(0,0,0,0.65)', 
+          color: '#fff', 
+          textTransform: 'uppercase', 
+          letterSpacing: '0.04em',
+          backdropFilter: 'blur(8px)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
         }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-text-tertiary)' }}>
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
+          <span>{catEmoji[course.category]}</span>
+          {course.category}
+        </span>
+      </div>
+
+      {/* Card Body */}
+      <div style={{ padding: '16px 20px 20px' }}>
+        {/* Title */}
+        <h3 style={{
+          fontSize: '0.95rem', 
+          fontWeight: 700, 
+          lineHeight: 1.4, 
+          color: 'var(--color-text-primary)',
+          marginBottom: '10px',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical' as const,
+          overflow: 'hidden',
+        }}>
+          {course.title}
+        </h3>
+
+        {/* Metadata row: Duration, Modules, Lessons */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          fontSize: '0.75rem',
+          color: 'var(--color-text-tertiary)',
+          marginBottom: '14px',
+        }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             {course.duration}
           </span>
-          
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-text-tertiary)' }}>
-              <rect x="2" y="3" width="20" height="14" rx="2" />
-              <line x1="8" y1="21" x2="16" y2="21" />
-              <line x1="12" y1="17" x2="12" y2="21" />
-            </svg>
-            {course.modules.length} modules · {totalLessons} lessons
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            {course.modules.length} Modules
           </span>
-          
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-text-tertiary)' }}>
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            {course.instructor}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 10 3 12 0v-5"/></svg>
+            {totalLessons} Lessons
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: '1px', backgroundColor: 'var(--color-border)', marginBottom: '12px' }} />
+
+        {/* Instructor Row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Instructor avatar placeholder */}
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: `linear-gradient(135deg, ${cc.bg}, ${cc.text}40)`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            color: cc.text,
+            flexShrink: 0,
+          }}>
+            {instructorName.split(' ').map(n => n[0]).join('')}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {instructorName}
+            </div>
+            {instructorRole && (
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {instructorRole}
+              </div>
+            )}
+          </div>
+          {/* Level badge */}
+          <span style={{
+            marginLeft: 'auto',
+            fontSize: '0.65rem', 
+            fontWeight: 600, 
+            padding: '2px 8px', 
+            borderRadius: '4px',
+            backgroundColor: cc.bg, 
+            color: cc.text,
+            flexShrink: 0,
+          }}>
+            {course.level}
           </span>
         </div>
       </div>
 
-      {/* Expanded Content (Modules and Curriculum) */}
-      {isExpandable && isExpanded && (
-        <div style={{ borderTop: '1px solid var(--color-border)', animation: 'fadeIn 0.2s ease-out' }}>
+      {/* Expanded Curriculum Section */}
+      {isExpanded && isExpandable && (
+        <div style={{
+          borderTop: '1px solid var(--color-border)',
+          padding: '20px',
+          backgroundColor: 'var(--color-surface-elevated)',
+        }}>
+          {/* Description */}
+          <p style={{ fontSize: '0.88rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '16px' }}>
+            {course.description}
+          </p>
+
           {/* Skills Acquired */}
-          <div style={{
-            padding: '16px 24px', 
-            display: 'flex', 
-            gap: '8px', 
-            flexWrap: 'wrap', 
-            alignItems: 'center',
-            borderBottom: '1px solid var(--color-border)',
-            backgroundColor: 'var(--color-surface-elevated)'
-          }}>
-            <span style={{ 
-              fontSize: '0.72rem', 
-              fontWeight: 700, 
-              color: 'var(--color-text-tertiary)', 
-              marginRight: '8px', 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.05em' 
-            }}>
-              Skills Acquired:
-            </span>
-            {course.skillsAcquired.map(skill => (
-              <span key={skill} style={{
-                fontSize: '0.72rem', 
-                fontWeight: 600, 
-                padding: '4px 12px', 
-                borderRadius: '16px',
-                backgroundColor: 'var(--color-accent-subtle)', 
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+            {course.skillsAcquired.map((skill, idx) => (
+              <span key={idx} style={{
+                fontSize: '0.7rem', fontWeight: 600, padding: '3px 10px', borderRadius: '20px',
+                backgroundColor: 'var(--color-accent-subtle)',
                 color: 'var(--color-accent)',
-                border: '1px solid rgba(52, 211, 153, 0.15)'
+                border: '1px solid rgba(52,211,153,0.15)',
               }}>
                 {skill}
               </span>
             ))}
           </div>
 
-          {/* Modules List */}
-          <div style={{ padding: '24px' }}>
-            <h4 style={{ 
-              fontSize: '0.78rem', 
-              fontWeight: 800, 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.06em', 
-              color: 'var(--color-text-primary)', 
-              marginBottom: '16px' 
-            }}>
-              Program Curriculum
-            </h4>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {course.modules.map((mod, modIdx) => {
-                const isModOpen = expandedModuleId === mod.id;
-                
-                return (
-                  <div key={mod.id} style={{
-                    backgroundColor: 'var(--color-surface-elevated)',
-                    border: isModOpen ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)', 
-                    overflow: 'hidden', 
-                    transition: 'all var(--transition-fast)',
-                  }}>
-                    {/* Module Header (Toggle button) */}
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation(); // prevent collapsing the parent card
-                        if (onToggleModule) onToggleModule(mod.id);
-                      }}
-                      style={{ 
-                        padding: '16px 20px', 
-                        cursor: 'pointer', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '16px' 
-                      }}
-                    >
-                      {/* Module Number badge */}
-                      <div style={{
-                        width: '32px', 
-                        height: '32px', 
-                        borderRadius: '50%', 
-                        flexShrink: 0,
-                        backgroundColor: isModOpen ? 'var(--color-accent)' : 'var(--color-surface)',
-                        border: isModOpen ? 'none' : '1px solid var(--color-border)',
-                        color: isModOpen ? '#000' : 'var(--color-text-secondary)',
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        fontSize: '0.8rem', 
-                        fontWeight: 800, 
-                        transition: 'all var(--transition-fast)',
+          {/* Module list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {course.modules.map((mod, idx) => {
+              const isModuleOpen = expandedModuleId === mod.id;
+              return (
+                <div key={mod.id} 
+                  onClick={(e) => { e.stopPropagation(); onToggleModule?.(mod.id); }}
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    border: isModuleOpen ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+                    borderRadius: '8px',
+                    padding: '14px 16px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{
+                        width: '24px', height: '24px', borderRadius: '6px',
+                        backgroundColor: cc.bg, color: cc.text,
+                        fontSize: '0.72rem', fontWeight: 700,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                       }}>
-                        {modIdx + 1}
-                      </div>
-                      
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--color-text-primary)', lineHeight: 1.3 }}>
-                          {mod.title}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>
-                          ⏳ {mod.duration} · 📚 {mod.lessons.length} lessons
-                        </div>
-                      </div>
-                      
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                        style={{ 
-                          transform: isModOpen ? 'rotate(180deg)' : 'rotate(0)', 
-                          transition: 'transform 0.25s ease', 
-                          color: 'var(--color-text-tertiary)', 
-                          flexShrink: 0 
-                        }}
+                        {idx + 1}
+                      </span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                        {mod.title}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--color-text-tertiary)' }}>
+                        {mod.duration}
+                      </span>
+                      <svg 
+                        className={`accordion-chevron ${isModuleOpen ? 'open' : ''}`}
+                        width="14" 
+                        height="14" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        style={{ color: 'var(--color-text-tertiary)' }}
                       >
                         <polyline points="6 9 12 15 18 9" />
                       </svg>
                     </div>
-
-                    {/* Module Lessons details */}
-                    {isModOpen && (
-                      <div style={{ 
-                        borderTop: '1px solid var(--color-border)', 
-                        padding: '16px 20px 20px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.05)'
-                      }}>
-                        <p style={{ 
-                          fontSize: '0.82rem', 
-                          color: 'var(--color-text-secondary)', 
-                          lineHeight: 1.6, 
-                          margin: '0 0 16px 0', 
-                          padding: '0 4px',
-                          borderLeft: '2px solid var(--color-accent)',
-                          paddingLeft: '10px'
-                        }}>
-                          {mod.description}
-                        </p>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          {mod.lessons.map((lesson, idx) => (
-                            <div key={idx} style={{
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: '12px', 
-                              padding: '10px 8px',
-                              borderRadius: 'var(--radius-sm)', 
-                              transition: 'background-color 0.15s ease',
-                            }}
-                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--color-surface)'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                            >
-                              <div style={{
-                                width: '20px', 
-                                height: '20px', 
-                                borderRadius: '50%', 
-                                flexShrink: 0,
-                                border: '2px solid var(--color-border)',
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                justifyContent: 'center',
-                              }}>
-                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--color-border)' }} />
-                              </div>
-                              <span style={{ fontSize: '0.84rem', color: 'var(--color-text-secondary)', flex: 1 }}>{lesson}</span>
-                              <span style={{ 
-                                fontSize: '0.68rem', 
-                                fontWeight: 700, 
-                                color: 'var(--color-text-tertiary)', 
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.04em',
-                                flexShrink: 0 
-                              }}>
-                                Soon
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Preview Card Button (Rendered only on preview mode) */}
-      {!isExpandable && isHovered && (
-        <div style={{
-          position: 'absolute',
-          bottom: '12px',
-          right: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          fontSize: '0.78rem',
-          fontWeight: 700,
-          color: 'var(--color-accent)',
-          animation: 'fadeInRight 0.2s ease-out'
-        }}>
-          Explore Curriculum
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
+                  {isModuleOpen && (
+                    <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '10px' }}>
+                        {mod.description}
+                      </p>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {mod.lessons.map((lesson, li) => (
+                          <li 
+                            key={li} 
+                            className="lesson-item"
+                            style={{ 
+                              display: 'flex', 
+                              alignItems: 'flex-start', 
+                              gap: '10px',
+                              fontSize: '0.8rem', 
+                              color: 'var(--color-text-secondary)',
+                              padding: '4px 0',
+                              transition: 'color var(--transition-fast)',
+                            }}
+                          >
+                            <span className="lesson-step-bullet"></span>
+                            <span>{lesson}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

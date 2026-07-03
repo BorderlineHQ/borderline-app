@@ -23,7 +23,14 @@ import {
   Sparkles,
   ChevronRight,
   TrendingUp,
-  UserCheck
+  UserCheck,
+  User,
+  Mail,
+  MapPin,
+  Link2,
+  Smartphone,
+  Shield,
+  LogOut
 } from 'lucide-react';
 
 const Github = ({ className }: { className?: string }) => (
@@ -42,7 +49,7 @@ const Github = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type TabType = 'opportunities' | 'portfolio' | 'verify' | 'resources' | 'notifications';
+type TabType = 'opportunities' | 'portfolio' | 'verify' | 'resources' | 'notifications' | 'settings';
 
 export default function TalentPortal() {
   const { 
@@ -281,46 +288,21 @@ export default function TalentPortal() {
           </nav>
         </div>
 
-        {/* Sidebar settings and switches */}
+        {/* Sidebar bottom: Account Settings link + Theme toggle */}
         <div className="sidebar-settings">
-          <div className="flex items-center justify-between border-b border-gray-800 pb-2 mb-1">
-            <span className="text-[10px] uppercase font-bold text-gray-500">Settings</span>
-            <Settings className="w-3.5 h-3.5 text-gray-500" />
-          </div>
-
-          {/* Theme switcher */}
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`sidebar-nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
+          >
+            <Settings className="w-4 h-4" />
+            Account Settings
+          </button>
           <button 
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="flex items-center justify-between text-xs text-gray-400 hover:text-white px-2 py-1.5 rounded hover:bg-gray-800/40 w-full"
+            className="sidebar-nav-btn"
           >
-            <span className="flex items-center gap-2">
-              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-              Theme
-            </span>
-            <span className="text-[10px] text-gray-500 uppercase">{theme}</span>
-          </button>
-
-          {/* Profile Switcher (Demo purposes) */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[9px] text-gray-500 font-bold uppercase pl-2">Switch Dev Profile</label>
-            <select
-              value={activeProfileId}
-              onChange={(e) => setActiveProfileId(e.target.value)}
-              className="bg-[var(--color-surface-elevated)] border border-gray-800 rounded px-2 py-1 text-xs text-gray-300 outline-none w-full"
-            >
-              {profiles.map(p => (
-                <option key={p.id} value={p.id}>{p.fullName}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Reset database */}
-          <button
-            onClick={resetDatabase}
-            className="flex items-center gap-2 text-[10px] text-red-400 hover:text-red-300 pl-2 py-1 mt-1 text-left w-full hover:bg-red-950/20 rounded"
-          >
-            <RotateCcw className="w-3 h-3" />
-            Reset Seed Data
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
           </button>
         </div>
       </aside>
@@ -359,6 +341,12 @@ export default function TalentPortal() {
           >
             Inbox
           </button>
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`tab-btn-mobile ${activeTab === 'settings' ? 'active' : ''}`}
+          >
+            Settings
+          </button>
         </div>
 
         {/* Welcome Header */}
@@ -371,6 +359,7 @@ export default function TalentPortal() {
               {activeTab === 'verify' && `Vouch for peers in your network to build mutual proof-of-work credibility.`}
               {activeTab === 'resources' && `Curated references and local API docs to help you ship clean code faster.`}
               {activeTab === 'notifications' && `Stay updated on matches, shortlists, and vouches on your projects.`}
+              {activeTab === 'settings' && `Manage your account details, preferences, and connected services.`}
             </p>
           </div>
 
@@ -677,6 +666,182 @@ export default function TalentPortal() {
             </div>
           )}
 
+          {/* TAB 6: ACCOUNT SETTINGS */}
+          {activeTab === 'settings' && (
+            <div className="settings-panel">
+              {/* Profile Information Card */}
+              <div className="settings-card">
+                <div className="settings-card-header">
+                  <User className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
+                  <h3>Profile Information</h3>
+                </div>
+                <div className="settings-field-group">
+                  <div className="settings-field">
+                    <label className="settings-label">
+                      <User className="w-3.5 h-3.5" />
+                      Full Name
+                    </label>
+                    <div className="settings-value">{currentProfile.fullName}</div>
+                  </div>
+                  <div className="settings-field">
+                    <label className="settings-label">
+                      <Mail className="w-3.5 h-3.5" />
+                      Email
+                    </label>
+                    <div className="settings-value">{currentProfile.fullName.toLowerCase().replace(' ', '.')}@borderline.africa</div>
+                  </div>
+                  <div className="settings-field">
+                    <label className="settings-label">
+                      <MapPin className="w-3.5 h-3.5" />
+                      Location
+                    </label>
+                    <div className="settings-value">{currentProfile.country}</div>
+                  </div>
+                  <div className="settings-field">
+                    <label className="settings-label">
+                      <Briefcase className="w-3.5 h-3.5" />
+                      Tech Focus
+                    </label>
+                    <div className="settings-value">{currentProfile.techFocus}</div>
+                  </div>
+                  <div className="settings-field">
+                    <label className="settings-label">
+                      <Smartphone className="w-3.5 h-3.5" />
+                      WhatsApp
+                    </label>
+                    <div className="settings-value" style={{ color: 'var(--color-accent)' }}>Connected ✓</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notification Preferences */}
+              <div className="settings-card">
+                <div className="settings-card-header">
+                  <Bell className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
+                  <h3>Notification Preferences</h3>
+                </div>
+                <div className="settings-field-group">
+                  <div className="settings-toggle-row">
+                    <div>
+                      <span className="settings-toggle-label">Gig match alerts</span>
+                      <span className="settings-toggle-desc">Get notified when new gigs match your skills</span>
+                    </div>
+                    <div className="settings-toggle active">
+                      <div className="settings-toggle-knob" />
+                    </div>
+                  </div>
+                  <div className="settings-toggle-row">
+                    <div>
+                      <span className="settings-toggle-label">Shortlist updates</span>
+                      <span className="settings-toggle-desc">Alerts when recruiters shortlist your profile</span>
+                    </div>
+                    <div className="settings-toggle active">
+                      <div className="settings-toggle-knob" />
+                    </div>
+                  </div>
+                  <div className="settings-toggle-row">
+                    <div>
+                      <span className="settings-toggle-label">Peer vouch notifications</span>
+                      <span className="settings-toggle-desc">When someone vouches for your project</span>
+                    </div>
+                    <div className="settings-toggle">
+                      <div className="settings-toggle-knob" />
+                    </div>
+                  </div>
+                  <div className="settings-toggle-row">
+                    <div>
+                      <span className="settings-toggle-label">WhatsApp notifications</span>
+                      <span className="settings-toggle-desc">Receive updates via WhatsApp messages</span>
+                    </div>
+                    <div className="settings-toggle active">
+                      <div className="settings-toggle-knob" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Connected Services */}
+              <div className="settings-card">
+                <div className="settings-card-header">
+                  <Link2 className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
+                  <h3>Connected Services</h3>
+                </div>
+                <div className="settings-field-group">
+                  <div className="settings-service-row">
+                    <div className="settings-service-info">
+                      <Github className="w-4 h-4" />
+                      <span>GitHub</span>
+                    </div>
+                    <span className="settings-service-status connected">Connected</span>
+                  </div>
+                  <div className="settings-service-row">
+                    <div className="settings-service-info">
+                      <Globe className="w-4 h-4" />
+                      <span>Figma</span>
+                    </div>
+                    <span className="settings-service-status">Not connected</span>
+                  </div>
+                  <div className="settings-service-row">
+                    <div className="settings-service-info">
+                      <Smartphone className="w-4 h-4" />
+                      <span>Mobile Money (MTN)</span>
+                    </div>
+                    <span className="settings-service-status connected">Connected</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Demo Profile Switcher */}
+              <div className="settings-card">
+                <div className="settings-card-header">
+                  <Shield className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
+                  <h3>Demo Controls</h3>
+                </div>
+                <div className="settings-field-group">
+                  <div className="settings-field">
+                    <label className="settings-label">
+                      <User className="w-3.5 h-3.5" />
+                      Switch Dev Profile
+                    </label>
+                    <select
+                      value={activeProfileId}
+                      onChange={(e) => setActiveProfileId(e.target.value)}
+                      className="settings-select"
+                    >
+                      {profiles.map(p => (
+                        <option key={p.id} value={p.id}>{p.fullName}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Danger Zone */}
+              <div className="settings-card settings-card-danger">
+                <div className="settings-card-header">
+                  <AlertCircle className="w-4 h-4" style={{ color: 'var(--color-danger)' }} />
+                  <h3 style={{ color: 'var(--color-danger)' }}>Danger Zone</h3>
+                </div>
+                <div className="settings-danger-actions">
+                  <button
+                    onClick={resetDatabase}
+                    className="settings-danger-btn"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    Reset All Seed Data
+                  </button>
+                  <button
+                    className="settings-danger-btn"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </main>
 
@@ -713,18 +878,18 @@ export default function TalentPortal() {
           <span>Verify</span>
         </button>
         <button 
-          onClick={() => setActiveTab('resources')}
-          className={`mobile-bottom-nav-item ${activeTab === 'resources' ? 'active' : ''}`}
-        >
-          <BookOpen className="w-5 h-5" />
-          <span>Resources</span>
-        </button>
-        <button 
           onClick={() => setActiveTab('notifications')}
           className={`mobile-bottom-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
         >
           <Bell className="w-5 h-5" />
           <span>Inbox</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab('settings')}
+          className={`mobile-bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+        >
+          <Settings className="w-5 h-5" />
+          <span>Settings</span>
         </button>
       </nav>
 

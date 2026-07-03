@@ -89,5 +89,6 @@ export interface Course {
   description: string;
   skillsAcquired: string[];
   modules: Module[];
+  thumbnail: string;
 }
 

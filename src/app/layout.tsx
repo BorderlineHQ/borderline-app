@@ -35,7 +35,7 @@ const lora = Lora({
 export const metadata: Metadata = {
   metadataBase: new URL("https://borderline.africa"),
   title: {
-    default: "BorderLine | Trust Infrastructure for Africa's Digital Builders",
+    default: "BorderLine | Find Work and Hire Across Africa",
     template: "%s | BorderLine",
   },
   description: "AI-powered economic infrastructure that verifies, connects, and monetizes Africa's emerging digital builders. Bypassing corporate resume walls via automated skill verification, smart matching, and cross-border escrow settled via Mobile Money.",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://borderline.africa",
     siteName: "BorderLine",
-    title: "BorderLine | Trust Infrastructure for Africa's Digital Builders",
+    title: "BorderLine | Find Work and Hire Across Africa",
     description: "AI-powered economic infrastructure that verifies, connects, and monetizes Africa's emerging digital builders. WhatsApp-native profile management and escrow payments.",
     images: [
       {
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "BorderLine | Trust Infrastructure for Africa's Digital Builders",
+    title: "BorderLine | Find Work and Hire Across Africa",
     description: "AI-powered economic infrastructure that verifies, connects, and monetizes Africa's emerging digital builders.",
     images: ["/borderline_talent_cafe.png"],
     creator: "@borderline_africa",

@@ -12,6 +12,7 @@ function UpskillContent() {
   const courseParam = searchParams.get('course');
   
   const [selectedCategory, setSelectedCategory] = useState<'All' | 'Tech' | 'Creativity' | 'Business'>('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null);
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
   
@@ -34,7 +35,16 @@ function UpskillContent() {
   }, [courseParam]);
 
   const filteredCourses = mockCourses.filter(
-    (c) => selectedCategory === 'All' || c.category === selectedCategory
+    (c) => {
+      const matchesCategory = selectedCategory === 'All' || c.category === selectedCategory;
+      const query = searchQuery.toLowerCase().trim();
+      const matchesSearch = !query || 
+        c.title.toLowerCase().includes(query) ||
+        c.instructor.toLowerCase().includes(query) ||
+        c.skillsAcquired.some(skill => skill.toLowerCase().includes(query)) ||
+        c.description.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    }
   );
 
   const toggleCourse = (id: string) => {
@@ -61,7 +71,7 @@ function UpskillContent() {
         zIndex: 0, pointerEvents: 'none',
       }} />
 
-      <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '880px', margin: '0 auto' }}>
+      <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-xl)' }}>
           <span style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
@@ -82,8 +92,37 @@ function UpskillContent() {
           </p>
         </div>
 
+        {/* Search Bar */}
+        <div className="course-search-container">
+          <div className="course-search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            className="course-search-input"
+            placeholder="Search courses, skills, or instructors..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="course-search-clear"
+              aria-label="Clear search"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
+        </div>
+
         {/* Filters */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: 'var(--spacing-xl)' }}>
+        <div className="course-filter-bar">
           {(['All', 'Tech', 'Creativity', 'Business'] as const).map((cat) => (
             <button
               key={cat}
@@ -94,6 +133,7 @@ function UpskillContent() {
                 color: selectedCategory === cat ? '#000' : 'var(--color-text-secondary)',
                 border: selectedCategory === cat ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
                 cursor: 'pointer', transition: 'all 0.15s',
+                flexShrink: 0,
               }}
             >
               {cat === 'All' ? '🔥 All Skills' : `${catEmoji[cat]} ${cat}`}
@@ -101,12 +141,8 @@ function UpskillContent() {
           ))}
         </div>
 
-        {/* Course Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-          gap: 'var(--spacing-lg)' 
-        }}>
+        {/* Course Cards Grid */}
+        <div className="course-cards-grid">
           {filteredCourses.map((course) => (
             <div 
               key={course.id} 
@@ -127,6 +163,30 @@ function UpskillContent() {
             </div>
           ))}
         </div>
+
+        {/* Empty State */}
+        {filteredCourses.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: 'var(--spacing-xxl) var(--spacing-md)',
+            color: 'var(--color-text-secondary)',
+            backgroundColor: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '12px',
+          }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px', opacity: 0.5, color: 'var(--color-accent)' }}>
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <line x1="8" y1="11" x2="14" y2="11" />
+            </svg>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
+              No courses found
+            </h3>
+            <p style={{ fontSize: '0.88rem', maxWidth: '320px', margin: '0 auto' }}>
+              We couldn&apos;t find any courses matching &ldquo;{searchQuery}&rdquo;. Try checking your spelling or selecting a different category.
+            </p>
+          </div>
+        )}
 
         {/* Bottom CTA */}
         <div style={{
@@ -154,6 +214,26 @@ function UpskillContent() {
           </a>
         </div>
       </div>
+
+      {/* Mobile Sticky Bottom CTA */}
+      {expandedCourseId && (
+        <div className="mobile-sticky-cta">
+          <div className="mobile-sticky-cta-content">
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <span className="mobile-sticky-tag">PEER-LED PROGRAM</span>
+              <h4 className="mobile-sticky-title">
+                {mockCourses.find(c => c.id === expandedCourseId)?.title}
+              </h4>
+            </div>
+            <button 
+              onClick={() => alert('Successfully applied to peer program! Check your WhatsApp for updates.')} 
+              className="mobile-sticky-btn"
+            >
+              Join Program
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
