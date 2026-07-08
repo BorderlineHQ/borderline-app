@@ -49,6 +49,7 @@ export default function TeamsPaymentsPage() {
 
   // ─ Modal state ───────────────────────────────────────────────────────────
   const [modalOpen, setModalOpen] = useState(false);
+  const [complianceOpen, setComplianceOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -505,6 +506,72 @@ export default function TeamsPaymentsPage() {
         </div>
       </section>
 
+      {/* ─── Payment Providers ────────────────────────────────────────── */}
+      <section className="tp-providers-section">
+        <div className="tp-providers-container">
+          <h4 className="tp-providers-title">Supported Payout Channels & Networks</h4>
+          <div className="tp-providers-grid">
+            <a href="https://paystack.com" target="_blank" rel="noopener noreferrer" className="tp-provider-card">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="5" fill="#3cbef9" />
+                <path d="M7 6h6.5c1.8 0 2.9 1 2.9 2.5s-1.1 2.5-2.9 2.5H10v5H7V6zm3 2v3h3.5c.6 0 1-.3 1-1s-.4-1-1-1H10z" fill="white" />
+              </svg>
+              <span className="tp-provider-name">Paystack</span>
+            </a>
+            <a href="https://flutterwave.com" target="_blank" rel="noopener noreferrer" className="tp-provider-card">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="5" fill="#fb923c" />
+                <path d="M8 6h7v2.5H11v3h3.5v2.5H11V18H8V6z" fill="white" />
+              </svg>
+              <span className="tp-provider-name">Flutterwave</span>
+            </a>
+            <a href="https://onzazapay.com" target="_blank" rel="noopener noreferrer" className="tp-provider-card">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="5" fill="url(#zazaGrad)" />
+                <path d="M7 7h10v2.5l-6 6.5h6V18H7v-2.5l6-6.5H7V7z" fill="white" />
+                <defs>
+                  <linearGradient id="zazaGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#3B82F6" />
+                    <stop offset="1" stopColor="#8B5CF6" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <span className="tp-provider-name">ZazaPay</span>
+            </a>
+            <a href="https://www.mastercard.com" target="_blank" rel="noopener noreferrer" className="tp-provider-card">
+              <svg width="32" height="24" viewBox="0 0 32 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="12" r="8" fill="#EB001B" fillOpacity="0.9" />
+                <circle cx="21" cy="12" r="8" fill="#FF5F00" fillOpacity="0.9" />
+                <path d="M16 6.588A7.984 7.984 0 0 1 19.068 12 7.984 7.984 0 0 1 16 17.412a7.984 7.984 0 0 1-3.068-5.412A7.984 7.984 0 0 1 16 6.588z" fill="#F79E1B" />
+              </svg>
+              <span className="tp-provider-name">Mastercard</span>
+            </a>
+          </div>
+
+          {/* Compliance & Regulation Link */}
+          <div style={{ marginTop: '28px', textAlign: 'center' }}>
+            <button
+              onClick={() => setComplianceOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-accent)',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Learn how we handle Regulatory Compliance & Security
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Add / Edit Modal ──────────────────────────────────────────── */}
       {modalOpen && (
         <div className="tp-modal-overlay" onClick={() => setModalOpen(false)}>
@@ -567,6 +634,53 @@ export default function TeamsPaymentsPage() {
               </button>
               <button className="btn btn-primary" onClick={handleSave} style={{ borderRadius: '8px', padding: '10px 20px', fontSize: '0.85rem', fontWeight: 600 }}>
                 {editingMember ? 'Save Changes' : 'Add Member'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ─── Compliance Information Modal ────────────────────────────── */}
+      {complianceOpen && (
+        <div className="tp-modal-overlay" onClick={() => setComplianceOpen(false)}>
+          <div className="tp-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
+            <div className="tp-modal-header">
+              <h3 style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Regulatory Compliance & Security
+              </h3>
+              <button onClick={() => setComplianceOpen(false)} className="tp-modal-close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="tp-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '20px', fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: '1.6' }}>
+              <div>
+                <strong style={{ color: 'var(--color-text-primary)', display: 'block', fontSize: '0.9rem', marginBottom: '6px' }}>
+                  🏛️ Licensed Infrastructure & FX Settlement
+                </strong>
+                Cross-border payout settlement rails are integrated directly with central bank regulated entities. Multi-currency payroll routing complies with guidelines from the Bank of Ghana (BoG), Central Bank of Nigeria (CBN), South African Reserve Bank (SARB), and Central Bank of Kenya (CBK). Payouts use licensed International Money Transfer Operator (IMTO), Payment Service Provider (PSP), and local clearing bank channels to fulfill compliance with local foreign exchange and capital control limits.
+              </div>
+              <div>
+                <strong style={{ color: 'var(--color-text-primary)', display: 'block', fontSize: '0.9rem', marginBottom: '6px' }}>
+                  🔒 KYC/KYB & Sanctions Screening
+                </strong>
+                To satisfy Anti-Money Laundering (AML) and Counter-Terrorist Financing (CTF) laws, both employers and team members undergo real-time validation. Verification engines query official government databases, including Nigeria's Bank Verification Number (BVN) / National Identification Number (NIN) registries, the Ghana Card Database, and local registries in South Africa and Kenya. Daily background screenings run against Politically Exposed Persons (PEP) and global sanctions lists (OFAC, UN, EU).
+              </div>
+              <div>
+                <strong style={{ color: 'var(--color-text-primary)', display: 'block', fontSize: '0.9rem', marginBottom: '6px' }}>
+                  📝 Worker Classification & Legal Safeguards
+                </strong>
+                Reduce legal liabilities and permanent establishment risk in cross-border operations. BorderLine enables automated generation of compliant independent contractor agreements drafted under localized employment jurisdictions. For full-time employees, payments are processed in partnership with certified local Employer of Record (EOR) entities who act as the legal employers of record, taking on complete administrative and legal responsibility.
+              </div>
+              <div>
+                <strong style={{ color: 'var(--color-text-primary)', display: 'block', fontSize: '0.9rem', marginBottom: '6px' }}>
+                  📊 Local Tax, Pension & Statutory Benefits
+                </strong>
+                Automatically calculate and withhold country-specific payroll deductions in real-time. Calculations are updated dynamically to reflect local tax brackets for PAYE income tax, national health insurance, and social security payments (such as Ghana's SSNIT, Kenya's NSSF & NHIF, South Africa's SARS & UIF, and Nigeria's PENCOM & NHF). BorderLine generates localized reporting to streamline monthly tax remittances and year-end filings.
+              </div>
+            </div>
+            <div className="tp-modal-footer">
+              <button className="btn btn-primary" onClick={() => setComplianceOpen(false)} style={{ borderRadius: '8px', padding: '10px 24px', fontSize: '0.85rem', fontWeight: 600 }}>
+                Got it
               </button>
             </div>
           </div>

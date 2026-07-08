@@ -9,6 +9,7 @@ const footerLinks = {
   Platform: [
     { label: 'Talent Profiles', href: '/talent' },
     { label: 'Recruiter Dashboard', href: '/recruiter' },
+    { label: 'Teams & Payments', href: '/teams-payments' },
     { label: 'Manifesto', href: '/manifesto' },
   ],
   Resources: [
