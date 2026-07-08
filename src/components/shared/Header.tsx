@@ -111,7 +111,7 @@ const Header: React.FC = () => {
           >
             <button 
               onClick={() => setTechDropdownOpen(!techDropdownOpen)}
-              className={`nav-item dropdown-trigger ${isActive('/whatsapp') ? 'active' : ''}`}
+              className={`nav-item dropdown-trigger ${isActive('/whatsapp') || isActive('/teams-payments') ? 'active' : ''}`}
               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               Technology
@@ -146,6 +146,24 @@ const Header: React.FC = () => {
                     e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
                     WhatsApp Bot
+                  </Link>
+                  <Link href="/teams-payments" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
+                    display: 'block', 
+                    padding: '10px 16px', 
+                    color: 'var(--color-text-secondary)',
+                    fontSize: '0.9rem',
+                    borderBottom: '1px solid var(--color-border)',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
+                    e.currentTarget.style.color = 'var(--color-accent)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--color-text-secondary)';
+                  }}>
+                    Teams & Payments
                   </Link>
                   <Link href="/manifesto" onClick={() => setTechDropdownOpen(false)} className="dropdown-item" style={{ 
                     display: 'block', 
@@ -415,6 +433,9 @@ const Header: React.FC = () => {
             </div>
             <Link href="/whatsapp" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/whatsapp') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               WhatsApp Bot
+            </Link>
+            <Link href="/teams-payments" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/teams-payments') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
+              Teams & Payments
             </Link>
             <Link href="/manifesto" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/manifesto') ? 'active' : ''}`} style={{ paddingLeft: '24px' }}>
               Our Manifesto

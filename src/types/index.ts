@@ -92,3 +92,36 @@ export interface Course {
   thumbnail: string;
 }
 
+export type TeamMemberStatus = 'Active' | 'On Leave' | 'Probation';
+
+export interface TeamMember {
+  id: string;
+  fullName: string;
+  email: string;
+  role: string;
+  country: string;
+  currency: string;
+  monthlySalary: number;
+  startDate: string;
+  status: TeamMemberStatus;
+  avatarUrl: string;
+}
+
+export interface PaymentEntry {
+  memberId: string;
+  memberName: string;
+  grossAmount: number;
+  currency: string;
+  usdEquivalent: number;
+  status: 'Completed' | 'Processing' | 'Failed';
+}
+
+export interface PaymentRun {
+  id: string;
+  period: string;
+  totalUSD: number;
+  entries: PaymentEntry[];
+  status: 'Completed' | 'Processing' | 'Failed';
+  processedAt: string;
+}
+
