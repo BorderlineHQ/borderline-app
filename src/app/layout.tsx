@@ -108,14 +108,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${inter.variable} ${jetbrainsMono.variable} ${lora.variable}`}>
+    <html lang="en" className={`${dmSans.variable} ${inter.variable} ${jetbrainsMono.variable} ${lora.variable}`} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               try {
                 var savedTheme = localStorage.getItem('borderline_theme') || 'light';
-                document.documentElement.className = savedTheme + '-theme';
                 var observer = new MutationObserver(function(mutations) {
                   if (document.body) {
                     document.body.className = savedTheme + '-theme';
@@ -128,7 +127,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="light-theme">
+      <body className="light-theme" suppressHydrationWarning>
         <AppProvider>
           <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             <Header />
