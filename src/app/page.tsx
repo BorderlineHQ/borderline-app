@@ -129,6 +129,7 @@ export default function Home() {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [activeDot, setActiveDot] = useState(0);
+  const scrollTick = React.useRef(false);
 
   const checkScroll = () => {
     if (carouselRef.current) {
@@ -139,9 +140,10 @@ export default function Home() {
       const children = carouselRef.current.children;
       let closestIdx = 0;
       let minDiff = Infinity;
+      const carouselOffset = carouselRef.current.offsetLeft;
       for (let i = 0; i < children.length; i++) {
         const child = children[i] as HTMLElement;
-        const diff = Math.abs(child.offsetLeft - scrollLeft - carouselRef.current.offsetLeft);
+        const diff = Math.abs(child.offsetLeft - scrollLeft - carouselOffset);
         if (diff < minDiff) {
           minDiff = diff;
           closestIdx = i;
@@ -151,16 +153,26 @@ export default function Home() {
     }
   };
 
+  const handleScroll = () => {
+    if (!scrollTick.current) {
+      requestAnimationFrame(() => {
+        checkScroll();
+        scrollTick.current = false;
+      });
+      scrollTick.current = true;
+    }
+  };
+
   useEffect(() => {
     const el = carouselRef.current;
     if (el) {
-      el.addEventListener('scroll', checkScroll);
+      el.addEventListener('scroll', handleScroll, { passive: true });
       // Wait a moment for layout sizing before checking scroll
       const timer = setTimeout(checkScroll, 100);
-      window.addEventListener('resize', checkScroll);
+      window.addEventListener('resize', handleScroll, { passive: true });
       return () => {
-        el.removeEventListener('scroll', checkScroll);
-        window.removeEventListener('resize', checkScroll);
+        el.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleScroll);
         clearTimeout(timer);
       };
     }
