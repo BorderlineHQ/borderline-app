@@ -56,9 +56,24 @@ export interface Gig {
   createdAt: string;
 }
 
+export interface Job {
+  id: string;
+  recruiterId: string;
+  companyName: string; // De-normalized for convenience
+  logoUrl?: string;
+  title: string;
+  description: string;
+  requiredSkills: string[];
+  salaryRange: string; // e.g. "3000-5000 GHS"
+  employmentType: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP';
+  location: string;
+  createdAt: string;
+}
+
 export interface Application {
   id: string;
-  gigId: string;
+  gigId?: string;
+  jobId?: string;
   profileId: string;
   status: 'PENDING' | 'SHORTLISTED' | 'REJECTED' | 'HIRED';
   createdAt: string;

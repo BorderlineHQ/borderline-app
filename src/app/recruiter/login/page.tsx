@@ -44,37 +44,11 @@ export default function RecruiterLogin() {
   };
 
   return (
-    <div style={{
-      minHeight: '80vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 'var(--spacing-lg) var(--spacing-md)',
-      position: 'relative',
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '440px',
-        backgroundColor: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 'var(--spacing-xl)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-        backdropFilter: 'blur(8px)',
-      }}>
+    <div className="login-container">
+      <div className="login-card">
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-xl)' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '48px',
-            height: '48px',
-            borderRadius: '12px',
-            backgroundColor: 'var(--color-accent-subtle)',
-            color: 'var(--color-accent)',
-            marginBottom: '16px'
-          }}>
+        <div className="login-header">
+          <div className="login-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
@@ -82,67 +56,38 @@ export default function RecruiterLogin() {
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '6px', color: 'var(--color-text-primary)' }}>
-            Recruiter Portal
-          </h1>
-          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-secondary)' }}>
-            Sign in to search, review, and hire verified African developers.
+          <h1>Recruiter Portal</h1>
+          <p>
+            Sign in to search, review, and hire verified African professionals.
           </p>
         </div>
 
         {/* Passwordless Login Form */}
         {!otpSent ? (
-          <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Work Email
-              </label>
+          <form onSubmit={handleRequestOtp} className="login-form">
+            <div className="form-group">
+              <label className="form-label">Work Email</label>
               <input
                 type="email"
                 required
                 placeholder="name@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px 14px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--color-border)',
-                  backgroundColor: 'var(--color-bg)',
-                  color: 'var(--color-text-primary)',
-                  fontSize: '0.9rem',
-                  outline: 'none',
-                  transition: 'border-color var(--transition-fast)'
-                }}
+                className="form-input"
               />
             </div>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn btn-primary"
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: 'var(--radius-sm)',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
+              className="btn btn-primary btn-lg"
             >
               {isSubmitting ? 'Requesting Code...' : 'Get One-Time Sign In Link'}
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Enter OTP Verification Code
-              </label>
+          <form onSubmit={handleVerifyOtp} className="login-form">
+            <div className="form-group">
+              <label className="form-label">Enter OTP Verification Code</label>
               <input
                 type="text"
                 required
@@ -150,52 +95,23 @@ export default function RecruiterLogin() {
                 placeholder="123456"
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px 14px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--color-border)',
-                  backgroundColor: 'var(--color-bg)',
-                  color: 'var(--color-text-primary)',
-                  fontSize: '1.1rem',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  letterSpacing: '0.2em',
-                  outline: 'none',
-                }}
+                className="otp-input"
               />
-              <p style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', marginTop: '8px', textAlign: 'center' }}>
-                We sent a 6-digit code to <strong style={{ color: 'var(--color-text-primary)' }}>{email}</strong>
+              <p className="otp-hint">
+                We sent a 6-digit code to <strong>{email}</strong>
               </p>
             </div>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn btn-primary"
-              style={{
-                width: '100%',
-                padding: '12px',
-                borderRadius: 'var(--radius-sm)',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className="btn btn-primary btn-lg"
             >
               {isSubmitting ? 'Verifying...' : 'Verify & Log In'}
             </button>
             <button
               type="button"
               onClick={() => setOtpSent(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--color-text-secondary)',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                textAlign: 'center',
-                textDecoration: 'underline'
-              }}
+              className="text-link"
             >
               Change Email
             </button>
@@ -203,61 +119,40 @@ export default function RecruiterLogin() {
         )}
 
         {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0', gap: '12px' }}>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }} />
-          <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Demo Accounts</span>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--color-border)' }} />
+        <div className="login-divider">
+          <div className="divider-line" />
+          <span>Demo Accounts</span>
+          <div className="divider-line" />
         </div>
 
         {/* Demo Quick-select Profiles */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="demo-accounts">
           {recruiters.map(recruiter => (
             <button
               key={recruiter.id}
               onClick={() => handleDemoLogin(recruiter.id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--color-border)',
-                backgroundColor: activeRecruiterId === recruiter.id ? 'var(--color-accent-subtle)' : 'transparent',
-                color: 'var(--color-text-primary)',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all var(--transition-fast)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-accent)';
-                e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-                e.currentTarget.style.backgroundColor = activeRecruiterId === recruiter.id ? 'var(--color-accent-subtle)' : 'transparent';
-              }}
+              className={`demo-account-btn ${activeRecruiterId === recruiter.id ? 'active' : ''}`}
             >
               <img
                 src={recruiter.logoUrl}
                 alt={recruiter.companyName}
-                style={{ width: '28px', height: '28px', borderRadius: '6px', objectFit: 'cover' }}
+                className="demo-account-logo"
               />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>{recruiter.companyName}</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--color-text-secondary)' }}>{recruiter.website}</div>
+              <div className="demo-account-info">
+                <div className="demo-account-name">{recruiter.companyName}</div>
+                <div className="demo-account-website">{recruiter.website}</div>
               </div>
               {activeRecruiterId === recruiter.id && (
-                <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--color-accent)', textTransform: 'uppercase' }}>Active</span>
+                <span className="active-badge">Active</span>
               )}
             </button>
           ))}
         </div>
 
         {/* Footer Link */}
-        <div style={{ textAlign: 'center', marginTop: 'var(--spacing-xl)', fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+        <div className="login-footer">
           Are you a developer?{' '}
-          <Link href="/talent/login" style={{ color: 'var(--color-accent)', fontWeight: 600, textDecoration: 'none' }}>
+          <Link href="/talent/login" className="text-link">
             Go to Talent Login
           </Link>
         </div>

@@ -2,15 +2,18 @@
 /* eslint-disable react-hooks/set-state-in-effect, react-hooks/purity */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Profile, Gig, Application, RecruiterProfile, WhatsAppMessage, Project } from '../types';
+import { Profile, Gig, Application, RecruiterProfile, WhatsAppMessage, Project, Job, TeamMember, PaymentRun } from '../types';
 import { dbService } from '../services/db';
 import { aiService } from '../services/ai';
 
 interface AppContextType {
   profiles: Profile[];
   gigs: Gig[];
+  jobs: Job[];
   applications: Application[];
   recruiters: RecruiterProfile[];
+  teamMembers: TeamMember[];
+  paymentHistory: PaymentRun[];
   theme: 'dark' | 'light';
   setTheme: (theme: 'dark' | 'light') => void;
   activeProfileId: string;
@@ -19,8 +22,14 @@ interface AppContextType {
   setActiveRecruiterId: (id: string) => void;
   addProject: (profileId: string, title: string, rawInput: string, githubUrl?: string, figmaUrl?: string) => Promise<void>;
   postGig: (title: string, description: string, requiredSkills: string[], budgetGHS: number) => void;
+  postJob: (title: string, description: string, requiredSkills: string[], salaryRange: string, employmentType: Job['employmentType'], location: string) => void;
   applyForGig: (gigId: string, profileId: string) => void;
+  applyForJob: (jobId: string, profileId: string) => void;
   updateApplicationStatus: (applicationId: string, status: Application['status']) => void;
+  addTeamMember: (member: TeamMember) => void;
+  updateTeamMember: (member: TeamMember) => void;
+  removeTeamMember: (id: string) => void;
+  runPayroll: (period: string, entries: any[], totalUSD: number) => void;
   whatsappMessages: WhatsAppMessage[];
   sendWhatsAppMessage: (body: string) => void;
   toggleVerifyProfile: (profileId: string) => void;
@@ -34,8 +43,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [gigs, setGigs] = useState<Gig[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [recruiters, setRecruiters] = useState<RecruiterProfile[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [paymentHistory, setPaymentHistory] = useState<PaymentRun[]>([]);
   const [theme, setThemeState] = useState<'dark' | 'light'>('light');
   const [activeProfileId, setActiveProfileId] = useState<string>('talent-chidi');
   const [activeRecruiterId, setActiveRecruiterId] = useState<string>('recruiter-susupay');
@@ -47,8 +59,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dbService.initialize();
     setProfiles(dbService.getProfiles());
     setGigs(dbService.getGigs());
+    setJobs(dbService.getJobs());
     setApplications(dbService.getApplications());
     setRecruiters(dbService.getRecruiters());
+    setTeamMembers(dbService.getTeamMembers());
+    setPaymentHistory(dbService.getPaymentRuns());
 
     // Load theme
     const savedTheme = localStorage.getItem('borderline_theme') as 'dark' | 'light';
@@ -156,6 +171,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dbService.saveGigs(updatedGigs);
   };
 
+  const postJob = (title: string, description: string, requiredSkills: string[], salaryRange: string, employmentType: Job['employmentType'], location: string) => {
+    const recruiter = recruiters.find(r => r.id === activeRecruiterId);
+    const newJob: Job = {
+      id: `job-${Date.now()}`,
+      recruiterId: activeRecruiterId,
+      companyName: recruiter ? recruiter.companyName : 'Partner Startup',
+      logoUrl: recruiter?.logoUrl,
+      title,
+      description,
+      requiredSkills,
+      salaryRange,
+      employmentType,
+      location,
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedJobs = [newJob, ...jobs];
+    setJobs(updatedJobs);
+    dbService.saveJobs(updatedJobs);
+  };
+
   const applyForGig = (gigId: string, profileId: string) => {
     // Check if already applied
     const exists = applications.some(a => a.gigId === gigId && a.profileId === profileId);
@@ -164,6 +200,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const newApp: Application = {
       id: `app-${Date.now()}`,
       gigId,
+      profileId,
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedApps = [newApp, ...applications];
+    setApplications(updatedApps);
+    dbService.saveApplications(updatedApps);
+  };
+
+  const applyForJob = (jobId: string, profileId: string) => {
+    // Check if already applied
+    const exists = applications.some(a => a.jobId === jobId && a.profileId === profileId);
+    if (exists) return;
+
+    const newApp: Application = {
+      id: `app-${Date.now()}`,
+      jobId,
       profileId,
       status: 'PENDING',
       createdAt: new Date().toISOString(),
@@ -210,17 +264,55 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dbService.saveProfiles(updated);
   };
 
+  const addTeamMember = (member: TeamMember) => {
+    const updated = [...teamMembers, member];
+    setTeamMembers(updated);
+    dbService.saveTeamMembers(updated);
+  };
+
+  const updateTeamMember = (member: TeamMember) => {
+    const updated = teamMembers.map(m => m.id === member.id ? member : m);
+    setTeamMembers(updated);
+    dbService.saveTeamMembers(updated);
+  };
+
+  const removeTeamMember = (id: string) => {
+    const updated = teamMembers.filter(m => m.id !== id);
+    setTeamMembers(updated);
+    dbService.saveTeamMembers(updated);
+  };
+
+  const runPayroll = (period: string, entries: any[], totalUSD: number) => {
+    const newRun: PaymentRun = {
+      id: `pr-${Date.now()}`,
+      period,
+      totalUSD,
+      entries,
+      status: 'Completed',
+      processedAt: new Date().toISOString(),
+    };
+    const updated = [newRun, ...paymentHistory];
+    setPaymentHistory(updated);
+    dbService.savePaymentRuns(updated);
+  };
+
   const resetDatabase = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('borderline_profiles');
       localStorage.removeItem('borderline_gigs');
+      localStorage.removeItem('borderline_jobs');
       localStorage.removeItem('borderline_applications');
       localStorage.removeItem('borderline_recruiters');
+      localStorage.removeItem('borderline_team_members');
+      localStorage.removeItem('borderline_payment_runs');
       dbService.initialize();
       setProfiles(dbService.getProfiles());
       setGigs(dbService.getGigs());
+      setJobs(dbService.getJobs());
       setApplications(dbService.getApplications());
       setRecruiters(dbService.getRecruiters());
+      setTeamMembers(dbService.getTeamMembers());
+      setPaymentHistory(dbService.getPaymentRuns());
     }
   };
 
@@ -349,8 +441,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <AppContext.Provider value={{
       profiles,
       gigs,
+      jobs,
       applications,
       recruiters,
+      teamMembers,
+      paymentHistory,
       theme,
       setTheme,
       activeProfileId,
@@ -359,8 +454,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setActiveRecruiterId,
       addProject,
       postGig,
+      postJob,
       applyForGig,
+      applyForJob,
       updateApplicationStatus,
+      addTeamMember,
+      updateTeamMember,
+      removeTeamMember,
+      runPayroll,
       whatsappMessages,
       sendWhatsAppMessage,
       toggleVerifyProfile,

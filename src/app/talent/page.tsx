@@ -2,68 +2,32 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Gig } from '../../types';
-import { 
-  Briefcase, 
-  FolderOpen, 
-  ShieldCheck, 
-  BookOpen, 
-  Bell, 
-  Settings, 
-  Upload, 
-  Globe, 
-  CheckCircle2, 
-  AlertCircle, 
-  Plus, 
-  X, 
-  ExternalLink, 
-  Moon, 
-  Sun, 
-  RotateCcw,
-  Sparkles,
-  ChevronRight,
-  TrendingUp,
-  UserCheck,
-  User,
-  Mail,
-  MapPin,
-  Link2,
-  Smartphone,
-  Shield,
-  LogOut
-} from 'lucide-react';
+import { Gig, Job } from '../../types';
+import TalentHeader from '../../components/talent/TalentHeader';
+import TalentSidebar from '../../components/talent/TalentSidebar';
+import GigCard from '../../components/talent/GigCard';
+import ProjectCard from '../../components/talent/ProjectCard';
+import { currencySymbols } from '../../data/teamsData';
 
-const Github = ({ className }: { className?: string }) => (
-  <svg 
-    width="16" 
-    height="16" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-  </svg>
-);
-
-type TabType = 'opportunities' | 'portfolio' | 'verify' | 'resources' | 'notifications' | 'settings';
+type TabType = 'opportunities' | 'portfolio' | 'verify' | 'contracts' | 'resources' | 'notifications' | 'settings';
 
 export default function TalentPortal() {
   const { 
     profiles, 
     gigs, 
+    jobs,
     applications, 
     activeProfileId, 
     setActiveProfileId, 
     addProject, 
     applyForGig,
+    applyForJob,
     toggleVerifyProject,
     theme,
     setTheme,
     resetDatabase,
+    teamMembers,
+    paymentHistory,
     mounted 
   } = useApp();
 
@@ -176,9 +140,22 @@ export default function TalentPortal() {
     return Math.round((shared.length / gig.requiredSkills.length) * 100);
   };
 
+  // Calculate matching score for a job
+  const calculateJobMatchScore = (job: Job) => {
+    const shared = job.requiredSkills.filter(s => currentProfile.skills.includes(s));
+    if (job.requiredSkills.length === 0) return 0;
+    return Math.round((shared.length / job.requiredSkills.length) * 100);
+  };
+
   // Matched gigs
   const matchedGigs = gigs
     .map(gig => ({ gig, score: calculateMatchScore(gig) }))
+    .filter(m => m.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  // Matched jobs
+  const matchedJobs = jobs
+    .map(job => ({ job, score: calculateJobMatchScore(job) }))
     .filter(m => m.score > 0)
     .sort((a, b) => b.score - a.score);
 
@@ -212,785 +189,573 @@ export default function TalentPortal() {
   // Developers list for peer verification (excluding current user)
   const peerDevelopers = profiles.filter(p => p.id !== currentProfile.id);
 
+  // Find matching contract details and payout history in Teams & Payments
+  const matchedMember = teamMembers.find(m => m.fullName.toLowerCase() === currentProfile.fullName.toLowerCase());
+  const matchedPayments = paymentHistory.filter(run => 
+    run.entries.some(entry => entry.memberName.toLowerCase() === currentProfile.fullName.toLowerCase())
+  ).map(run => {
+    const entry = run.entries.find(e => e.memberName.toLowerCase() === currentProfile.fullName.toLowerCase())!;
+    return {
+      id: run.id,
+      period: run.period,
+      processedAt: run.processedAt,
+      grossAmount: entry.grossAmount,
+      currency: entry.currency,
+      usdEquivalent: entry.usdEquivalent,
+      status: entry.status || run.status
+    };
+  });
+
   return (
-    <div className="dashboard-layout">
-      {/* LEFT SIDEBAR (Desktop only, hidden on mobile) */}
-      <aside className="dashboard-sidebar glass-panel">
-        <div>
-          {/* Profile overview */}
-          <div className="sidebar-profile">
-            <div className="sidebar-avatar-wrap">
-              <img 
-                src={currentProfile.avatarUrl || 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=200'} 
-                alt={currentProfile.fullName}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <h3 className="sidebar-name text-white">
-              {currentProfile.fullName}
-              {currentProfile.isVerified && (
-                <span title="Verified Profile">
-                  <CheckCircle2 className="w-4 h-4 text-[var(--color-accent)] inline ml-1" />
-                </span>
-              )}
-            </h3>
-            <span className="sidebar-focus">{currentProfile.techFocus}</span>
-            <span className="sidebar-vouched">{currentProfile.peerVouched || '0 Vouched'}</span>
+    <div className="talent-container">
+      {/* Talent Header */}
+      <TalentHeader
+        fullName={currentProfile.fullName}
+        techFocus={currentProfile.techFocus}
+        avatarUrl={currentProfile.avatarUrl || ''}
+        isVerified={currentProfile.isVerified}
+        skills={currentProfile.skills}
+        onUploadProject={() => setIsDrawerOpen(true)}
+      />
+
+      <div className="talent-grid">
+        {/* Talent Sidebar */}
+        <TalentSidebar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          matchedGigsCount={matchedGigs.length + matchedJobs.length}
+          hasNotifications={userApplications.some(a => a.status === 'SHORTLISTED')}
+        />
+
+        {/* Main Content */}
+        <main className="talent-main">
+          {/* TAB BODY CONTENTS */}
+          <div className="talent-content">
             
-            <div className="mt-3 flex flex-wrap gap-1 justify-center max-h-[70px] overflow-y-auto">
-              {currentProfile.skills.map((skill, idx) => (
-                <span key={idx} className="badge badge-accent text-[10px] py-0.5 px-1.5">{skill}</span>
-              ))}
-            </div>
-          </div>
+            {/* TAB 1: OPPORTUNITIES */}
+            {activeTab === 'opportunities' && (
+              <div className="opportunities-section">
+                <h3>Micro-Gigs</h3>
+                {matchedGigs.length === 0 ? (
+                  <div className="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p>No matching gigs found for your active skill tags.</p>
+                    <p className="empty-hint">Add projects to extract verified skills and trigger automated matching.</p>
+                  </div>
+                ) : (
+                  <div className="cards-grid">
+                    {matchedGigs.map(({ gig, score }) => {
+                      const isApplied = applications.some(a => a.gigId === gig.id && a.profileId === currentProfile.id);
+                      return (
+                        <GigCard
+                          key={gig.id}
+                          gig={gig}
+                          matchScore={score}
+                          isApplied={isApplied}
+                          userSkills={currentProfile.skills}
+                          onApply={() => applyForGig(gig.id, currentProfile.id)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
 
-          {/* Navigation Links */}
-          <nav className="sidebar-nav">
-            <button 
-              onClick={() => setActiveTab('opportunities')}
-              className={`sidebar-nav-btn ${activeTab === 'opportunities' ? 'active' : ''}`}
-            >
-              <Briefcase className="w-4 h-4" />
-              Opportunities
-              {matchedGigs.length > 0 && <span className="badge-dot" />}
-            </button>
-            <button 
-              onClick={() => setActiveTab('portfolio')}
-              className={`sidebar-nav-btn ${activeTab === 'portfolio' ? 'active' : ''}`}
-            >
-              <FolderOpen className="w-4 h-4" />
-              My Portfolio
-            </button>
-            <button 
-              onClick={() => setActiveTab('verify')}
-              className={`sidebar-nav-btn ${activeTab === 'verify' ? 'active' : ''}`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              Verify Peers
-            </button>
-            <button 
-              onClick={() => setActiveTab('resources')}
-              className={`sidebar-nav-btn ${activeTab === 'resources' ? 'active' : ''}`}
-            >
-              <BookOpen className="w-4 h-4" />
-              Resources Gateway
-            </button>
-            <button 
-              onClick={() => setActiveTab('notifications')}
-              className={`sidebar-nav-btn ${activeTab === 'notifications' ? 'active' : ''}`}
-            >
-              <Bell className="w-4 h-4" />
-              Notifications
-              {userApplications.some(a => a.status === 'SHORTLISTED') && (
-                <span className="badge-dot bg-red-500" />
-              )}
-            </button>
-          </nav>
-        </div>
-
-        {/* Sidebar bottom: Account Settings link + Theme toggle */}
-        <div className="sidebar-settings">
-          <button 
-            onClick={() => setActiveTab('settings')}
-            className={`sidebar-nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
-          >
-            <Settings className="w-4 h-4" />
-            Account Settings
-          </button>
-          <button 
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="sidebar-nav-btn"
-          >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-          </button>
-        </div>
-      </aside>
-
-      {/* MAIN MAIN CONTENT CONTAINER */}
-      <main className="dashboard-main">
-        {/* Mobile Horizontal Scrolling Navigation Bar */}
-        <div className="tab-bar-mobile">
-          <button 
-            onClick={() => setActiveTab('opportunities')}
-            className={`tab-btn-mobile ${activeTab === 'opportunities' ? 'active' : ''}`}
-          >
-            Gigs
-          </button>
-          <button 
-            onClick={() => setActiveTab('portfolio')}
-            className={`tab-btn-mobile ${activeTab === 'portfolio' ? 'active' : ''}`}
-          >
-            Portfolio
-          </button>
-          <button 
-            onClick={() => setActiveTab('verify')}
-            className={`tab-btn-mobile ${activeTab === 'verify' ? 'active' : ''}`}
-          >
-            Verify
-          </button>
-          <button 
-            onClick={() => setActiveTab('resources')}
-            className={`tab-btn-mobile ${activeTab === 'resources' ? 'active' : ''}`}
-          >
-            Resources
-          </button>
-          <button 
-            onClick={() => setActiveTab('notifications')}
-            className={`tab-btn-mobile ${activeTab === 'notifications' ? 'active' : ''}`}
-          >
-            Inbox
-          </button>
-          <button 
-            onClick={() => setActiveTab('settings')}
-            className={`tab-btn-mobile ${activeTab === 'settings' ? 'active' : ''}`}
-          >
-            Settings
-          </button>
-        </div>
-
-        {/* Welcome Header */}
-        <div className="dashboard-welcome">
-          <div className="welcome-text">
-            <h2>Welcome back, {currentProfile.fullName.split(' ')[0]}!</h2>
-            <p>
-              {activeTab === 'opportunities' && `You have ${matchedGigs.length} matching micro-gigs waiting for your verification token.`}
-              {activeTab === 'portfolio' && `Manage your verified projects and case studies. Click Upload to sync new ones.`}
-              {activeTab === 'verify' && `Vouch for peers in your network to build mutual proof-of-work credibility.`}
-              {activeTab === 'resources' && `Curated references and local API docs to help you ship clean code faster.`}
-              {activeTab === 'notifications' && `Stay updated on matches, shortlists, and vouches on your projects.`}
-              {activeTab === 'settings' && `Manage your account details, preferences, and connected services.`}
-            </p>
-          </div>
-
-          <button 
-            onClick={() => setIsDrawerOpen(true)}
-            className="btn btn-primary text-xs py-2 px-4 flex items-center gap-1.5 shadow-md shadow-emerald-950/20"
-          >
-            <Plus className="w-4 h-4" />
-            Upload Project
-          </button>
-        </div>
-
-        {/* TAB BODY CONTENTS */}
-        <div className="dashboard-content-panel">
-          
-          {/* TAB 1: OPPORTUNITIES */}
-          {activeTab === 'opportunities' && (
-            <div className="opportunities-grid">
-              {matchedGigs.length === 0 ? (
-                <div className="col-span-full py-12 text-center border border-dashed border-gray-800 rounded-xl">
-                  <AlertCircle className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">No matching gigs found for your active skill tags.</p>
-                  <p className="text-xs text-gray-600 mt-1">Add projects to extract verified skills and trigger automated matching.</p>
-                </div>
-              ) : (
-                matchedGigs.map(({ gig, score }) => {
-                  const isApplied = applications.some(a => a.gigId === gig.id && a.profileId === currentProfile.id);
-                  return (
-                    <div key={gig.id} className="gig-dash-card glow-card">
-                      <div>
-                        <div className="gig-dash-header">
-                          <img src={gig.logoUrl} alt={gig.companyName} className="gig-company-logo" />
-                          <div className="gig-title-area">
-                            <h4 className="gig-dash-title text-white">{gig.title}</h4>
-                            <span className="gig-company-name">
-                              <Globe className="w-3.5 h-3.5" />
-                              {gig.companyName}
-                            </span>
-                          </div>
-                          <span className="match-badge">{score}% Match</span>
-                        </div>
-                        
-                        <p className="gig-dash-body">{gig.description}</p>
-                        
-                        <div className="gig-dash-tags">
-                          {gig.requiredSkills.map((s, i) => (
-                            <span 
-                              key={i} 
-                              className={`tag-badge ${currentProfile.skills.includes(s) ? 'matched' : ''}`}
-                            >
-                              {s}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="gig-dash-footer">
-                        <div className="gig-budget">
-                          GHS {gig.budgetGHS}
-                          <span className="ml-1">/project</span>
-                        </div>
-                        {isApplied ? (
-                          <span className="text-xs text-gray-500 font-semibold flex items-center gap-1">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                            Applied
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => applyForGig(gig.id, currentProfile.id)}
-                            className="btn btn-secondary text-xs py-1.5 px-3"
-                          >
-                            Apply Instantly
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          )}
+                <h3 style={{ marginTop: 'var(--spacing-xl)' }}>Full-Time Jobs</h3>
+                {matchedJobs.length === 0 ? (
+                  <div className="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="12"/>
+                      <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p>No matching jobs found for your active skill tags.</p>
+                    <p className="empty-hint">Add projects to extract verified skills and trigger automated matching.</p>
+                  </div>
+                ) : (
+                  <div className="cards-grid">
+                    {matchedJobs.map(({ job, score }) => {
+                      const isApplied = applications.some(a => a.jobId === job.id && a.profileId === currentProfile.id);
+                      return (
+                        <GigCard
+                          key={job.id}
+                          gig={{ ...job, budgetGHS: 0, requiredSkills: job.requiredSkills }}
+                          matchScore={score}
+                          isApplied={isApplied}
+                          userSkills={currentProfile.skills}
+                          onApply={() => applyForJob(job.id, currentProfile.id)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
           {/* TAB 2: PORTFOLIO */}
           {activeTab === 'portfolio' && (
-            <div className="portfolio-grid">
+            <div className="portfolio-section">
+              <h3>My Portfolio</h3>
               {currentProfile.projects.length === 0 ? (
-                <div className="col-span-full py-12 text-center border border-dashed border-gray-800 rounded-xl">
-                  <FolderOpen className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">No project case studies compiled yet.</p>
-                  <p className="text-xs text-gray-600 mt-1">Use the &quot;Upload Project&quot; button above to generate your first AI case study.</p>
+                <div className="empty-state">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <p>No project case studies compiled yet.</p>
+                  <p className="empty-hint">Use the "Upload Project" button above to generate your first AI case study.</p>
                 </div>
               ) : (
-                currentProfile.projects.map((proj) => (
-                  <div key={proj.id} className="proj-dash-card">
-                    <div className="proj-dash-header">
-                      <div>
-                        <h4 className="proj-dash-title text-white">{proj.title}</h4>
-                        <span className="text-[10px] text-gray-500">
-                          Compiled on {new Date(proj.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      
-                      {proj.isAudited ? (
-                        <span className="status-chip audited">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Audited
-                        </span>
-                      ) : (
-                        <span className="status-chip pending">
-                          <AlertCircle className="w-3.5 h-3.5" />
-                          Pending Review
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="proj-dash-skills">
-                      {proj.verifiedSkills.map((s, idx) => (
-                        <span key={idx} className="badge badge-accent text-[9px]">{s}</span>
-                      ))}
-                    </div>
-
-                    <div className="proj-dash-summary">
-                      {renderMarkdown(proj.aiSummary)}
-                    </div>
-
-                    <div className="proj-dash-links">
-                      {proj.githubUrl && (
-                        <a 
-                          href={proj.githubUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="proj-link-btn text-white hover:text-[var(--color-accent)]"
-                        >
-                          <Github className="w-3.5 h-3.5" />
-                          GitHub
-                          <ExternalLink className="w-2.5 h-2.5 ml-1" />
-                        </a>
-                      )}
-                      {proj.figmaUrl && (
-                        <a 
-                          href={proj.figmaUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="proj-link-btn text-white hover:text-[var(--color-accent)]"
-                        >
-                          <Globe className="w-3.5 h-3.5" />
-                          Figma
-                          <ExternalLink className="w-2.5 h-2.5 ml-1" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))
+                <div className="cards-grid">
+                  {currentProfile.projects.map((proj) => (
+                    <ProjectCard key={proj.id} project={proj} />
+                  ))}
+                </div>
               )}
             </div>
           )}
 
           {/* TAB 3: VERIFY PEERS */}
           {activeTab === 'verify' && (
-            <div className="peers-grid">
+            <div className="verify-section">
+              <h3>Verify Peers</h3>
               {peerDevelopers.length === 0 ? (
-                <div className="col-span-full py-12 text-center border border-dashed border-gray-800 rounded-xl">
-                  <ShieldCheck className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">No other developer profiles in local workspace.</p>
+                <div className="empty-state">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                  <p>No other professional profiles in local workspace.</p>
                 </div>
               ) : (
-                peerDevelopers.map((peer) => {
-                  return peer.projects.map((proj) => (
-                    <div key={proj.id} className="peer-card">
-                      <div>
+                <div className="cards-grid">
+                  {peerDevelopers.map((peer) => {
+                    return peer.projects.map((proj) => (
+                      <div key={proj.id} className="peer-card">
                         <div className="peer-header">
                           <img src={peer.avatarUrl} alt={peer.fullName} className="peer-avatar" />
-                          <div className="peer-name-area">
-                            <h4 className="peer-name text-white">{peer.fullName}</h4>
-                            <span className="peer-focus">{peer.techFocus} ({peer.country})</span>
+                          <div className="peer-info">
+                            <h4>{peer.fullName}</h4>
+                            <span>{peer.techFocus} ({peer.country})</span>
                           </div>
                         </div>
 
-                        <div className="my-3">
-                          <h5 className="peer-proj-title text-white">{proj.title}</h5>
-                          <div className="flex flex-wrap gap-1 mt-1">
+                        <div className="peer-project">
+                          <h5>{proj.title}</h5>
+                          <div className="peer-skills">
                             {proj.verifiedSkills.map((s, i) => (
-                              <span key={i} className="badge badge-accent text-[9px] py-0.5 px-1.5">{s}</span>
+                              <span key={i} className="skill-badge">{s}</span>
                             ))}
                           </div>
                         </div>
 
-                        <div className="proj-dash-summary max-h-[140px] overflow-y-auto mb-3">
+                        <div className="peer-summary">
                           {renderMarkdown(proj.aiSummary)}
                         </div>
-                      </div>
 
-                      {proj.isAudited ? (
-                        <button
-                          disabled
-                          className="btn btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 text-emerald-400 border-emerald-950/20 bg-emerald-950/10 cursor-default"
-                        >
-                          <UserCheck className="w-4 h-4" />
-                          You Vouched Work
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => toggleVerifyProject(proj.id)}
-                          className="btn btn-primary text-xs w-full py-2 flex items-center justify-center gap-1.5"
-                        >
-                          <ShieldCheck className="w-4 h-4" />
-                          Vouch Work Credibility
-                        </button>
-                      )}
+                        {proj.isAudited ? (
+                          <button disabled className="btn btn-secondary btn-sm disabled">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                              <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            You Vouched Work
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => toggleVerifyProject(proj.id)}
+                            className="btn btn-primary btn-sm"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                            Vouch Work Credibility
+                          </button>
+                        )}
+                      </div>
+                    ));
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: CONTRACTS & PAYOUTS */}
+          {activeTab === 'contracts' && (
+            <div className="contracts-section">
+              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: 'var(--spacing-md)' }}>Contracts & Payout Ledger</h3>
+              {matchedMember ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+                  {/* Active Contract Info */}
+                  <div className="card" style={{ padding: 'var(--spacing-lg)', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px', marginBottom: '16px' }}>
+                      <div>
+                        <span className="badge badge-accent" style={{ textTransform: 'uppercase', fontSize: '0.7rem', fontWeight: 700, padding: '4px 10px', borderRadius: '4px' }}>
+                          ● Active Service Agreement
+                        </span>
+                        <h4 style={{ fontSize: '1.2rem', fontWeight: 700, marginTop: '8px', marginBottom: '2px', color: 'var(--color-text-primary)' }}>{matchedMember.role}</h4>
+                        <span style={{ fontSize: '0.82rem', color: 'var(--color-text-tertiary)' }}>Hub Location: {matchedMember.country}</span>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Payout Rate</span>
+                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-accent)' }}>
+                          {currencySymbols[matchedMember.currency] || matchedMember.currency}
+                          {matchedMember.monthlySalary.toLocaleString()}/mo
+                        </div>
+                      </div>
                     </div>
-                  ));
-                })
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', fontSize: '0.85rem' }}>
+                      <div>
+                        <strong style={{ display: 'block', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Contract Start Date</strong>
+                        <span style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>{new Date(matchedMember.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                      </div>
+                      <div>
+                        <strong style={{ display: 'block', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Payout Schedule</strong>
+                        <span style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>Monthly Settlement (28th)</span>
+                      </div>
+                      <div>
+                        <strong style={{ display: 'block', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Payout Wallet / Channel</strong>
+                        <span style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>Mobile Money Wallet ({matchedMember.currency})</span>
+                      </div>
+                      <div>
+                        <strong style={{ display: 'block', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>Compliance Status</strong>
+                        <span style={{ color: 'var(--color-accent)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                          Fully Verified
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Payment History Card */}
+                  <div className="card" style={{ padding: 'var(--spacing-lg)' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: 'var(--spacing-md)' }}>Payout Log & Payslips</h4>
+                    {matchedPayments.length === 0 ? (
+                      <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '24px 0' }}>
+                        No payouts have been processed under this contract yet. Next payroll will run on the 28th.
+                      </p>
+                    ) : (
+                      <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid var(--color-border)', textAlign: 'left' }}>
+                              <th style={{ padding: '8px 12px', color: 'var(--color-text-tertiary)' }}>Pay Period</th>
+                              <th style={{ padding: '8px 12px', color: 'var(--color-text-tertiary)' }}>Processed Date</th>
+                              <th style={{ padding: '8px 12px', color: 'var(--color-text-tertiary)' }}>Gross Amount</th>
+                              <th style={{ padding: '8px 12px', color: 'var(--color-text-tertiary)' }}>USD Equiv.</th>
+                              <th style={{ padding: '8px 12px', color: 'var(--color-text-tertiary)' }}>Status</th>
+                              <th style={{ padding: '8px 12px', textAlign: 'right', color: 'var(--color-text-tertiary)' }}>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {matchedPayments.map((pay) => (
+                              <tr key={pay.id} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                                <td style={{ padding: '12px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{pay.period}</td>
+                                <td style={{ padding: '12px', color: 'var(--color-text-secondary)' }}>{new Date(pay.processedAt).toLocaleDateString()}</td>
+                                <td style={{ padding: '12px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                                  {currencySymbols[pay.currency] || pay.currency}
+                                  {pay.grossAmount.toLocaleString()}
+                                </td>
+                                <td style={{ padding: '12px', color: 'var(--color-accent)', fontWeight: 600 }}>${pay.usdEquivalent.toLocaleString()}</td>
+                                <td style={{ padding: '12px' }}>
+                                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-accent)', border: '1px solid var(--color-accent)' }}>
+                                    {pay.status}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '12px', textAlign: 'right' }}>
+                                  <button 
+                                    className="btn btn-secondary btn-sm" 
+                                    onClick={() => alert(`Receipt downloaded for ${pay.period}`)}
+                                    style={{ fontSize: '0.72rem', padding: '4px 8px' }}
+                                  >
+                                    Download PDF
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="card" style={{ padding: 'var(--spacing-xl)', textAlign: 'center' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'var(--color-accent-subtle)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', marginBottom: '16px', border: '1px solid var(--color-accent)' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="5" width="20" height="14" rx="2" ry="2"/>
+                      <line x1="2" y1="10" x2="22" y2="10"/>
+                    </svg>
+                  </div>
+                  <h4 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-primary)' }}>No Active Service Contract Found</h4>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', maxWidth: '480px', margin: '0 auto 20px auto', lineHeight: '1.6' }}>
+                    Once a recruiter shortlists and hires you for a gig or role, your formal work agreement, verified compliance details, tax forms, and automatic payout ledger history will show up here.
+                  </p>
+                  
+                  <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '20px', maxWidth: '560px', margin: '0 auto', textAlign: 'left' }}>
+                    <h5 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>How Payouts Work on BorderLine:</h5>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                      <div>
+                        <strong style={{ color: 'var(--color-text-primary)' }}>💸 Regulated Settlement rails</strong>
+                        <p style={{ margin: '4px 0 0 0' }}>All contractor payouts are cleared via regional Mobile Money networks (MTN, Wave, Orange, M-Pesa) or local bank accounts instantly.</p>
+                      </div>
+                      <div>
+                        <strong style={{ color: 'var(--color-text-primary)' }}>🛡️ Escrow Safeguards</strong>
+                        <p style={{ margin: '4px 0 0 0' }}>Startups pre-fund the project escrow before the work starts. Once verified, payments are settled securely.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           )}
 
           {/* TAB 4: RESOURCES GATEWAY */}
           {activeTab === 'resources' && (
-            <div className="resources-grid">
-              <div className="resource-dash-card">
-                <span className="resource-category">Sandbox Integration</span>
-                <h4 className="resource-title text-white">WhatsApp Sandboxing Walkthrough</h4>
-                <p className="resource-desc text-gray-400">
-                  Learn how to register your mobile number into our local mock SMS gateway. Push code descriptions, query micro-gigs, and apply to opportunities without loading full-size web browser pages on spotty 2G connections.
-                </p>
-                <a href="/whatsapp" className="resource-action hover:underline">
-                  Go to WhatsApp Sandbox
-                  <ChevronRight className="w-4 h-4" />
-                </a>
-              </div>
+            <div className="resources-section">
+              <h3>Resources</h3>
+              <div className="cards-grid">
+                <div className="resource-card">
+                  <span className="resource-category">Sandbox Integration</span>
+                  <h4>WhatsApp Sandboxing Walkthrough</h4>
+                  <p>Learn how to register your mobile number into our local mock SMS gateway. Push code descriptions, query micro-gigs, and apply to opportunities without loading full-size web browser pages on spotty 2G connections.</p>
+                  <a href="/whatsapp" className="resource-link">
+                    Go to WhatsApp Sandbox
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </a>
+                </div>
 
-              <div className="resource-dash-card">
-                <span className="resource-category">Local Payment APIs</span>
-                <h4 className="resource-title text-white">Susu Pay Ledger APIs</h4>
-                <p className="resource-desc text-gray-400">
-                  Technical guides to integrating localized escrow API services. Implements instant checkout triggers, verification logs, and mobile money splits.
-                </p>
-                <a href="#" className="resource-action hover:underline" onClick={(e) => e.preventDefault()}>
-                  Read Developer Guide
-                  <ChevronRight className="w-4 h-4" />
-                </a>
-              </div>
-
-              <div className="resource-dash-card">
-                <span className="resource-category">Mobile Money</span>
-                <h4 className="resource-title text-white">Ghana Momo Integration Details</h4>
-                <p className="resource-desc text-gray-400">
-                  Curated endpoints for MTN Mobile Money and Telecel. Configures secure callbacks, trust tier authentication, and GHS-denominated payouts.
-                </p>
-                <a href="#" className="resource-action hover:underline" onClick={(e) => e.preventDefault()}>
-                  Explore Specs
-                  <ChevronRight className="w-4 h-4" />
-                </a>
-              </div>
-
-              <div className="resource-dash-card">
-                <span className="resource-category">Community</span>
-                <h4 className="resource-title text-white">BorderLine Peer Networks</h4>
-                <p className="resource-desc text-gray-400">
-                  A gateway to joining regional developer boards, discord guilds, and peer-to-peer code review circles across West Africa.
-                </p>
-                <a href="#" className="resource-action hover:underline" onClick={(e) => e.preventDefault()}>
-                  Join Network
-                  <ChevronRight className="w-4 h-4" />
-                </a>
+                <div className="resource-card">
+                  <span className="resource-category">Local Payment APIs</span>
+                  <h4>Susu Pay Ledger APIs</h4>
+                  <p>Technical guides to integrating localized escrow API services. Implements instant checkout triggers, verification logs, and mobile money splits.</p>
+                  <a href="#" className="resource-link">
+                    View Documentation
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </a>
+                </div>
               </div>
             </div>
           )}
 
           {/* TAB 5: NOTIFICATIONS */}
           {activeTab === 'notifications' && (
-            <div className="notifications-panel">
+            <div className="notifications-section">
+              <h3>Notifications</h3>
               {notificationsList.length === 0 ? (
-                <div className="py-12 text-center">
-                  <Bell className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Your notifications inbox is empty.</p>
+                <div className="empty-state">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                  </svg>
+                  <p>Your notifications inbox is empty.</p>
                 </div>
               ) : (
-                notificationsList.map((notif, idx) => (
-                  <div key={idx} className="notif-row">
-                    <div className={`notif-icon-wrap ${notif.status}`}>
-                      {notif.status === 'shortlisted' ? (
-                        <TrendingUp className="w-4 h-4" />
-                      ) : notif.status === 'hired' ? (
-                        <Sparkles className="w-4 h-4" />
-                      ) : (
-                        <Bell className="w-4 h-4" />
+                <div className="notifications-list">
+                  {notificationsList.map((notif, idx) => (
+                    <div key={idx} className="notification-item">
+                      <div className={`notification-icon ${notif.status}`}>
+                        {notif.status === 'shortlisted' ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                            <polyline points="17 6 23 6 23 12"/>
+                          </svg>
+                        ) : notif.status === 'hired' ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                          </svg>
+                        )}
+                      </div>
+                      
+                      <div className="notification-content">
+                        <p>{notif.message}</p>
+                        <span className="notification-time">{notif.time}</span>
+                      </div>
+
+                      {notif.status !== 'pending' && (
+                        <span className={`notification-badge ${notif.status}`}>
+                          {notif.status}
+                        </span>
                       )}
                     </div>
-                    
-                    <div className="notif-body">
-                      <p className="notif-message">{notif.message}</p>
-                      <span className="notif-time text-gray-500">{notif.time}</span>
-                    </div>
-
-                    {notif.status !== 'pending' && (
-                      <span className={`notif-status-badge ${notif.status}`}>
-                        {notif.status}
-                      </span>
-                    )}
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
           )}
 
           {/* TAB 6: ACCOUNT SETTINGS */}
           {activeTab === 'settings' && (
-            <div className="settings-panel">
-              {/* Profile Information Card */}
+            <div className="settings-section">
+              <h3>Account Settings</h3>
               <div className="settings-card">
-                <div className="settings-card-header">
-                  <User className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
-                  <h3>Profile Information</h3>
+                <div className="settings-header">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <h4>Profile Information</h4>
                 </div>
-                <div className="settings-field-group">
-                  <div className="settings-field">
-                    <label className="settings-label">
-                      <User className="w-3.5 h-3.5" />
-                      Full Name
-                    </label>
-                    <div className="settings-value">{currentProfile.fullName}</div>
-                  </div>
-                  <div className="settings-field">
-                    <label className="settings-label">
-                      <Mail className="w-3.5 h-3.5" />
-                      Email
-                    </label>
-                    <div className="settings-value">{currentProfile.fullName.toLowerCase().replace(' ', '.')}@borderline.africa</div>
-                  </div>
-                  <div className="settings-field">
-                    <label className="settings-label">
-                      <MapPin className="w-3.5 h-3.5" />
-                      Location
-                    </label>
-                    <div className="settings-value">{currentProfile.country}</div>
-                  </div>
-                  <div className="settings-field">
-                    <label className="settings-label">
-                      <Briefcase className="w-3.5 h-3.5" />
-                      Tech Focus
-                    </label>
-                    <div className="settings-value">{currentProfile.techFocus}</div>
-                  </div>
-                  <div className="settings-field">
-                    <label className="settings-label">
-                      <Smartphone className="w-3.5 h-3.5" />
-                      WhatsApp
-                    </label>
-                    <div className="settings-value" style={{ color: 'var(--color-accent)' }}>Connected ✓</div>
-                  </div>
+                <div className="settings-field">
+                  <label>Full Name</label>
+                  <div className="settings-value">{currentProfile.fullName}</div>
+                </div>
+                <div className="settings-field">
+                  <label>Email</label>
+                  <div className="settings-value">{currentProfile.fullName.toLowerCase().replace(' ', '.')}@borderline.africa</div>
+                </div>
+                <div className="settings-field">
+                  <label>Focus Area</label>
+                  <div className="settings-value">{currentProfile.techFocus}</div>
+                </div>
+                <div className="settings-field">
+                  <label>Location</label>
+                  <div className="settings-value">{currentProfile.country}</div>
                 </div>
               </div>
 
-              {/* Notification Preferences */}
               <div className="settings-card">
-                <div className="settings-card-header">
-                  <Bell className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
-                  <h3>Notification Preferences</h3>
+                <div className="settings-header">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 
+0 1 0 2.83 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  </svg>
+                  <h4>Preferences</h4>
                 </div>
-                <div className="settings-field-group">
-                  <div className="settings-toggle-row">
-                    <div>
-                      <span className="settings-toggle-label">Gig match alerts</span>
-                      <span className="settings-toggle-desc">Get notified when new gigs match your skills</span>
-                    </div>
-                    <div className="settings-toggle active">
-                      <div className="settings-toggle-knob" />
-                    </div>
-                  </div>
-                  <div className="settings-toggle-row">
-                    <div>
-                      <span className="settings-toggle-label">Shortlist updates</span>
-                      <span className="settings-toggle-desc">Alerts when recruiters shortlist your profile</span>
-                    </div>
-                    <div className="settings-toggle active">
-                      <div className="settings-toggle-knob" />
-                    </div>
-                  </div>
-                  <div className="settings-toggle-row">
-                    <div>
-                      <span className="settings-toggle-label">Peer vouch notifications</span>
-                      <span className="settings-toggle-desc">When someone vouches for your project</span>
-                    </div>
-                    <div className="settings-toggle">
-                      <div className="settings-toggle-knob" />
-                    </div>
-                  </div>
-                  <div className="settings-toggle-row">
-                    <div>
-                      <span className="settings-toggle-label">WhatsApp notifications</span>
-                      <span className="settings-toggle-desc">Receive updates via WhatsApp messages</span>
-                    </div>
-                    <div className="settings-toggle active">
-                      <div className="settings-toggle-knob" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Connected Services */}
-              <div className="settings-card">
-                <div className="settings-card-header">
-                  <Link2 className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
-                  <h3>Connected Services</h3>
-                </div>
-                <div className="settings-field-group">
-                  <div className="settings-service-row">
-                    <div className="settings-service-info">
-                      <Github className="w-4 h-4" />
-                      <span>GitHub</span>
-                    </div>
-                    <span className="settings-service-status connected">Connected</span>
-                  </div>
-                  <div className="settings-service-row">
-                    <div className="settings-service-info">
-                      <Globe className="w-4 h-4" />
-                      <span>Figma</span>
-                    </div>
-                    <span className="settings-service-status">Not connected</span>
-                  </div>
-                  <div className="settings-service-row">
-                    <div className="settings-service-info">
-                      <Smartphone className="w-4 h-4" />
-                      <span>Mobile Money (MTN)</span>
-                    </div>
-                    <span className="settings-service-status connected">Connected</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Demo Profile Switcher */}
-              <div className="settings-card">
-                <div className="settings-card-header">
-                  <Shield className="w-4 h-4" style={{ color: 'var(--color-accent)' }} />
-                  <h3>Demo Controls</h3>
-                </div>
-                <div className="settings-field-group">
-                  <div className="settings-field">
-                    <label className="settings-label">
-                      <User className="w-3.5 h-3.5" />
-                      Switch Dev Profile
-                    </label>
-                    <select
-                      value={activeProfileId}
-                      onChange={(e) => setActiveProfileId(e.target.value)}
-                      className="settings-select"
-                    >
-                      {profiles.map(p => (
-                        <option key={p.id} value={p.id}>{p.fullName}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Danger Zone */}
-              <div className="settings-card settings-card-danger">
-                <div className="settings-card-header">
-                  <AlertCircle className="w-4 h-4" style={{ color: 'var(--color-danger)' }} />
-                  <h3 style={{ color: 'var(--color-danger)' }}>Danger Zone</h3>
-                </div>
-                <div className="settings-danger-actions">
-                  <button
-                    onClick={resetDatabase}
-                    className="settings-danger-btn"
+                <div className="settings-field">
+                  <label>Theme</label>
+                  <button 
+                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    className="btn btn-secondary btn-sm"
                   >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    Reset All Seed Data
+                    {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                   </button>
-                  <button
-                    className="settings-danger-btn"
-                    onClick={(e) => e.preventDefault()}
+                </div>
+              </div>
+
+              <div className="settings-card">
+                <div className="settings-header">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                  </svg>
+                  <h4>Danger Zone</h4>
+                </div>
+                <div className="settings-field">
+                  <label>Reset Database</label>
+                  <button 
+                    onClick={resetDatabase}
+                    className="btn btn-danger btn-sm"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Sign Out
+                    Reset All Data
                   </button>
                 </div>
               </div>
             </div>
           )}
-
         </div>
-      </main>
+        </main>
+      </div>
 
-      {/* FLOATING ACTION BUTTON (Upload Project shortcut) */}
-      <button 
-        onClick={() => setIsDrawerOpen(true)}
-        className="floating-fab btn btn-primary cursor-pointer hover:scale-105"
-      >
-        <Upload className="w-4 h-4" />
-        <span>Upload Project</span>
-      </button>
-
-      {/* MOBILE BOTTOM NAVIGATION BAR */}
-      <nav className="mobile-bottom-nav">
-        <button 
-          onClick={() => setActiveTab('opportunities')}
-          className={`mobile-bottom-nav-item ${activeTab === 'opportunities' ? 'active' : ''}`}
-        >
-          <Briefcase className="w-5 h-5" />
-          <span>Gigs</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('portfolio')}
-          className={`mobile-bottom-nav-item ${activeTab === 'portfolio' ? 'active' : ''}`}
-        >
-          <FolderOpen className="w-5 h-5" />
-          <span>Portfolio</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('verify')}
-          className={`mobile-bottom-nav-item ${activeTab === 'verify' ? 'active' : ''}`}
-        >
-          <ShieldCheck className="w-5 h-5" />
-          <span>Verify</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('notifications')}
-          className={`mobile-bottom-nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
-        >
-          <Bell className="w-5 h-5" />
-          <span>Inbox</span>
-        </button>
-        <button 
-          onClick={() => setActiveTab('settings')}
-          className={`mobile-bottom-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-        >
-          <Settings className="w-5 h-5" />
-          <span>Settings</span>
-        </button>
-      </nav>
-
-      {/* SLIDING DRAWER MODAL FOR UPLOAD / AI COMPILER */}
+      {/* Upload Project Drawer */}
       {isDrawerOpen && (
-        <div className="drawer-backdrop-v2" onClick={() => !isParsing && setIsDrawerOpen(false)}>
-          <div className="drawer-panel-v2" onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header-v2">
-              <h3 className="flex items-center gap-2 text-white">
-                <Sparkles className="w-5 h-5 text-[var(--color-accent)]" />
-                AI Case Study Compiler
-              </h3>
+        <div className="drawer-overlay">
+          <div className="drawer-content">
+            <div className="drawer-header">
+              <h3>Upload Project</h3>
               <button 
-                onClick={() => !isParsing && setIsDrawerOpen(false)}
-                className="drawer-close-btn"
-                disabled={isParsing}
+                onClick={() => setIsDrawerOpen(false)}
+                className="drawer-close"
               >
-                <X className="w-5 h-5" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
               </button>
             </div>
 
-            <p className="text-xs text-gray-400">
-              Provide messy repository documentation, assignment briefs, or raw scripts. Our compiler parses the patterns, registers your verified skills, and outputs a formatted case study.
-            </p>
-
-            {isParsing ? (
-              <div className="log-console mt-2">
-                <div className="flex justify-between border-b border-gray-800 pb-2 mb-2">
-                  <span>BORDERLINE AI PARSER v1.0.3</span>
-                  <span className="animate-pulse text-emerald-400 font-bold text-xs">● ACTIVE</span>
-                </div>
-                {logs.map((log, idx) => (
-                  <div key={idx} className="log-line">
-                    <span className="text-gray-600">&gt;</span>
-                    <div>{log}</div>
-                  </div>
-                ))}
-                <div ref={logEndRef} />
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label className="form-label">Project Title</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  placeholder="e.g. E-commerce Platform"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required 
+                />
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="form-group mb-0">
-                  <label className="form-label text-xs" htmlFor="project-title-input">Project Title</label>
-                  <input 
-                    type="text" 
-                    id="project-title-input"
-                    className="form-input text-xs" 
-                    placeholder="e.g. Momo Escrow API, AgriDist USSD"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="form-group mb-0">
-                  <label className="form-label text-xs" htmlFor="project-raw-notes-input">Raw Notes or Code Description</label>
-                  <textarea 
-                    id="project-raw-notes-input"
-                    className="form-textarea text-xs min-h-[140px]" 
-                    placeholder="Paste rough notes, list of tools, or copy paste code. For example: 'Built a ledger screen for cocoa farmers in React. Uses local storage for offline. Fast responses.'"
-                    value={rawInput}
-                    onChange={(e) => setRawInput(e.target.value)}
-                    required
-                  />
-                </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="form-group mb-0">
-                    <label className="form-label text-xs" htmlFor="project-github-input">GitHub Repo URL (Optional)</label>
-                    <input 
-                      type="url" 
-                      id="project-github-input"
-                      className="form-input text-xs" 
-                      placeholder="https://github.com/..."
-                      value={githubUrl}
-                      onChange={(e) => setGithubUrl(e.target.value)}
-                    />
+              <div className="form-group">
+                <label className="form-label">Project Description</label>
+                <textarea 
+                  className="form-textarea" 
+                  placeholder="Describe the project, technologies used, and your role..."
+                  value={rawInput}
+                  onChange={(e) => setRawInput(e.target.value)}
+                  required 
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">GitHub URL (optional)</label>
+                <input 
+                  type="url" 
+                  className="form-input" 
+                  placeholder="https://github.com/..."
+                  value={githubUrl}
+                  onChange={(e) => setGithubUrl(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Figma URL (optional)</label>
+                <input 
+                  type="url" 
+                  className="form-input" 
+                  placeholder="https://figma.com/..."
+                  value={figmaUrl}
+                  onChange={(e) => setFigmaUrl(e.target.value)}
+                />
+              </div>
+
+              {isParsing && (
+                <div className="ai-logs">
+                  <div className="ai-logs-header">
+                    <span className="ai-logs-title">AI Processing</span>
+                    <span className="ai-logs-status">Running...</span>
                   </div>
-                  <div className="form-group mb-0">
-                    <label className="form-label text-xs" htmlFor="project-figma-input">Figma Link (Optional)</label>
-                    <input 
-                      type="url" 
-                      id="project-figma-input"
-                      className="form-input text-xs" 
-                      placeholder="https://figma.com/..."
-                      value={figmaUrl}
-                      onChange={(e) => setFigmaUrl(e.target.value)}
-                    />
+                  <div className="ai-logs-content">
+                    {logs.map((log, idx) => (
+                      <div key={idx} className="ai-log-entry">{log}</div>
+                    ))}
+                    <div ref={logEndRef} />
                   </div>
                 </div>
+              )}
 
-                <button 
-                  type="submit" 
-                  className="btn btn-primary text-xs py-2.5 mt-2 flex items-center justify-center gap-1.5"
-                  id="btn-submit-project"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  Compile & Verify Case Study
-                </button>
-              </form>
-            )}
+              <button 
+                type="submit" 
+                className="btn btn-primary btn-lg"
+                disabled={isParsing}
+              >
+                {isParsing ? 'Processing...' : 'Generate Case Study'}
+              </button>
+            </form>
           </div>
         </div>
       )}

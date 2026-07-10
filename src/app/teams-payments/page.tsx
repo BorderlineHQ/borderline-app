@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useApp } from '../../context/AppContext';
 import { TeamMember, TeamMemberStatus, PaymentRun } from '../../types';
 import {
-  mockTeamMembers,
-  mockPaymentHistory,
   currencyRates,
   currencySymbols,
   countryCurrency,
@@ -15,9 +14,6 @@ const fmt = (n: number, currency: string) => {
   const sym = currencySymbols[currency] || currency;
   return `${sym}${n.toLocaleString()}`;
 };
-
-const toUSD = (amount: number, currency: string) =>
-  Math.round(amount * (currencyRates[currency] || 1));
 
 const statusColor = (s: string) => {
   switch (s) {
@@ -35,11 +31,63 @@ const statusColor = (s: string) => {
   }
 };
 
+const highlightText = (text: string, search: string) => {
+  if (!search) return text;
+  const parts = text.split(new RegExp(`(${search.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})`, 'gi'));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === search.toLowerCase() ? (
+          <mark key={i} style={{ backgroundColor: 'rgba(52, 211, 153, 0.2)', color: 'var(--color-accent)', padding: '0 2px', borderRadius: '2px' }}>
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
+
+
 // ─── Page Component ────────────────────────────────────────────────────────
 export default function TeamsPaymentsPage() {
-  // ─ Team member state (local, mutable) ───────────────────────────────────
-  const [members, setMembers] = useState<TeamMember[]>(mockTeamMembers);
-  const [paymentHistory, setPaymentHistory] = useState<PaymentRun[]>(mockPaymentHistory);
+  // ─ Global App Context State ─────────────────────────────────────────────
+  const {
+    teamMembers: members,
+    paymentHistory,
+    addTeamMember,
+    updateTeamMember,
+    removeTeamMember,
+    runPayroll,
+    mounted
+  } = useApp();
+
+  // ─ Currency Exchange Rates state ─────────────────────────────────────────
+  const [rates, setRates] = useState<Record<string, number>>(currencyRates);
+
+  React.useEffect(() => {
+    fetch('https://open.er-api.com/v6/latest/USD')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.rates) {
+          const apiRates = data.rates;
+          const newRates: Record<string, number> = { ...currencyRates };
+          ['GHS', 'NGN', 'ZAR', 'KES', 'XOF'].forEach((curr) => {
+            if (apiRates[curr]) {
+              newRates[curr] = 1 / apiRates[curr];
+            }
+          });
+          setRates(newRates);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to fetch real-time exchange rates, using local fallback:', err);
+      });
+  }, []);
+
+  const toUSD = (amount: number, currency: string) =>
+    Math.round(amount * (rates[currency] || 1));
 
   // ─ UI state ──────────────────────────────────────────────────────────────
   const [search, setSearch] = useState('');
@@ -51,6 +99,7 @@ export default function TeamsPaymentsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [complianceOpen, setComplianceOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -68,6 +117,17 @@ export default function TeamsPaymentsPage() {
 
   // ─ Payment history expand state ──────────────────────────────────────────
   const [expandedRun, setExpandedRun] = useState<string | null>(null);
+
+  // ─ Sorting & Pagination states ───────────────────────────────────────────
+  const [sortField, setSortField] = useState<'fullName' | 'role' | 'country' | 'monthlySalary' | 'startDate' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
+  // Reset pagination on filter or search change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filterCountry, filterStatus]);
 
   // ─── Derived data ────────────────────────────────────────────────────────
   const countries = useMemo(() => {
@@ -87,6 +147,104 @@ export default function TeamsPaymentsPage() {
     });
   }, [members, search, filterCountry, filterStatus]);
 
+  const sortedMembers = useMemo(() => {
+    if (!sortField) return filtered;
+    return [...filtered].sort((a, b) => {
+      let aVal = a[sortField];
+      let bVal = b[sortField];
+
+      // Normalize salary comparison to USD equivalent so sorting is globally accurate
+      if (sortField === 'monthlySalary') {
+        aVal = toUSD(a.monthlySalary, a.currency);
+        bVal = toUSD(b.monthlySalary, b.currency);
+      }
+
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filtered, sortField, sortDirection]);
+
+  const totalPages = Math.ceil(sortedMembers.length / ITEMS_PER_PAGE);
+
+  const paginatedMembers = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return sortedMembers.slice(start, start + ITEMS_PER_PAGE);
+  }, [sortedMembers, currentPage]);
+
+  const handleSort = (field: 'fullName' | 'role' | 'country' | 'monthlySalary' | 'startDate') => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const exportRosterToCSV = () => {
+    const headers = ['Name', 'Email', 'Role', 'Country', 'Status', 'Salary (Local)', 'Currency', 'Salary (USD)'];
+    const rows = sortedMembers.map((m) => [
+      m.fullName,
+      m.email,
+      m.role,
+      m.country,
+      m.status,
+      m.monthlySalary,
+      m.currency,
+      toUSD(m.monthlySalary, m.currency)
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `borderline_team_roster_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportHistoryRunToCSV = (run: PaymentRun) => {
+    const headers = ['Member Name', 'Gross Amount', 'Currency', 'USD Equivalent', 'Status'];
+    const rows = run.entries.map((e) => [
+      e.memberName,
+      e.grossAmount,
+      e.currency,
+      e.usdEquivalent,
+      e.status
+    ]);
+
+    const csvContent = [
+      [`Period: ${run.period}`, `Processed At: ${run.processedAt}`, `Total USD: $${run.totalUSD}`],
+      [],
+      headers,
+      ...rows
+    ]
+      .map((row) => row.map((val) => `"${String(val).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `borderline_payroll_report_${run.period.replace(' ', '_')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
+
   const activeMembers = members.filter((m) => m.status === 'Active');
   const uniqueCountries = new Set(members.map((m) => m.country)).size;
   const totalMonthlyUSD = members
@@ -96,12 +254,14 @@ export default function TeamsPaymentsPage() {
   // ─── Modal handlers ─────────────────────────────────────────────────────
   const openAddModal = () => {
     setEditingMember(null);
+    setFormErrors({});
     setFormData({ fullName: '', email: '', role: '', country: 'Ghana', monthlySalary: '', startDate: '', status: 'Active' });
     setModalOpen(true);
   };
 
   const openEditModal = (member: TeamMember) => {
     setEditingMember(member);
+    setFormErrors({});
     setFormData({
       fullName: member.fullName,
       email: member.email,
@@ -115,17 +275,41 @@ export default function TeamsPaymentsPage() {
   };
 
   const handleSave = () => {
-    if (!formData.fullName || !formData.email || !formData.role || !formData.monthlySalary) return;
+    const errors: Record<string, string> = {};
+    if (!formData.fullName.trim()) {
+      errors.fullName = 'Full Name is required';
+    }
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    if (!formData.role.trim()) {
+      errors.role = 'Role / Title is required';
+    }
+    if (!formData.monthlySalary) {
+      errors.monthlySalary = 'Salary is required';
+    } else {
+      const sal = Number(formData.monthlySalary);
+      if (isNaN(sal) || sal <= 0) {
+        errors.monthlySalary = 'Salary must be a positive number';
+      }
+    }
 
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setFormErrors({});
     const currency = countryCurrency[formData.country] || 'USD';
     if (editingMember) {
-      setMembers((prev) =>
-        prev.map((m) =>
-          m.id === editingMember.id
-            ? { ...m, ...formData, monthlySalary: Number(formData.monthlySalary), currency }
-            : m
-        )
-      );
+      updateTeamMember({
+        ...editingMember,
+        ...formData,
+        monthlySalary: Number(formData.monthlySalary),
+        currency
+      });
     } else {
       const newMember: TeamMember = {
         id: `tm-${Date.now()}`,
@@ -134,13 +318,13 @@ export default function TeamsPaymentsPage() {
         currency,
         avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.fullName)}&background=22C55E&color=fff&size=200`,
       };
-      setMembers((prev) => [...prev, newMember]);
+      addTeamMember(newMember);
     }
     setModalOpen(false);
   };
 
   const removeMember = (id: string) => {
-    setMembers((prev) => prev.filter((m) => m.id !== id));
+    removeTeamMember(id);
   };
 
   // ─── Payroll runner ──────────────────────────────────────────────────────
@@ -150,22 +334,15 @@ export default function TeamsPaymentsPage() {
   const handleRunPayroll = () => {
     setPayrollProcessing(true);
     setTimeout(() => {
-      const newRun: PaymentRun = {
-        id: `pr-${Date.now()}`,
-        period: selectedPeriod,
-        totalUSD: payrollTotal,
-        entries: payrollMembers.map((m) => ({
-          memberId: m.id,
-          memberName: m.fullName,
-          grossAmount: m.monthlySalary,
-          currency: m.currency,
-          usdEquivalent: toUSD(m.monthlySalary, m.currency),
-          status: 'Completed' as const,
-        })),
-        status: 'Completed',
-        processedAt: new Date().toISOString(),
-      };
-      setPaymentHistory((prev) => [newRun, ...prev]);
+      const entries = payrollMembers.map((m) => ({
+        memberId: m.id,
+        memberName: m.fullName,
+        grossAmount: m.monthlySalary,
+        currency: m.currency,
+        usdEquivalent: toUSD(m.monthlySalary, m.currency),
+        status: 'Completed' as const,
+      }));
+      runPayroll(selectedPeriod, entries, payrollTotal);
       setPayrollProcessing(false);
       setPayrollSuccess(true);
       setTimeout(() => setPayrollSuccess(false), 4000);
@@ -173,6 +350,8 @@ export default function TeamsPaymentsPage() {
   };
 
   // ─── RENDER ──────────────────────────────────────────────────────────────
+  if (!mounted) return null;
+
   return (
     <div className="tp-page">
       {/* ── Hero ───────────────────────────────────────────────────────── */}
@@ -283,6 +462,22 @@ export default function TeamsPaymentsPage() {
                   <option value="On Leave">On Leave</option>
                   <option value="Probation">Probation</option>
                 </select>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={exportRosterToCSV} 
+                  style={{ 
+                    padding: '10px 18px', 
+                    fontSize: '0.85rem', 
+                    borderRadius: 'var(--radius-sm)', 
+                    whiteSpace: 'nowrap',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export CSV
+                </button>
                 <button className="btn btn-primary tp-add-btn" onClick={openAddModal}>
                   + Add Member
                 </button>
@@ -293,37 +488,45 @@ export default function TeamsPaymentsPage() {
                 <table className="tp-table">
                   <thead>
                     <tr>
-                      <th>Member</th>
-                      <th>Role</th>
-                      <th>Country</th>
+                      <th onClick={() => handleSort('fullName')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                        Member <span style={{ fontSize: '0.7rem', color: sortField === 'fullName' ? 'var(--color-accent)' : 'inherit' }}>{sortField === 'fullName' ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : ' ↕'}</span>
+                      </th>
+                      <th onClick={() => handleSort('role')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                        Role <span style={{ fontSize: '0.7rem', color: sortField === 'role' ? 'var(--color-accent)' : 'inherit' }}>{sortField === 'role' ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : ' ↕'}</span>
+                      </th>
+                      <th onClick={() => handleSort('country')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                        Country <span style={{ fontSize: '0.7rem', color: sortField === 'country' ? 'var(--color-accent)' : 'inherit' }}>{sortField === 'country' ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : ' ↕'}</span>
+                      </th>
                       <th>Status</th>
-                      <th>Monthly Salary</th>
+                      <th onClick={() => handleSort('monthlySalary')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                        Monthly Salary <span style={{ fontSize: '0.7rem', color: sortField === 'monthlySalary' ? 'var(--color-accent)' : 'inherit' }}>{sortField === 'monthlySalary' ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : ' ↕'}</span>
+                      </th>
                       <th>USD Equiv.</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.length === 0 && (
+                    {paginatedMembers.length === 0 && (
                       <tr>
                         <td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-tertiary)' }}>
                           No team members found.
                         </td>
                       </tr>
                     )}
-                    {filtered.map((m) => (
+                    {paginatedMembers.map((m) => (
                       <tr key={m.id}>
                         <td>
                           <div className="tp-member-cell">
                             <img src={m.avatarUrl} alt={m.fullName} className="tp-member-avatar" />
                             <div>
-                              <div className="tp-member-name">{m.fullName}</div>
-                              <div className="tp-member-email">{m.email}</div>
+                              <div className="tp-member-name">{highlightText(m.fullName, search)}</div>
+                              <div className="tp-member-email">{highlightText(m.email, search)}</div>
                             </div>
                           </div>
                         </td>
-                        <td>{m.role}</td>
+                        <td>{highlightText(m.role, search)}</td>
                         <td>
-                          <span className="tp-country-badge">{m.country}</span>
+                          <span className="tp-country-badge">{highlightText(m.country, search)}</span>
                         </td>
                         <td>
                           <span className="tp-status-badge" style={{ color: statusColor(m.status), borderColor: statusColor(m.status), backgroundColor: `${statusColor(m.status)}15` }}>
@@ -347,6 +550,61 @@ export default function TeamsPaymentsPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination controls */}
+              {totalPages > 1 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '16px',
+                  paddingTop: '16px',
+                  borderTop: '1px solid var(--color-border)',
+                  fontSize: '0.85rem',
+                  color: 'var(--color-text-secondary)',
+                  flexWrap: 'wrap',
+                  gap: '12px'
+                }}>
+                  <div>
+                    Showing {Math.min(sortedMembers.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)} to {Math.min(sortedMembers.length, currentPage * ITEMS_PER_PAGE)} of {sortedMembers.length} members
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: '6px' }}
+                    >
+                      Previous
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        style={{
+                          padding: '6px 12px',
+                          fontSize: '0.8rem',
+                          borderRadius: '6px',
+                          border: '1px solid var(--color-border)',
+                          backgroundColor: currentPage === page ? 'var(--color-accent-subtle)' : 'var(--color-surface)',
+                          color: currentPage === page ? 'var(--color-accent)' : 'var(--color-text-primary)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: '6px' }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -496,6 +754,23 @@ export default function TeamsPaymentsPage() {
                             ))}
                           </tbody>
                         </table>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                          <button 
+                            className="btn btn-secondary" 
+                            onClick={() => exportHistoryRunToCSV(run)} 
+                            style={{ 
+                              padding: '6px 12px', 
+                              fontSize: '0.8rem', 
+                              borderRadius: '6px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export CSV Report
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -588,15 +863,60 @@ export default function TeamsPaymentsPage() {
               <div className="tp-form-grid">
                 <div className="tp-form-group">
                   <label>Full Name *</label>
-                  <input type="text" value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} placeholder="e.g. Amara Osei" className="tp-input" />
+                  <input 
+                    type="text" 
+                    value={formData.fullName} 
+                    onChange={(e) => {
+                      setFormData({ ...formData, fullName: e.target.value });
+                      if (formErrors.fullName) setFormErrors((prev) => ({ ...prev, fullName: '' }));
+                    }} 
+                    placeholder="e.g. Amara Osei" 
+                    className="tp-input" 
+                    style={formErrors.fullName ? { borderColor: 'var(--color-danger)' } : {}} 
+                  />
+                  {formErrors.fullName && (
+                    <span style={{ color: 'var(--color-danger)', fontSize: '0.72rem', marginTop: '2px', fontWeight: 500 }}>
+                      {formErrors.fullName}
+                    </span>
+                  )}
                 </div>
                 <div className="tp-form-group">
                   <label>Email *</label>
-                  <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="e.g. amara@company.com" className="tp-input" />
+                  <input 
+                    type="email" 
+                    value={formData.email} 
+                    onChange={(e) => {
+                      setFormData({ ...formData, email: e.target.value });
+                      if (formErrors.email) setFormErrors((prev) => ({ ...prev, email: '' }));
+                    }} 
+                    placeholder="e.g. amara@company.com" 
+                    className="tp-input" 
+                    style={formErrors.email ? { borderColor: 'var(--color-danger)' } : {}} 
+                  />
+                  {formErrors.email && (
+                    <span style={{ color: 'var(--color-danger)', fontSize: '0.72rem', marginTop: '2px', fontWeight: 500 }}>
+                      {formErrors.email}
+                    </span>
+                  )}
                 </div>
                 <div className="tp-form-group">
                   <label>Role / Title *</label>
-                  <input type="text" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} placeholder="e.g. Frontend Developer" className="tp-input" />
+                  <input 
+                    type="text" 
+                    value={formData.role} 
+                    onChange={(e) => {
+                      setFormData({ ...formData, role: e.target.value });
+                      if (formErrors.role) setFormErrors((prev) => ({ ...prev, role: '' }));
+                    }} 
+                    placeholder="e.g. Frontend Developer" 
+                    className="tp-input" 
+                    style={formErrors.role ? { borderColor: 'var(--color-danger)' } : {}} 
+                  />
+                  {formErrors.role && (
+                    <span style={{ color: 'var(--color-danger)', fontSize: '0.72rem', marginTop: '2px', fontWeight: 500 }}>
+                      {formErrors.role}
+                    </span>
+                  )}
                 </div>
                 <div className="tp-form-group">
                   <label>Country</label>
@@ -610,7 +930,22 @@ export default function TeamsPaymentsPage() {
                 </div>
                 <div className="tp-form-group">
                   <label>Monthly Salary ({currencySymbols[countryCurrency[formData.country] || 'USD']}) *</label>
-                  <input type="number" value={formData.monthlySalary} onChange={(e) => setFormData({ ...formData, monthlySalary: e.target.value })} placeholder="e.g. 8500" className="tp-input" />
+                  <input 
+                    type="number" 
+                    value={formData.monthlySalary} 
+                    onChange={(e) => {
+                      setFormData({ ...formData, monthlySalary: e.target.value });
+                      if (formErrors.monthlySalary) setFormErrors((prev) => ({ ...prev, monthlySalary: '' }));
+                    }} 
+                    placeholder="e.g. 8500" 
+                    className="tp-input" 
+                    style={formErrors.monthlySalary ? { borderColor: 'var(--color-danger)' } : {}} 
+                  />
+                  {formErrors.monthlySalary && (
+                    <span style={{ color: 'var(--color-danger)', fontSize: '0.72rem', marginTop: '2px', fontWeight: 500 }}>
+                      {formErrors.monthlySalary}
+                    </span>
+                  )}
                 </div>
                 <div className="tp-form-group">
                   <label>Start Date</label>

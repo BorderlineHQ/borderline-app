@@ -173,7 +173,7 @@ export default function AdminPortal() {
       </section>
 
       {/* Main Admin Pipeline grid */}
-      <div className="recruiter-grid" style={{ gridTemplateColumns: '1fr 320px', gap: 'var(--spacing-lg)' }}>
+      <div className="admin-grid-layout" id="admin-grid-layout">
         
         {/* Left Side: Audit Pipeline */}
         <section>
@@ -183,12 +183,11 @@ export default function AdminPortal() {
               AI Portfolio Audit Queue
             </h2>
             
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="admin-header-buttons">
               <button
                 id="btn-admin-tab-pending"
                 onClick={() => setActiveTab('pending')}
-                className={`btn ${activeTab === 'pending' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                className={`btn admin-tab-btn ${activeTab === 'pending' ? 'btn-primary' : 'btn-secondary'}`}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 Pending Review ({pendingProjects.length})
@@ -196,8 +195,7 @@ export default function AdminPortal() {
               <button
                 id="btn-admin-tab-audited"
                 onClick={() => setActiveTab('audited')}
-                className={`btn ${activeTab === 'audited' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '6px 12px', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                className={`btn admin-tab-btn ${activeTab === 'audited' ? 'btn-primary' : 'btn-secondary'}`}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 Audited Archive ({auditedProjects.length})
@@ -205,7 +203,7 @@ export default function AdminPortal() {
             </div>
           </div>
 
-          <div style={{ marginTop: 'var(--spacing-md)' }}>
+          <div className="admin-queue-list">
             {projectListToDisplay.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: 'var(--spacing-xxl)' }}>
                 <p style={{ color: 'var(--color-text-tertiary)' }}>No projects in this queue.</p>
@@ -215,25 +213,24 @@ export default function AdminPortal() {
                 <div key={project.id} className="audit-item-card">
                   
                   {/* Queue Item Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px' }}>
-                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <div className="audit-item-header">
+                    <div className="audit-profile-info">
                       <img 
                         src={project.profile.avatarUrl} 
                         alt={project.profile.fullName} 
-                        style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }}
+                        className="audit-profile-pic"
                       />
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{project.profile.fullName}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)' }}>Hub: {project.profile.country} • Focus: {project.profile.techFocus}</div>
+                        <div className="audit-profile-name">{project.profile.fullName}</div>
+                        <div className="audit-profile-sub">Hub: {project.profile.country} • Focus: {project.profile.techFocus}</div>
                       </div>
                     </div>
                     
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                    <div className="audit-actions-row">
                       <button
                         id={`btn-toggle-verify-profile-${project.profile.id}`}
                         onClick={() => toggleVerifyProfile(project.profile.id)}
-                        className={`btn ${project.profile.isVerified ? 'btn-danger' : 'btn-secondary'}`}
-                        style={{ padding: '4px 8px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        className={`btn audit-btn ${project.profile.isVerified ? 'btn-danger' : 'btn-secondary'}`}
                       >
                         {project.profile.isVerified ? 'Revoke Profile Badge' : (
                           <>
@@ -246,8 +243,8 @@ export default function AdminPortal() {
                       <button
                         id={`btn-toggle-verify-project-${project.id}`}
                         onClick={() => toggleVerifyProject(project.id)}
-                        className="btn btn-primary"
-                        style={{ padding: '4px 8px', fontSize: '0.75rem', backgroundColor: project.isAudited ? 'var(--color-danger)' : 'var(--color-accent)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        className="btn btn-primary audit-btn"
+                        style={{ backgroundColor: project.isAudited ? 'var(--color-danger)' : 'var(--color-accent)' }}
                       >
                         {project.isAudited ? 'Revert to Pending' : (
                           <>
@@ -260,16 +257,16 @@ export default function AdminPortal() {
                   </div>
 
                   {/* Info details */}
-                  <div style={{ fontSize: '0.85rem' }}>
+                  <div className="audit-item-details">
                     <strong>Project:</strong> {project.title} • 
                     {project.githubUrl && (
-                      <a id={`link-admin-project-github-${project.id}`} href={project.githubUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', marginLeft: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <a id={`link-admin-project-github-${project.id}`} href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="audit-link audit-link-github">
                         GitHub Repo 
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                       </a>
                     )}
                     {project.figmaUrl && (
-                      <a id={`link-admin-project-figma-${project.id}`} href={project.figmaUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent-secondary)', marginLeft: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <a id={`link-admin-project-figma-${project.id}`} href={project.figmaUrl} target="_blank" rel="noopener noreferrer" className="audit-link audit-link-figma">
                         Figma 
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                       </a>
@@ -294,7 +291,7 @@ export default function AdminPortal() {
         </section>
 
         {/* Right Side: System Logs Console */}
-        <aside style={{ position: 'sticky', top: '90px' }}>
+        <aside className="admin-sidebar">
           <div className="card" style={{ padding: 'var(--spacing-md)' }}>
             <h3 style={{ fontSize: '1.1rem', marginBottom: 'var(--spacing-sm)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
