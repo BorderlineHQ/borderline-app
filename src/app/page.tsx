@@ -473,17 +473,26 @@ A full-stack web application that helps students form peer study groups based on
             </p>
           </div>
 
-          <div className="card-stack-container">
-            {showcaseProfiles.map((profile) => (
-              <div
-                key={profile.id}
-                className="sticky-stacked-card"
-                onClick={() => {
-                  setSelectedProfile(profile);
-                  setActiveProject(profile.projects[0]);
-                }}
-                style={{ padding: 'var(--spacing-lg)', textAlign: 'left' }}
-              >
+          <div className="card-stack-container" style={{ display: 'block' }}>
+            {showcaseProfiles.map((profile, index) => {
+              const topOffset = 100 + index * 30;
+              const zIndex = 10 + index * 10;
+              return (
+                <div
+                  key={profile.id}
+                  className="sticky-stacked-card"
+                  onClick={() => {
+                    setSelectedProfile(profile);
+                    setActiveProject(profile.projects[0]);
+                  }}
+                  style={{
+                    padding: 'var(--spacing-lg)',
+                    textAlign: 'left',
+                    position: 'sticky',
+                    top: `${topOffset}px`,
+                    zIndex: zIndex
+                  }}
+                >
                 {/* Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <span className="badge badge-verified" style={{ fontSize: '0.7rem', padding: '4px 8px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center' }}>
@@ -575,8 +584,9 @@ A full-stack web application that helps students form peer study groups based on
                   </Link>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
         </div>
       </section>
 

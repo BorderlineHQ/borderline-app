@@ -76,7 +76,6 @@ body.light-theme {
 html, body {
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   font-family: var(--font-body), system-ui, sans-serif;
