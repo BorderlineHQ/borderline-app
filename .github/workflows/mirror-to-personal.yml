@@ -18,6 +18,10 @@ jobs:
 
       - name: Push to Personal Repo
         run: |
+          if [ -z "${{ secrets.PERSONAL_GITHUB_TOKEN }}" ]; then
+            echo "::warning::PERSONAL_GITHUB_TOKEN secret is not set. Skipping mirror push."
+            exit 0
+          fi
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git remote add personal https://${{ secrets.PERSONAL_GITHUB_TOKEN }}@github.com/GodwinOkronipa/borderline-app.git
