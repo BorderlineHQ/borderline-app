@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Profile, Gig, Application, RecruiterProfile, WhatsAppMessage, Project, Job, TeamMember, PaymentRun } from '../types';
 import { dbService } from '../services/db';
 import { aiService } from '../services/ai';
+import { track } from '@vercel/analytics';
 
 interface AppContextType {
   profiles: Profile[];
@@ -89,10 +90,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (typeof window !== 'undefined') {
       localStorage.setItem('borderline_theme', newTheme);
       document.body.className = `${newTheme}-theme`;
+      track('theme_changed', { theme: newTheme });
     }
   };
 
   const addProject = async (profileId: string, title: string, rawInput: string, githubUrl?: string, figmaUrl?: string) => {
+    track('project_added', {
+      title,
+      hasGithub: !!githubUrl,
+      hasFigma: !!figmaUrl,
+    });
+
     // 1. Instantly create a pending project
     const tempProjectId = `project-temp-${Date.now()}`;
     const newProject: Project = {
@@ -153,6 +161,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const postGig = (title: string, description: string, requiredSkills: string[], budgetGHS: number) => {
+    track('gig_posted', { title, budgetGHS });
     const recruiter = recruiters.find(r => r.id === activeRecruiterId);
     const newGig: Gig = {
       id: `gig-${Date.now()}`,
@@ -172,6 +181,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const postJob = (title: string, description: string, requiredSkills: string[], salaryRange: string, employmentType: Job['employmentType'], location: string) => {
+    track('job_posted', { title, salaryRange, employmentType, location });
     const recruiter = recruiters.find(r => r.id === activeRecruiterId);
     const newJob: Job = {
       id: `job-${Date.now()}`,
@@ -193,6 +203,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const applyForGig = (gigId: string, profileId: string) => {
+    track('gig_applied', { gigId, profileId });
     // Check if already applied
     const exists = applications.some(a => a.gigId === gigId && a.profileId === profileId);
     if (exists) return;
@@ -211,6 +222,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const applyForJob = (jobId: string, profileId: string) => {
+    track('job_applied', { jobId, profileId });
     // Check if already applied
     const exists = applications.some(a => a.jobId === jobId && a.profileId === profileId);
     if (exists) return;
@@ -229,6 +241,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateApplicationStatus = (applicationId: string, status: Application['status']) => {
+    track('application_status_updated', { applicationId, status });
     const updatedApps = applications.map(app => {
       if (app.id === applicationId) {
         return { ...app, status };
@@ -242,6 +255,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const toggleVerifyProfile = (profileId: string) => {
     const updated = profiles.map(p => {
       if (p.id === profileId) {
+        track('profile_verification_toggled', { profileId, verified: !p.isVerified });
         return { ...p, isVerified: !p.isVerified };
       }
       return p;
@@ -251,6 +265,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const toggleVerifyProject = (projectId: string) => {
+    track('project_verification_toggled', { projectId });
     const updated = profiles.map(p => {
       const updatedProjects = p.projects.map(proj => {
         if (proj.id === projectId) {
@@ -265,24 +280,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addTeamMember = (member: TeamMember) => {
+    track('team_member_added', { role: member.role });
     const updated = [...teamMembers, member];
     setTeamMembers(updated);
     dbService.saveTeamMembers(updated);
   };
 
   const updateTeamMember = (member: TeamMember) => {
+    track('team_member_updated', { role: member.role });
     const updated = teamMembers.map(m => m.id === member.id ? member : m);
     setTeamMembers(updated);
     dbService.saveTeamMembers(updated);
   };
 
   const removeTeamMember = (id: string) => {
+    track('team_member_removed', { id });
     const updated = teamMembers.filter(m => m.id !== id);
     setTeamMembers(updated);
     dbService.saveTeamMembers(updated);
   };
 
   const runPayroll = (period: string, entries: any[], totalUSD: number) => {
+    track('payroll_run', { period, totalUSD, entriesCount: entries.length });
     const newRun: PaymentRun = {
       id: `pr-${Date.now()}`,
       period,
@@ -297,6 +316,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const resetDatabase = () => {
+    track('database_reset');
     if (typeof window !== 'undefined') {
       localStorage.removeItem('borderline_profiles');
       localStorage.removeItem('borderline_gigs');
@@ -318,6 +338,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // WhatsApp chat command execution handler
   const sendWhatsAppMessage = async (body: string) => {
+    track('whatsapp_message_sent', {
+      bodyLength: body.length,
+      commandType: body.trim().toLowerCase().split(' ')[0]
+    });
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg: WhatsAppMessage = {
       id: `msg-user-${Date.now()}`,

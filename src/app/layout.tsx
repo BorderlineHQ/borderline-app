@@ -109,6 +109,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${dmSans.variable} ${inter.variable} ${jetbrainsMono.variable} ${lora.variable}`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var savedTheme = localStorage.getItem('borderline_theme') || 'light';
+                document.documentElement.className = savedTheme + '-theme';
+                var observer = new MutationObserver(function(mutations) {
+                  if (document.body) {
+                    document.body.className = savedTheme + '-theme';
+                    observer.disconnect();
+                  }
+                });
+                observer.observe(document.documentElement, { childList: true, subtree: true });
+              } catch (e) {}
+            `
+          }}
+        />
+      </head>
       <body className="light-theme">
         <AppProvider>
           <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
