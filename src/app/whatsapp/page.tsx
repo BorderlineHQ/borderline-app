@@ -56,13 +56,7 @@ export default function WhatsAppSandbox() {
             <span><strong>Reactive Sync Demo:</strong> Try sending the command to add a project, then head over to the <strong>Talent Portal</strong> or <strong>Recruiter Feed</strong>. You will see the AI-generated case study and new job matches synced instantly in real time!</span>
           </div>
 
-          <div style={{ margin: 'var(--spacing-md) 0', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
-            <img 
-              src="/whatsapp_bot_mockup.png" 
-              alt="Try our Whatsapp Bot Mockup" 
-              style={{ width: '100%', height: 'auto', display: 'block' }} 
-            />
-          </div>
+
 
           <div style={{ marginTop: 'var(--spacing-md)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-md)' }}>
             <h4 className="switcher-title">Simulate Client Phone Owner</h4>

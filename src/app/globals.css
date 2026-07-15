@@ -7083,7 +7083,7 @@ body.light-theme .site-footer {
   margin: 0 auto;
   padding: 48px 24px 40px;
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(110px, 1fr));
+  grid-template-columns: minmax(220px, 1.4fr) repeat(2, minmax(110px, 1fr));
   gap: 40px;
 }
 
@@ -7092,6 +7092,17 @@ body.light-theme .site-footer {
     grid-template-columns: 1fr 1fr;
     gap: 28px;
     padding: 32px 20px;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+    text-align: justify;
+  }
+  .footer-brand-desc {
+    max-width: 100% !important;
+    text-align: justify;
+  }
+  .footer-newsletter {
+    max-width: 100% !important;
   }
 }
 

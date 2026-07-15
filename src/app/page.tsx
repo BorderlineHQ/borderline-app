@@ -412,7 +412,7 @@ A full-stack web application that helps students form peer study groups based on
           </h1>
 
           <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--color-text-primary)', lineHeight: 1.6, maxWidth: '750px', margin: '0 auto var(--spacing-xl) auto' }}>
-            Africa has the talent and the demand, yet collaboration is at an all-time low. Borderline is building the trust layer for Africa's tech and creative talent, using AI to verify skills and making recruitment easier. Build your startup and hire teams, continentally.
+            Africa has the talent and the demand, yet collaboration is at an all-time low. BorderLine is building the trust layer for Africa's tech and creative talent, helping builders find work, enabling startups to hire verified talent, and managing team contracts and payroll continentally.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', margin: '0 auto var(--spacing-xl) auto' }}>
@@ -1145,7 +1145,7 @@ A full-stack web application that helps students form peer study groups based on
                 <span className="logo-text" style={{ fontSize: '1.25rem' }}>Border<span>Line</span></span>
               </div>
               <p className="footer-desc">
-                Creating the world's most trusted engineering talent marketplace by verifying raw capability with AI-driven proof of work.
+                Connecting Africa's builders with trusted jobs, verified portfolios, and modern payroll management.
               </p>
               <div className="footer-socials" style={{ display: 'flex', gap: '8px' }}>
                 <a href="#" className="footer-social-icon" aria-label="GitHub">

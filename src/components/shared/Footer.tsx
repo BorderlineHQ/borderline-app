@@ -9,20 +9,20 @@ const footerLinks = {
   Platform: [
     { label: 'Talent Profiles', href: '/talent' },
     { label: 'Recruiter Dashboard', href: '/recruiter' },
-    { label: 'Teams & Payments', href: '/teams-payments' },
-    { label: 'Manifesto', href: '/manifesto' },
+    { label: 'Teams & Payroll', href: '/teams-payments' },
+    { label: 'Verification Protocol', href: '/development' },
+    { label: 'API for Hiring', href: '/development' },
+    { label: 'Active Job Board', href: '/development' },
+    { label: 'Contract Manager', href: '/development' },
   ],
-  Resources: [
+  'Company & Resources': [
+    { label: 'About Us & Manifesto', href: '/manifesto' },
+    { label: 'Careers (We\'re Hiring)', href: '#' },
     { label: 'Upskill & Grow', href: '/resources/upskill' },
-    { label: 'Communities', href: '/resources/communities' },
+    { label: 'Builder Communities', href: '/resources/communities' },
     { label: 'Blog & Insights', href: '/resources/blog' },
-    { label: 'Foundation', href: '/resources/foundation' },
-  ],
-  Company: [
-    { label: 'About Us', href: '/manifesto' },
-    { label: 'Careers', href: '#' },
-    { label: 'Press Kit', href: '#' },
-    { label: 'Contact', href: 'mailto:hello@borderline.africa' },
+    { label: 'Foundation & Grants', href: '/resources/foundation' },
+    { label: 'Contact Support', href: 'mailto:hello@borderline.africa' },
   ],
 };
 
@@ -83,8 +83,47 @@ const Footer: React.FC = () => {
           </Link>
 
           <p className="footer-brand-desc">
-            Trust infrastructure for Africa&apos;s digital builders. Verify skills, connect with recruiters, and get paid — all without a corporate resume.
+            Find remote jobs, hire vetted African talent, and manage global payroll — all in one platform.
           </p>
+
+          {/* Subscribe to Newsletter */}
+          <div className="footer-newsletter" style={{ marginBottom: '18px', display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '280px', width: '100%', textAlign: 'inherit' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-text-primary)' }}>Subscribe to Updates</span>
+            <form onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing!'); }} style={{ display: 'flex', gap: '8px' }}>
+              <input 
+                type="email" 
+                placeholder="email@company.com" 
+                required 
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-surface-elevated)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: '0.75rem',
+                  flexGrow: 1,
+                  outline: 'none',
+                  minWidth: 0
+                }} 
+              />
+              <button 
+                type="submit" 
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: '6px',
+                  backgroundColor: 'var(--color-accent)',
+                  color: '#fff',
+                  border: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Join
+              </button>
+            </form>
+          </div>
 
           {/* Social Links */}
           <div className="footer-social">

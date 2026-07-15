@@ -71,4 +71,3 @@ Our talent scaling model is governed by the **Gig-to-Career Lifecycle**:
 3. **Try-Before-You-Buy Conversion**: Startups naturally convert successful junior builders into long-term retainers and full-time employees, building a resilient talent network across tech hubs.
 
 Read the full, in-depth manifesto at [docs/manifesto.md](file:///c:/Users/gokro/Documents/GitHub/borderline/docs/manifesto.md).
-
