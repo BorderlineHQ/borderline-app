@@ -1,5 +1,5 @@
 import { Profile, Gig, Application, RecruiterProfile, Job, TeamMember, PaymentRun } from '../types';
-import { mockProfiles, mockGigs, mockApplications, mockRecruiters } from '../data/mockData';
+import { mockProfiles, mockGigs, mockApplications, mockRecruiters, mockJobs } from '../data/mockData';
 import { mockTeamMembers, mockPaymentHistory } from '../data/teamsData';
 
 const KEYS = {
@@ -26,7 +26,7 @@ export const dbService = {
       localStorage.setItem(KEYS.GIGS, JSON.stringify(mockGigs));
     }
     if (!localStorage.getItem(KEYS.JOBS)) {
-      localStorage.setItem(KEYS.JOBS, JSON.stringify([]));
+      localStorage.setItem(KEYS.JOBS, JSON.stringify(mockJobs));
     }
     if (!localStorage.getItem(KEYS.APPLICATIONS)) {
       localStorage.setItem(KEYS.APPLICATIONS, JSON.stringify(mockApplications));

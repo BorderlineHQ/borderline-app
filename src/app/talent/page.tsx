@@ -32,6 +32,7 @@ export default function TalentPortal() {
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<TabType>('opportunities');
+  const [opportunityType, setOpportunityType] = useState<'GIGS' | 'JOBS'>('GIGS');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Form states for AI Compiler
@@ -235,62 +236,85 @@ export default function TalentPortal() {
             {/* TAB 1: OPPORTUNITIES */}
             {activeTab === 'opportunities' && (
               <div className="opportunities-section">
-                <h3>Micro-Gigs</h3>
-                {matchedGigs.length === 0 ? (
-                  <div className="empty-state">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="12" y1="8" x2="12" y2="12"/>
-                      <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    <p>No matching gigs found for your active skill tags.</p>
-                    <p className="empty-hint">Add projects to extract verified skills and trigger automated matching.</p>
-                  </div>
-                ) : (
-                  <div className="cards-grid">
-                    {matchedGigs.map(({ gig, score }) => {
-                      const isApplied = applications.some(a => a.gigId === gig.id && a.profileId === currentProfile.id);
-                      return (
-                        <GigCard
-                          key={gig.id}
-                          gig={gig}
-                          matchScore={score}
-                          isApplied={isApplied}
-                          userSkills={currentProfile.skills}
-                          onApply={() => applyForGig(gig.id, currentProfile.id)}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-lg)' }}>
+                  <h3 style={{ margin: 0 }}>{opportunityType === 'GIGS' ? 'Micro-Gigs' : 'Full-Time Jobs'}</h3>
+                  <select
+                    value={opportunityType}
+                    onChange={(e) => setOpportunityType(e.target.value as 'GIGS' | 'JOBS')}
+                    style={{
+                      background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-text-primary)',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      fontSize: '0.85rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      outline: 'none',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                    }}
+                  >
+                    <option value="GIGS">Micro-Gigs</option>
+                    <option value="JOBS">Full-Time Jobs</option>
+                  </select>
+                </div>
 
-                <h3 style={{ marginTop: 'var(--spacing-xl)' }}>Full-Time Jobs</h3>
-                {matchedJobs.length === 0 ? (
-                  <div className="empty-state">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="12" y1="8" x2="12" y2="12"/>
-                      <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    <p>No matching jobs found for your active skill tags.</p>
-                    <p className="empty-hint">Add projects to extract verified skills and trigger automated matching.</p>
-                  </div>
+                {opportunityType === 'GIGS' ? (
+                  matchedGigs.length === 0 ? (
+                    <div className="empty-state">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                      <p>No matching gigs found for your active skill tags.</p>
+                      <p className="empty-hint">Add projects to extract verified skills and trigger automated matching.</p>
+                    </div>
+                  ) : (
+                    <div className="cards-grid">
+                      {matchedGigs.map(({ gig, score }) => {
+                        const isApplied = applications.some(a => a.gigId === gig.id && a.profileId === currentProfile.id);
+                        return (
+                          <GigCard
+                            key={gig.id}
+                            gig={gig}
+                            matchScore={score}
+                            isApplied={isApplied}
+                            userSkills={currentProfile.skills}
+                            onApply={() => applyForGig(gig.id, currentProfile.id)}
+                          />
+                        );
+                      })}
+                    </div>
+                  )
                 ) : (
-                  <div className="cards-grid">
-                    {matchedJobs.map(({ job, score }) => {
-                      const isApplied = applications.some(a => a.jobId === job.id && a.profileId === currentProfile.id);
-                      return (
-                        <GigCard
-                          key={job.id}
-                          gig={{ ...job, budgetGHS: 0, requiredSkills: job.requiredSkills }}
-                          matchScore={score}
-                          isApplied={isApplied}
-                          userSkills={currentProfile.skills}
-                          onApply={() => applyForJob(job.id, currentProfile.id)}
-                        />
-                      );
-                    })}
-                  </div>
+                  matchedJobs.length === 0 ? (
+                    <div className="empty-state">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                      <p>No matching jobs found for your active skill tags.</p>
+                      <p className="empty-hint">Add projects to extract verified skills and trigger automated matching.</p>
+                    </div>
+                  ) : (
+                    <div className="cards-grid">
+                      {matchedJobs.map(({ job, score }) => {
+                        const isApplied = applications.some(a => a.jobId === job.id && a.profileId === currentProfile.id);
+                        return (
+                          <GigCard
+                            key={job.id}
+                            gig={{ ...job, budgetGHS: 0, requiredSkills: job.requiredSkills }}
+                            matchScore={score}
+                            isApplied={isApplied}
+                            userSkills={currentProfile.skills}
+                            onApply={() => applyForJob(job.id, currentProfile.id)}
+                          />
+                        );
+                      })}
+                    </div>
+                  )
                 )}
               </div>
             )}

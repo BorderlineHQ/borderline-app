@@ -1,4 +1,4 @@
-import { Profile, Gig, RecruiterProfile, Application } from '../types';
+import { Profile, Gig, RecruiterProfile, Application, Job } from '../types';
 
 export const mockProfiles: Profile[] = [
   {
@@ -197,10 +197,10 @@ export const mockGigs: Gig[] = [
     recruiterId: 'recruiter-susupay',
     companyName: 'Susu Pay',
     logoUrl: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=100',
-    title: 'React Merchant Ledger UI',
-    description: 'We need an eager junior developer to craft a simple React front-end dashboard screen for local shopkeepers. The layout must handle ledger inputs and show simple responsive tables.',
-    requiredSkills: ['React', 'TypeScript', 'TailwindCSS'],
-    budgetGHS: 2500,
+    title: 'Social Media Manager & Visual Designer',
+    description: 'We need a creative Social Media Manager to craft engaging content, manage our visual assets, and engage with the builder community across Twitter (X), LinkedIn, and Instagram. Must be able to design high-quality visual posts.',
+    requiredSkills: ['Marketing', 'Design', 'Content Writing', 'Figma'],
+    budgetGHS: 1800,
     createdAt: '2026-06-10T09:00:00Z'
   },
   {
@@ -224,6 +224,22 @@ export const mockGigs: Gig[] = [
     requiredSkills: ['Figma', 'UI/UX Design', 'User Research'],
     budgetGHS: 3000,
     createdAt: '2026-06-14T15:00:00Z'
+  }
+];
+
+export const mockJobs: Job[] = [
+  {
+    id: 'job-junior-engineer',
+    recruiterId: 'recruiter-susupay',
+    companyName: 'Susu Pay',
+    logoUrl: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=100',
+    title: 'Junior Software Engineer',
+    description: 'Join our core engineering team to build scalable financial APIs and ledger systems. This role is paid in Nigerian Naira (₦1,200,000 / month, which is approximately 9,600 GHS equivalent).',
+    requiredSkills: ['React', 'TypeScript', 'Node.js', 'Express', 'SQL'],
+    salaryRange: '₦1,200,000 (~9,600 GHC equivalent)',
+    employmentType: 'FULL_TIME',
+    location: 'Lagos, Nigeria (Remote)',
+    createdAt: '2026-06-11T10:00:00Z'
   }
 ];
 

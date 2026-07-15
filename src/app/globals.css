@@ -2917,12 +2917,19 @@ body.light-theme .phone-mockup {
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
   height: fit-content;
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
 @media (max-width: 640px) {
   .talent-sidebar {
     border-radius: var(--radius-md);
     padding: var(--spacing-sm) var(--spacing-md);
+    position: static;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 

@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Profile, Gig, RecruiterProfile, Project, Job } from '../../types';
+import { Profile, Gig, RecruiterProfile, Project, Job, Application } from '../../types';
 import RecruiterHeader from '../../components/recruiter/RecruiterHeader';
 import StatsCard from '../../components/recruiter/StatsCard';
 import FilterSidebar from '../../components/recruiter/FilterSidebar';
 import TalentCard from '../../components/recruiter/TalentCard';
-import GigCard from '../../components/recruiter/GigCard';
 import CandidateDrawer from '../../components/recruiter/CandidateDrawer';
 import OnboardingFlow from '../../components/recruiter/OnboardingFlow';
+
+type WizardStep = 'VIEW_JOB' | 'INVITE' | 'REVIEW' | 'HIRE';
+type ProposalTab = 'ALL' | 'SHORTLISTED' | 'MESSAGED' | 'ARCHIVED';
 
 export default function RecruiterPortal() {
   const {
@@ -23,10 +25,38 @@ export default function RecruiterPortal() {
     postGig,
     postJob,
     updateApplicationStatus,
+    applyForGig,
+    applyForJob,
     mounted
   } = useApp();
 
-  // Filter states
+  const activeRecruiter = recruiters.find(r => r.id === activeRecruiterId) || recruiters[0] || {
+    id: 'recruiter-susupay',
+    companyName: 'Susu Pay',
+    website: 'https://susupay.io',
+    logoUrl: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=100'
+  };
+
+  // Find recruiter posted gigs & jobs
+  const recruiterGigs = gigs.filter(g => g.recruiterId === activeRecruiter.id);
+  const recruiterJobs = jobs.filter(j => j.recruiterId === activeRecruiter.id);
+
+  // Combine jobs & gigs for selection
+  const allPostings = [
+    ...recruiterGigs.map(g => ({ ...g, type: 'GIG' as const })),
+    ...recruiterJobs.map(j => ({ ...j, type: 'JOB' as const }))
+  ];
+
+  // Selected Posting ID
+  const [selectedPostingId, setSelectedPostingId] = useState<string>('');
+  
+  // Active Wizard Step
+  const [activeWizardStep, setActiveWizardStep] = useState<WizardStep>('REVIEW');
+  
+  // Active Proposal Tab
+  const [activeProposalTab, setActiveProposalTab] = useState<ProposalTab>('ALL');
+
+  // Filter states for directory/invite view
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('All');
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -35,14 +65,13 @@ export default function RecruiterPortal() {
   // View state: Drawer for active candidate
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
-  // Modal state: Post a gig
+  // Modal states for posting new gigs/jobs
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [gigTitle, setGigTitle] = useState('');
   const [gigDesc, setGigDesc] = useState('');
   const [gigBudget, setGigBudget] = useState('');
   const [gigReqSkills, setGigReqSkills] = useState<string[]>([]);
 
-  // Modal state: Post a job
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
   const [jobTitle, setJobTitle] = useState('');
   const [jobDesc, setJobDesc] = useState('');
@@ -54,13 +83,20 @@ export default function RecruiterPortal() {
   // Onboarding state
   const [showOnboarding, setShowOnboarding] = useState(false);
 
+  // Auto-select first posting on mount/load
+  useEffect(() => {
+    if (allPostings.length > 0 && !selectedPostingId) {
+      setSelectedPostingId(allPostings[0].id);
+    }
+  }, [gigs, jobs]);
+
   if (!mounted) return null;
 
-  const activeRecruiter = recruiters.find(r => r.id === activeRecruiterId) || recruiters[0];
+  const selectedPosting = allPostings.find(p => p.id === selectedPostingId) || allPostings[0];
 
   // List of all unique skills in the system for filtering
-  const allAvailableSkills = ['Project Management', 'Marketing', 'Design', 'Data Analysis', 'Content Writing', 'Sales', 'Operations', 'Finance', 'Customer Service', 'Strategy', 'React', 'Node.js', 'Python', 'TypeScript', 'Figma', 'UI/UX Design'];
-  const availableCountries = ['All', 'Ghana', 'Kenya', 'Senegal'];
+  const allAvailableSkills = ['Project Management', 'Marketing', 'Design', 'Data Analysis', 'Content Writing', 'Sales', 'Operations', 'Finance', 'Customer Service', 'Strategy', 'React', 'Node.js', 'Python', 'TypeScript', 'Figma', 'UI/UX Design', 'TailwindCSS', 'Vite', 'HTML5', 'CSS3', 'Express', 'SQLite', 'Git', 'REST APIs', 'SQL'];
+  const availableCountries = ['All', 'Ghana', 'Kenya', 'Senegal', 'Nigeria', 'South Africa'];
 
   const toggleSkillFilter = (skill: string) => {
     setSelectedSkills(prev => 
@@ -80,30 +116,13 @@ export default function RecruiterPortal() {
     );
   };
 
-  // Filter candidates
-  const filteredProfiles = profiles.filter(profile => {
-    const matchesSearch = profile.fullName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          profile.techFocus.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCountry = selectedCountry === 'All' || profile.country === selectedCountry;
-    
-    const matchesVerified = !onlyVerified || profile.isVerified;
-    
-    const matchesSkills = selectedSkills.length === 0 || 
-                          selectedSkills.every(s => profile.skills.includes(s));
-
-    return matchesSearch && matchesCountry && matchesVerified && matchesSkills;
-  });
-
-  const handleOpenProfile = (profile: Profile) => {
-    setSelectedProfile(profile);
-  };
-
   const handlePostGig = (e: React.FormEvent) => {
     e.preventDefault();
     if (!gigTitle || !gigDesc || !gigBudget) return;
 
+    const newGigId = `gig-${Date.now()}`;
     postGig(gigTitle, gigDesc, gigReqSkills, parseFloat(gigBudget));
+    setSelectedPostingId(newGigId);
     
     // Reset form
     setGigTitle('');
@@ -111,13 +130,16 @@ export default function RecruiterPortal() {
     setGigBudget('');
     setGigReqSkills([]);
     setIsModalOpen(false);
+    setActiveWizardStep('REVIEW');
   };
 
   const handlePostJob = (e: React.FormEvent) => {
     e.preventDefault();
     if (!jobTitle || !jobDesc || !jobSalary || !jobLocation) return;
 
+    const newJobId = `job-${Date.now()}`;
     postJob(jobTitle, jobDesc, jobReqSkills, jobSalary, jobEmploymentType, jobLocation);
+    setSelectedPostingId(newJobId);
     
     // Reset form
     setJobTitle('');
@@ -127,63 +149,183 @@ export default function RecruiterPortal() {
     setJobLocation('');
     setJobReqSkills([]);
     setIsJobModalOpen(false);
+    setActiveWizardStep('REVIEW');
   };
 
-  // Helper to render case study markdown
-  const renderMarkdown = (text: string) => {
-    if (!text) return null;
-    let inList = false;
-    const listItems: React.ReactNode[] = [];
-    const elements: React.ReactNode[] = [];
+  // Get applications specific to selected posting
+  const postingApplications = selectedPosting
+    ? applications.filter(app => app.gigId === selectedPosting.id || app.jobId === selectedPosting.id)
+    : [];
 
-    const lines = text.split('\n');
+  // Filter candidates for "Invite Freelancers" directory
+  const filteredProfiles = profiles.filter(profile => {
+    const matchesSearch = profile.fullName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          profile.techFocus.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCountry = selectedCountry === 'All' || profile.country === selectedCountry;
+    const matchesVerified = !onlyVerified || profile.isVerified;
+    const matchesSkills = selectedSkills.length === 0 || 
+                          selectedSkills.every(s => profile.skills.includes(s));
 
-    lines.forEach((line, idx) => {
-      const isHeader = line.startsWith('### ');
-      const isBullet = line.startsWith('* ') || line.startsWith('- ');
-
-      if (inList && !isBullet) {
-        elements.push(<ul key={`list-${idx}`}>{[...listItems]}</ul>);
-        listItems.length = 0;
-        inList = false;
-      }
-
-      if (isHeader) {
-        elements.push(<h3 key={idx}>{line.substring(4)}</h3>);
-      } else if (isBullet) {
-        inList = true;
-        listItems.push(<li key={idx}>{line.substring(2)}</li>);
-      } else if (line.trim() === '') {
-        // Skip
-      } else {
-        elements.push(<p key={idx}>{line}</p>);
-      }
-    });
-
-    if (inList) {
-      elements.push(<ul key="list-final">{[...listItems]}</ul>);
-    }
-
-    return <div className="markdown-render">{elements}</div>;
-  };
-
-  // Find recruiter posted gigs
-  const recruiterGigs = gigs.filter(g => g.recruiterId === activeRecruiter.id);
-
-  // Find recruiter posted jobs
-  const recruiterJobs = jobs.filter(j => j.recruiterId === activeRecruiter.id);
-
-  // Find applications submitted to this recruiter's gigs
-  const recruiterApplications = applications.filter(app => {
-    const gig = gigs.find(g => g.id === app.gigId);
-    const job = jobs.find(j => j.id === app.jobId);
-    return gig?.recruiterId === activeRecruiter.id || job?.recruiterId === activeRecruiter.id;
+    return matchesSearch && matchesCountry && matchesVerified && matchesSkills;
   });
 
+  // Handle invitation to apply
+  const handleInviteToApply = (profileId: string) => {
+    if (!selectedPosting) return;
+    if (selectedPosting.type === 'GIG') {
+      applyForGig(selectedPosting.id, profileId);
+    } else {
+      applyForJob(selectedPosting.id, profileId);
+    }
+  };
+
+  // Find candidate profile for a given application
+  const getCandidateProfile = (app: Application) => {
+    return profiles.find(p => p.id === app.profileId);
+  };
+
+  // Generate dynamic custom cover letters/pitch summaries matching the selected posting
+  const getCustomPitch = (profile: Profile, postingTitle: string) => {
+    const mainSkills = profile.skills.slice(0, 3).join(', ');
+    const projectTitle = profile.projects[0]?.title || 'recent projects';
+    
+    return `Hi! I'm highly interested in the "${postingTitle}" role. Based in ${profile.country}, I specialize in ${profile.techFocus} with hands-on expertise in ${mainSkills}. My most relevant work is "${projectTitle}", where I built lightweight, optimized solutions specifically tailored for high performance under low-bandwidth networks. I look forward to contributing to your team!`;
+  };
+
+  // Filter applications by active sub-tab
+  const filteredApplications = postingApplications.filter(app => {
+    if (activeProposalTab === 'ALL') return true;
+    if (activeProposalTab === 'SHORTLISTED') return app.status === 'SHORTLISTED';
+    if (activeProposalTab === 'MESSAGED') return app.status === 'PENDING'; // simulate messaged as pending/active review
+    if (activeProposalTab === 'ARCHIVED') return app.status === 'REJECTED';
+    return true;
+  });
+
+  const hiredApplications = postingApplications.filter(app => app.status === 'HIRED');
+
   return (
-    <div className="portal-container">
-      <h1 style={{ display: 'none' }}>Recruiter Portal - BorderLine Africa's Emerging Professional Workforce</h1>
+    <div className="portal-container" style={{ maxWidth: '1280px', margin: '0 auto', padding: 'var(--spacing-lg)' }}>
       
+      {/* CSS overrides inside a style block for accurate premium aesthetics */}
+      <style>{`
+        .upwork-wizard {
+          display: flex;
+          background: var(--color-surface);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          margin-bottom: var(--spacing-lg);
+        }
+        .upwork-wizard-step {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: var(--spacing-md) var(--spacing-sm);
+          font-weight: 600;
+          font-size: 0.85rem;
+          color: var(--color-text-secondary);
+          cursor: pointer;
+          position: relative;
+          transition: all var(--transition-fast);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border-right: 1px solid var(--color-border);
+        }
+        .upwork-wizard-step:last-child {
+          border-right: none;
+        }
+        .upwork-wizard-step.active {
+          background: var(--color-surface-greenblock);
+          color: var(--color-accent);
+        }
+        .upwork-wizard-step.active::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: var(--color-accent);
+        }
+        .proposal-subtabs {
+          display: flex;
+          border-bottom: 2px solid var(--color-border);
+          margin-bottom: var(--spacing-md);
+          gap: var(--spacing-md);
+        }
+        .proposal-subtab-btn {
+          padding: var(--spacing-sm) var(--spacing-md);
+          font-weight: 600;
+          font-size: 0.9rem;
+          color: var(--color-text-secondary);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          position: relative;
+          transition: all var(--transition-fast);
+        }
+        .proposal-subtab-btn.active {
+          color: var(--color-accent);
+        }
+        .proposal-subtab-btn.active::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: var(--color-accent);
+        }
+        .proposal-card-upgraded {
+          background: var(--color-surface);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-md);
+          padding: var(--spacing-lg);
+          transition: all var(--transition-normal);
+          display: flex;
+          gap: var(--spacing-lg);
+          position: relative;
+        }
+        .proposal-card-upgraded:hover {
+          border-color: var(--color-accent);
+          box-shadow: var(--color-accent-glow);
+        }
+        .proposal-avatar {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2.5px solid var(--color-border);
+        }
+        .vouched-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          padding: 2px 6px;
+          background: rgba(16, 185, 129, 0.1);
+          color: var(--color-accent);
+          border-radius: var(--radius-sm);
+        }
+        .postings-dropdown {
+          background: var(--color-surface-elevated);
+          border: 1px solid var(--color-border);
+          color: var(--color-text-primary);
+          padding: var(--spacing-sm) var(--spacing-md);
+          border-radius: var(--radius-sm);
+          font-weight: 600;
+          font-size: 0.95rem;
+          min-width: 250px;
+          outline: none;
+          cursor: pointer;
+        }
+        .postings-dropdown:focus {
+          border-color: var(--color-accent);
+        }
+      `}</style>
+
       {/* Onboarding Flow */}
       {showOnboarding && (
         <OnboardingFlow 
@@ -192,159 +334,481 @@ export default function RecruiterPortal() {
         />
       )}
 
-      <div className={`recruiter-grid ${selectedProfile ? 'has-drawer' : ''}`} id="recruiter-grid-layout">
+      {/* Recruiter Header & Posting Selector */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
         
-        {/* Left Column: Filters */}
-        <FilterSidebar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedCountry={selectedCountry}
-          onCountryChange={setSelectedCountry}
-          selectedSkills={selectedSkills}
-          onSkillToggle={toggleSkillFilter}
-          onlyVerified={onlyVerified}
-          onVerifiedToggle={setOnlyVerified}
-          availableSkills={allAvailableSkills}
-          availableCountries={availableCountries}
+        {/* Recruiter Identity Header */}
+        <RecruiterHeader
+          companyName={activeRecruiter.companyName}
+          website={activeRecruiter.website}
+          logoUrl={activeRecruiter.logoUrl}
+          onPostGig={() => setIsModalOpen(true)}
+          onPostJob={() => setIsJobModalOpen(true)}
         />
 
-        {/* Center Column: Feed and Gig Manager */}
-        <section id="recruiter-center-feed" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
-          {/* Recruiter Header */}
-          <RecruiterHeader
-            companyName={activeRecruiter.companyName}
-            website={activeRecruiter.website}
-            logoUrl={activeRecruiter.logoUrl}
-            onPostGig={() => setIsModalOpen(true)}
-            onPostJob={() => setIsJobModalOpen(true)}
-          />
-
-          {/* Stats Cards */}
-          <div className="stats-grid">
-            <StatsCard
-              title="Active Gigs"
-              value={recruiterGigs.length}
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                </svg>
-              }
-              color="accent"
-            />
-            <StatsCard
-              title="Active Jobs"
-              value={recruiterJobs.length}
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                </svg>
-              }
-              color="secondary"
-            />
-            <StatsCard
-              title="Total Applications"
-              value={recruiterApplications.length}
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                  <polyline points="10 9 9 9 8 9"/>
-                </svg>
-              }
-              color="secondary"
-            />
-            <StatsCard
-              title="Verified Professionals"
-              value={profiles.filter(p => p.isVerified).length}
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  <path d="m9 11 2 2 4-4"/>
-                </svg>
-              }
-              color="default"
-            />
-          </div>
-
-          {/* Active Recruiter Gigs */}
-          <div className="card" id="recruiter-posted-gigs-card">
-            <h3 style={{ fontSize: '1.2rem', marginBottom: 'var(--spacing-md)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-              </svg>
-              Active Posted Gigs ({recruiterGigs.length})
-            </h3>
-            {recruiterGigs.length === 0 ? (
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }} id="no-gigs-alert">No active gigs posted. Create one using the button above.</p>
+        {/* Selected Job/Gig Context Picker */}
+        <div className="card" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--spacing-md)', padding: 'var(--spacing-md)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
+            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>Select Active Posting:</span>
+            {allPostings.length === 0 ? (
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-tertiary)' }}>No jobs or gigs posted yet.</span>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px' }} id="recruiter-gigs-grid">
-                {recruiterGigs.map(gig => {
-                  const appCount = applications.filter(a => a.gigId === gig.id).length;
-                  return (
-                    <GigCard key={gig.id} gig={gig} applicationCount={appCount} />
-                  );
-                })}
-              </div>
+              <select 
+                className="postings-dropdown"
+                value={selectedPostingId} 
+                onChange={(e) => setSelectedPostingId(e.target.value)}
+              >
+                {allPostings.map(post => (
+                  <option key={post.id} value={post.id}>
+                    [{post.type}] {post.title}
+                  </option>
+                ))}
+              </select>
             )}
           </div>
 
-          {/* Candidates Feed */}
-          <div id="recruiter-candidates-feed">
-            <div className="recruiter-feed-header">
-              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                Professional Pipeline ({filteredProfiles.length})
-              </h3>
-              {selectedSkills.length > 0 && (
-                <button 
-                  onClick={() => setSelectedSkills([])} 
-                  className="btn btn-secondary" 
-                  style={{ padding: '4px 8px', fontSize: '0.75rem' }}
-                  id="btn-clear-skill-filters"
-                >
-                  Clear Filters ({selectedSkills.length})
-                </button>
-              )}
+          {selectedPosting && (
+            <div style={{ display: 'flex', gap: 'var(--spacing-lg)' }}>
+              <div>
+                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Total Applicants</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-accent)' }}>{postingApplications.length}</span>
+              </div>
+              <div>
+                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Hired</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>{hiredApplications.length}</span>
+              </div>
+              <div>
+                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Budget/Salary</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>
+                  {selectedPosting.type === 'GIG' 
+                    ? `${(selectedPosting as any).budgetGHS} GHS` 
+                    : `${(selectedPosting as any).salaryRange} GHS`}
+                </span>
+              </div>
             </div>
-
-            {filteredProfiles.length === 0 ? (
-              <div className="card" style={{ textAlign: 'center', padding: 'var(--spacing-xxl)' }} id="no-candidates-alert">
-                <p style={{ color: 'var(--color-text-tertiary)' }}>No professionals match your filters. Try widening your criteria.</p>
-              </div>
-            ) : (
-              <div className="talent-cards-grid" id="recruiter-candidates-grid">
-                {filteredProfiles.map(profile => {
-                  // Check if candidate applied to any of recruiter's gigs
-                  const appliedGig = recruiterApplications.find(app => app.profileId === profile.id);
-                  
-                  return (
-                    <TalentCard
-                      key={profile.id}
-                      profile={profile}
-                      isSelected={selectedProfile?.id === profile.id}
-                      onClick={() => handleOpenProfile(profile)}
-                      hasApplied={!!appliedGig}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </section>
-
+          )}
+        </div>
       </div>
 
-      {/* Candidate Drawer */}
+      {selectedPosting ? (
+        <>
+          {/* 1. Step Wizard Selector */}
+          <div className="upwork-wizard">
+            <div 
+              className={`upwork-wizard-step ${activeWizardStep === 'VIEW_JOB' ? 'active' : ''}`}
+              onClick={() => setActiveWizardStep('VIEW_JOB')}
+            >
+              View Job Post
+            </div>
+            <div 
+              className={`upwork-wizard-step ${activeWizardStep === 'INVITE' ? 'active' : ''}`}
+              onClick={() => setActiveWizardStep('INVITE')}
+            >
+              Invite Builders
+            </div>
+            <div 
+              className={`upwork-wizard-step ${activeWizardStep === 'REVIEW' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveWizardStep('REVIEW');
+                setActiveProposalTab('ALL');
+              }}
+            >
+              Review Proposals ({postingApplications.length})
+            </div>
+            <div 
+              className={`upwork-wizard-step ${activeWizardStep === 'HIRE' ? 'active' : ''}`}
+              onClick={() => setActiveWizardStep('HIRE')}
+            >
+              Hire ({hiredApplications.length})
+            </div>
+          </div>
+
+          {/* 2. Step Views */}
+          
+          {/* STEP A: VIEW JOB DETAIL */}
+          {activeWizardStep === 'VIEW_JOB' && (
+            <div className="card" style={{ padding: 'var(--spacing-xl)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+              <div>
+                <span className="vouched-badge" style={{ marginBottom: '8px' }}>{selectedPosting.type}</span>
+                <h2 style={{ fontSize: '1.8rem', marginBottom: '4px' }}>{selectedPosting.title}</h2>
+                <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+                  Posted on {new Date(selectedPosting.createdAt).toLocaleDateString()} by {selectedPosting.companyName}
+                </p>
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', padding: 'var(--spacing-md) 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--spacing-md)' }}>
+                <div>
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Compensation</span>
+                  <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>
+                    {selectedPosting.type === 'GIG' 
+                      ? `${(selectedPosting as any).budgetGHS} GHS (Fixed Price)` 
+                      : `${(selectedPosting as any).salaryRange} GHS / month`}
+                  </span>
+                </div>
+                <div>
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Employment Type</span>
+                  <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>
+                    {selectedPosting.type === 'GIG' ? 'Contract Gig' : (selectedPosting as any).employmentType}
+                  </span>
+                </div>
+                {selectedPosting.type === 'JOB' && (
+                  <div>
+                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Location</span>
+                    <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>{(selectedPosting as any).location}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h4 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>Description & Scope</h4>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem', whiteSpace: 'pre-wrap' }}>
+                  {selectedPosting.description}
+                </p>
+              </div>
+
+              <div>
+                <h4 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>Required Technical Competencies</h4>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {selectedPosting.requiredSkills.map(skill => (
+                    <span key={skill} className="skill-tag" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>{skill}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP B: INVITE BUILDERS DIRECTORY */}
+          {activeWizardStep === 'INVITE' && (
+            <div className="recruiter-grid" id="recruiter-grid-layout">
+              {/* Left Column: Filters */}
+              <FilterSidebar
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                selectedCountry={selectedCountry}
+                onCountryChange={setSelectedCountry}
+                selectedSkills={selectedSkills}
+                onSkillToggle={toggleSkillFilter}
+                onlyVerified={onlyVerified}
+                onVerifiedToggle={setOnlyVerified}
+                availableSkills={allAvailableSkills}
+                availableCountries={availableCountries}
+              />
+
+              {/* Right Column: Candidates Feed */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>
+                    Talent Directory ({filteredProfiles.length})
+                  </h3>
+                  {selectedSkills.length > 0 && (
+                    <button 
+                      onClick={() => setSelectedSkills([])} 
+                      className="btn btn-secondary" 
+                      style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                    >
+                      Clear Filters ({selectedSkills.length})
+                    </button>
+                  )}
+                </div>
+
+                {filteredProfiles.length === 0 ? (
+                  <div className="card" style={{ textAlign: 'center', padding: 'var(--spacing-xxl)' }}>
+                    <p style={{ color: 'var(--color-text-tertiary)' }}>No candidates match your criteria.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {filteredProfiles.map(profile => {
+                      const hasApplied = postingApplications.some(app => app.profileId === profile.id);
+                      return (
+                        <div key={profile.id} className="proposal-card-upgraded" style={{ alignItems: 'center' }}>
+                          <img src={profile.avatarUrl} alt={profile.fullName} className="proposal-avatar" />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                              <h4 style={{ fontSize: '1.1rem', margin: 0 }}>{profile.fullName}</h4>
+                              {profile.isVerified && (
+                                <span className="verified-badge">
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    <path d="m9 11 2 2 4-4"/>
+                                  </svg>
+                                </span>
+                              )}
+                              <span className="vouched-badge">{profile.peerVouched || '0 Vouched'}</span>
+                            </div>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+                              {profile.techFocus} &bull; {profile.country}
+                            </p>
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                              {profile.skills.slice(0, 5).map(skill => {
+                                const isRequired = selectedPosting.requiredSkills.includes(skill);
+                                return (
+                                  <span 
+                                    key={skill} 
+                                    className="skill-tag"
+                                    style={{
+                                      background: isRequired ? 'rgba(52, 211, 153, 0.15)' : 'var(--color-border)',
+                                      color: isRequired ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                                      border: isRequired ? '1px solid rgba(52, 211, 153, 0.3)' : 'none'
+                                    }}
+                                  >
+                                    {skill}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <button 
+                              className="btn btn-secondary" 
+                              onClick={() => setSelectedProfile(profile)}
+                              style={{ width: '120px', fontSize: '0.8rem' }}
+                            >
+                              View Profile
+                            </button>
+                            <button 
+                              className="btn btn-primary" 
+                              disabled={hasApplied}
+                              onClick={() => handleInviteToApply(profile.id)}
+                              style={{ width: '120px', fontSize: '0.8rem' }}
+                            >
+                              {hasApplied ? 'Applied' : 'Invite'}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* STEP C: REVIEW PROPOSALS (UPWORK-STYLE) */}
+          {activeWizardStep === 'REVIEW' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+              
+              {/* Proposal Sub-Tabs */}
+              <div className="proposal-subtabs">
+                <button 
+                  className={`proposal-subtab-btn ${activeProposalTab === 'ALL' ? 'active' : ''}`}
+                  onClick={() => setActiveProposalTab('ALL')}
+                >
+                  All Proposals ({postingApplications.length})
+                </button>
+                <button 
+                  className={`proposal-subtab-btn ${activeProposalTab === 'SHORTLISTED' ? 'active' : ''}`}
+                  onClick={() => setActiveProposalTab('SHORTLISTED')}
+                >
+                  Shortlisted ({postingApplications.filter(a => a.status === 'SHORTLISTED').length})
+                </button>
+                <button 
+                  className={`proposal-subtab-btn ${activeProposalTab === 'MESSAGED' ? 'active' : ''}`}
+                  onClick={() => setActiveProposalTab('MESSAGED')}
+                >
+                  Messaged ({postingApplications.filter(a => a.status === 'PENDING').length})
+                </button>
+                <button 
+                  className={`proposal-subtab-btn ${activeProposalTab === 'ARCHIVED' ? 'active' : ''}`}
+                  onClick={() => setActiveProposalTab('ARCHIVED')}
+                >
+                  Archived ({postingApplications.filter(a => a.status === 'REJECTED').length})
+                </button>
+              </div>
+
+              {/* Proposals List */}
+              {filteredApplications.length === 0 ? (
+                <div className="card" style={{ padding: 'var(--spacing-xxl)', textAlign: 'center' }}>
+                  <p style={{ color: 'var(--color-text-tertiary)' }}>No proposals in this category.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                  {filteredApplications.map(app => {
+                    const profile = getCandidateProfile(app);
+                    if (!profile) return null;
+
+                    // Calculate skill matching rate
+                    const matchingSkills = profile.skills.filter(s => selectedPosting.requiredSkills.includes(s));
+                    const matchPercent = Math.round((matchingSkills.length / selectedPosting.requiredSkills.length) * 100) || 0;
+
+                    return (
+                      <div key={app.id} className="proposal-card-upgraded">
+                        <img src={profile.avatarUrl} alt={profile.fullName} className="proposal-avatar" />
+                        
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          
+                          {/* Header Line */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                                <h4 
+                                  onClick={() => setSelectedProfile(profile)}
+                                  style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, cursor: 'pointer', color: 'var(--color-accent)' }}
+                                >
+                                  {profile.fullName}
+                                </h4>
+                                {profile.isVerified && (
+                                  <span className="verified-badge" title="Source Verified builder">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                      <path d="m9 11 2 2 4-4"/>
+                                    </svg>
+                                  </span>
+                                )}
+                                <span className="vouched-badge">{profile.peerVouched || '0 Vouched'}</span>
+                              </div>
+                              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
+                                {profile.techFocus} &bull; {profile.country}
+                              </p>
+                            </div>
+
+                            {/* Match Score Overlay */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(52, 211, 153, 0.08)', padding: '4px 10px', borderRadius: '4px', border: '1px solid rgba(52, 211, 153, 0.2)' }}>
+                              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Skill Match:</span>
+                              <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-accent)' }}>{matchPercent}%</span>
+                            </div>
+                          </div>
+
+                          {/* Cover Letter Pitch */}
+                          <div style={{ background: 'var(--color-surface-elevated)', padding: '12px', borderRadius: '8px', border: '1px solid var(--color-border)', margin: '4px 0' }}>
+                            <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>AI Match Context / Cover Letter Summary</span>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, fontStyle: 'italic' }}>
+                              "{getCustomPitch(profile, selectedPosting.title)}"
+                            </p>
+                          </div>
+
+                          {/* Skill Tags */}
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            {profile.skills.map(skill => {
+                              const isMatch = selectedPosting.requiredSkills.includes(skill);
+                              return (
+                                <span 
+                                  key={skill} 
+                                  className="skill-tag"
+                                  style={{
+                                    fontSize: '0.75rem',
+                                    background: isMatch ? 'rgba(52, 211, 153, 0.12)' : 'var(--color-bg)',
+                                    color: isMatch ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                                    border: isMatch ? '1px solid rgba(52, 211, 153, 0.25)' : '1px solid var(--color-border)'
+                                  }}
+                                >
+                                  {skill}
+                                </span>
+                              );
+                            })}
+                          </div>
+
+                        </div>
+
+                        {/* Actions Panel */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center', minWidth: '130px', borderLeft: '1px solid var(--color-border)', paddingLeft: 'var(--spacing-md)' }}>
+                          {app.status === 'PENDING' && (
+                            <button 
+                              className="btn btn-primary" 
+                              onClick={() => updateApplicationStatus(app.id, 'SHORTLISTED')}
+                              style={{ padding: '8px', fontSize: '0.8rem', width: '100%' }}
+                            >
+                              Shortlist
+                            </button>
+                          )}
+                          
+                          {app.status !== 'HIRED' && (
+                            <button 
+                              className="btn btn-primary" 
+                              onClick={() => updateApplicationStatus(app.id, 'HIRED')}
+                              style={{ padding: '8px', fontSize: '0.8rem', background: '#10B981', borderColor: '#10B981', width: '100%' }}
+                            >
+                              Hire Builder
+                            </button>
+                          )}
+
+                          {app.status !== 'REJECTED' && (
+                            <button 
+                              className="btn btn-secondary" 
+                              onClick={() => updateApplicationStatus(app.id, 'REJECTED')}
+                              style={{ padding: '8px', fontSize: '0.8rem', color: 'var(--color-danger)', borderColor: 'rgba(239, 68, 68, 0.2)', width: '100%' }}
+                            >
+                              Archive
+                            </button>
+                          )}
+
+                          {app.status === 'REJECTED' && (
+                            <button 
+                              className="btn btn-secondary" 
+                              onClick={() => updateApplicationStatus(app.id, 'PENDING')}
+                              style={{ padding: '8px', fontSize: '0.8rem', width: '100%' }}
+                            >
+                              Restore
+                            </button>
+                          )}
+
+                          <button 
+                            className="btn btn-secondary" 
+                            onClick={() => setSelectedProfile(profile)}
+                            style={{ padding: '8px', fontSize: '0.8rem', width: '100%' }}
+                          >
+                            View Case Studies
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+            </div>
+          )}
+
+          {/* STEP D: HIRE LIST & OFFER MANAGEMENT */}
+          {activeWizardStep === 'HIRE' && (
+            <div className="card" style={{ padding: 'var(--spacing-xl)' }}>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: 'var(--spacing-md)' }}>
+                Hired Digital Builders ({hiredApplications.length})
+              </h3>
+              {hiredApplications.length === 0 ? (
+                <p style={{ color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
+                  No candidates hired yet. Review proposals to send offers and onboard.
+                </p>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--spacing-md)' }}>
+                  {hiredApplications.map(app => {
+                    const profile = getCandidateProfile(app);
+                    if (!profile) return null;
+                    return (
+                      <div key={app.id} className="card" style={{ display: 'flex', gap: 'var(--spacing-md)', alignItems: 'center', background: 'var(--color-surface-greenblock)', border: '1px solid var(--color-accent)' }}>
+                        <img src={profile.avatarUrl} alt={profile.fullName} style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }} />
+                        <div>
+                          <h4 style={{ fontSize: '1rem', margin: 0 }}>{profile.fullName}</h4>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>{profile.techFocus}</p>
+                          <span className="vouched-badge" style={{ background: 'var(--color-accent)', color: '#FFFFFF' }}>Hired & Active</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="card" style={{ textAlign: 'center', padding: 'var(--spacing-xxl)' }}>
+          <h3>No active postings found.</h3>
+          <p style={{ color: 'var(--color-text-secondary)', margin: '12px 0 var(--spacing-md)' }}>
+            Start by posting a micro-gig or permanent job to access the recruitment matching system.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>Post a Gig</button>
+            <button className="btn btn-primary" onClick={() => setIsJobModalOpen(true)}>Post a Job</button>
+          </div>
+        </div>
+      )}
+
+      {/* Candidate Profile Drawer */}
       {selectedProfile && (
         <CandidateDrawer
           profile={selectedProfile}
           onClose={() => setSelectedProfile(null)}
-          applications={recruiterApplications}
+          applications={applications.filter(app => app.gigId === selectedPosting?.id || app.jobId === selectedPosting?.id)}
           gigs={gigs}
           onUpdateApplicationStatus={updateApplicationStatus}
         />
@@ -353,7 +817,7 @@ export default function RecruiterPortal() {
       {/* Post a Gig Modal Dialog */}
       {isModalOpen && (
         <div className="modal-overlay" id="gig-modal-overlay">
-          <div className="modal-content" id="gig-modal-content">
+          <div className="modal-content" id="gig-modal-content" style={{ background: 'var(--color-surface-elevated)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
             <div className="modal-header">
               <h3>Post a Micro-Gig</h3>
               <button 
@@ -361,7 +825,7 @@ export default function RecruiterPortal() {
                 onClick={() => setIsModalOpen(false)}
                 className="drawer-close"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18"/>
                   <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
@@ -424,10 +888,7 @@ export default function RecruiterPortal() {
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary btn-lg" id="btn-submit-publish-gig">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="12 2 2 22 22 22 12 2"/>
-                </svg>
+              <button type="submit" className="btn btn-primary btn-lg" id="btn-submit-publish-gig" style={{ width: '100%', marginTop: '12px' }}>
                 Publish Micro-Gig & Find Matches
               </button>
             </form>
@@ -438,7 +899,7 @@ export default function RecruiterPortal() {
       {/* Post a Job Modal Dialog */}
       {isJobModalOpen && (
         <div className="modal-overlay" id="job-modal-overlay">
-          <div className="modal-content" id="job-modal-content">
+          <div className="modal-content" id="job-modal-content" style={{ background: 'var(--color-surface-elevated)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-lg)' }}>
             <div className="modal-header">
               <h3>Post a Job</h3>
               <button 
@@ -446,7 +907,7 @@ export default function RecruiterPortal() {
                 onClick={() => setIsJobModalOpen(false)}
                 className="drawer-close"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18"/>
                   <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
@@ -538,10 +999,7 @@ export default function RecruiterPortal() {
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-primary btn-lg" id="btn-submit-publish-job">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="12 2 2 22 22 22 12 2"/>
-                </svg>
+              <button type="submit" className="btn btn-primary btn-lg" id="btn-submit-publish-job" style={{ width: '100%', marginTop: '12px' }}>
                 Publish Job & Find Candidates
               </button>
             </form>
