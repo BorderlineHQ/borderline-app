@@ -21,17 +21,7 @@ const HeroMap = dynamic(
   }
 );
 
-const VerificationVisualizer = dynamic(
-  () => import('../components/VerificationVisualizer').then((mod) => mod.VerificationVisualizer),
-  {
-    ssr: false,
-    loading: () => (
-      <div style={{ width: '100%', minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem', opacity: 0.5 }}>
-        Loading verification flow…
-      </div>
-    ),
-  }
-);
+
 
 const WhatsAppDemo = dynamic(
   () => import('../components/WhatsAppDemo').then((mod) => mod.WhatsAppDemo),
@@ -858,10 +848,6 @@ A full-stack web application that helps students form peer study groups based on
               </div>
             </div>
           </div>
-
-          <div style={{ marginTop: 'var(--spacing-xxxl)' }}>
-            <VerificationVisualizer />
-          </div>
         </div>
       </section>
 
@@ -885,7 +871,7 @@ A full-stack web application that helps students form peer study groups based on
                 We built BorderLine for the realities of the African tech ecosystem. Not everyone has fiber internet or a high-end laptop open 24/7.
               </p>
               <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.05rem', lineHeight: 1.6 }}>
-                Once your portfolio is AI-verified, you can manage your entire career via WhatsApp. Receive micro-gig alerts, accept contracts, and track Mobile Money payouts with simple text commands.
+                Once your profile is verified, you can manage your entire career via WhatsApp. Receive micro-gig alerts, accept contracts, and track Mobile Money payouts with simple text commands.
               </p>
             </div>
           </div>
@@ -896,7 +882,7 @@ A full-stack web application that helps students form peer study groups based on
       <section className="stats-section scroll-reveal" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="container">
           <div className="section-label" style={{ color: 'var(--color-accent-secondary)' }}>Target Ecosystem Value</div>
-          <h2 className="section-title">A Dual-Sided Workforce Bridge</h2>
+          <h2 className="section-title">A Two-Sided Workforce Bridge</h2>
 
           <div className="features-grid" style={{ gap: 'var(--spacing-xl)' }}>
             {/* Builders */}

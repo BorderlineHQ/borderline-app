@@ -27,7 +27,7 @@ After evaluating the core requirements of the platform (relational matching data
 * **Rationale**: 
   - **Server-Side Security**: BorderLine must securely call LLM APIs (Gemini/OpenAI) to summarize project notes. In a client-only React SPA, API keys would be exposed in the browser. Next.js provides secure Server Actions and API Routes.
   - **Dynamic Route Optimization**: Essential for SEO (so public portfolios can be indexed by search engines) and quick mobile load times via Server-Side Rendering (SSR).
-  - **API Endpoints**: Next.js serves as our backend directly, hosting the Webhook endpoints for WhatsApp message routing without needing a separate Express server.
+  - **API Endpoints**: Next.js serves as our backend directly, hosting the Webhook endpoints for WhatsApp message routing without needing a separate Express server. (See [WhatsApp Bot Architecture](file:///c:/Users/gokro/Documents/GitHub/borderline/docs/whatsapp_bot_architecture.md) for full implementation details).
 
 ### B. Supabase (PostgreSQL) vs. Firebase (NoSQL)
 * **Decision**: **Supabase (PostgreSQL)**.

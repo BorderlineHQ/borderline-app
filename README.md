@@ -26,7 +26,8 @@ borderline/
 │   ├── manifesto.md              # The BorderLine Manifesto: Africans Hiring Africans
 │   ├── product_strategy.md       # Target audience, brand brief, visual guides
 │   ├── systems_map.md            # Fellowship stage 1 systems map & feedback loops
-│   └── technical_architecture.md  # System architecture, database schema, and analytics pipeline
+│   ├── technical_architecture.md  # System architecture, database schema, and analytics pipeline
+│   └── whatsapp_bot_architecture.md # Technical architecture, sequence flows, and webhook blueprint for WhatsApp bot
 ├── research/                  # Survey questions, raw feedback, and user studies
 │   ├── google_form_survey_script.json  # Google Apps Script configuration
 │   ├── survey_interpretation.md  # Strategic interpretation of results

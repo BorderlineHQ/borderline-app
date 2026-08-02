@@ -2,30 +2,82 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
+interface GigPreset {
+  id: string;
+  title: string;
+  budget: number;
+  currencyGhs: number;
+  skills: string[];
+  candidateName: string;
+  candidateLocation: string;
+  candidatePhone: string;
+  candidateInitials: string;
+}
+
+const GIG_PRESETS: GigPreset[] = [
+  {
+    id: 'paystack',
+    title: 'Fix Paystack Checkout Bug',
+    budget: 50,
+    currencyGhs: 600,
+    skills: ['React', 'Paystack API', 'Node.js'],
+    candidateName: 'Alex Morgan',
+    candidateLocation: 'Kumasi, Ghana',
+    candidatePhone: '+233 24 *** 4567',
+    candidateInitials: 'AM',
+  },
+  {
+    id: 'ussd',
+    title: 'Build MTN MoMo USSD Gateway (*920*#)',
+    budget: 120,
+    currencyGhs: 1800,
+    skills: ['Python', 'USSD Protocol', 'MTN MoMo API'],
+    candidateName: 'Chidi Okonjo',
+    candidateLocation: 'Lagos, Nigeria',
+    candidatePhone: '+234 803 *** 1192',
+    candidateInitials: 'CO',
+  },
+  {
+    id: 'flutter',
+    title: 'Flutter Mobile Wallet UI Redesign',
+    budget: 90,
+    currencyGhs: 1350,
+    skills: ['Flutter', 'Dart', 'Mobile Money UI'],
+    candidateName: 'Amina Bello',
+    candidateLocation: 'Nairobi, Kenya',
+    candidatePhone: '+254 712 *** 8821',
+    candidateInitials: 'AB',
+  },
+];
+
 export const VerificationVisualizer: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
+  const [searchQuery, setSearchQuery] = useState('Fix Paystack Checkout Bug');
+  const [activeGig, setActiveGig] = useState<GigPreset>(GIG_PRESETS[0]);
+  
   // Terminal typing simulation
   const [terminalLines, setTerminalLines] = useState<string[]>([]);
-  // Verified output simulation
   const [verifiedSkills, setVerifiedSkills] = useState<string[]>([]);
-  const [buildScore, setBuildScore] = useState(0);
+  const [escrowAmount, setEscrowAmount] = useState(0);
 
-  const rawCodeSnippets = [
-    '> Analyzing repository: /asset-compliance-db...',
-    '> Fetching commit history (243 commits found)',
-    '> Scanning architecture patterns...',
-    '  - Detected: Node.js (Express)',
-    '  - Detected: PostgreSQL',
-    '  - Found ACID compliance implementation',
-    '> Running dependency audit...',
-    '  - AWS SDK (Lambda, API Gateway)',
-    '> Evaluating code complexity (Cyclomatic score: 14)',
-    '> Cross-referencing against asset compliance rules...',
-    '> PASS: Database schema validation verified.',
-    '> Generating verified case study...'
+  const getSnippetsForGig = (gig: GigPreset) => [
+    `> SEARCHING GIG DISPATCH DATABASE: "${gig.title}"`,
+    `> Budget: $${gig.budget} USD (approx. ${gig.currencyGhs} GHS) | Escrow Funded 🔒`,
+    `> Required Skills: [${gig.skills.join(', ')}]`,
+    `> Searching active verified builders in ${gig.candidateLocation}...`,
+    `  - Candidate Found: ${gig.candidateName} (${gig.candidatePhone})`,
+    `  - Skill Match Score: 98% (${gig.skills.slice(0, 2).join(', ')})`,
+    `> Dispatching WhatsApp Ping to candidate...`,
+    `  - WhatsApp Msg: "New $${gig.budget} micro-gig available. Reply YES to claim."`,
+    `> Candidate Response Received (${gig.candidatePhone}): "YES"`,
+    `> Locking Smart Escrow Contract ($${gig.budget}.00 USD)...`,
+    `> PASS: Escrow Verified. Gig assigned to ${gig.candidateName}.`,
+    `> STATUS: In Progress (24h Delivery Countdown Started ⏱️)`
   ];
+
+  const currentSnippets = getSnippetsForGig(activeGig);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,7 +86,7 @@ export const VerificationVisualizer: React.FC = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
 
     if (containerRef.current) {
@@ -44,39 +96,141 @@ export const VerificationVisualizer: React.FC = () => {
     return () => observer.disconnect();
   }, [isVisible]);
 
+  const triggerSimulation = (gig: GigPreset) => {
+    setActiveGig(gig);
+    setSearchQuery(gig.title);
+    setTerminalLines([]);
+    setVerifiedSkills([]);
+    setEscrowAmount(0);
+  };
+
   useEffect(() => {
     if (!isVisible) return;
 
+    setTerminalLines([]);
+    setVerifiedSkills([]);
+    setEscrowAmount(0);
+
     let lineIndex = 0;
+    const snippets = getSnippetsForGig(activeGig);
     
     const interval = setInterval(() => {
-      if (lineIndex < rawCodeSnippets.length) {
-        const currentLine = rawCodeSnippets[lineIndex];
+      if (lineIndex < snippets.length) {
+        const currentLine = snippets[lineIndex];
         if (currentLine) {
           setTerminalLines(prev => [...prev, currentLine]);
         }
         
-        // Trigger right panel updates based on left panel progress
-        if (lineIndex === 3) setVerifiedSkills(prev => [...prev, 'Node.js']);
-        if (lineIndex === 4) setVerifiedSkills(prev => [...prev, 'PostgreSQL']);
-        if (lineIndex === 7) setVerifiedSkills(prev => [...prev, 'AWS Serverless']);
-        if (lineIndex === 10) setVerifiedSkills(prev => [...prev, 'System Architecture']);
+        if (lineIndex === 2) setVerifiedSkills(activeGig.skills.slice(0, 2));
+        if (lineIndex === 4) setVerifiedSkills(activeGig.skills);
+        if (lineIndex === 9) setEscrowAmount(activeGig.budget);
+        if (lineIndex === 10) setVerifiedSkills(prev => [...prev, 'Escrow Secured']);
         
-        // Increment score
-        setBuildScore(prev => prev + 240);
-
         lineIndex++;
       } else {
         clearInterval(interval);
       }
-    }, 600);
+    }, 500);
 
     return () => clearInterval(interval);
-  }, [isVisible]);
+  }, [isVisible, activeGig.id]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = searchQuery.toLowerCase();
+    const found = GIG_PRESETS.find(g => 
+      g.title.toLowerCase().includes(query) || 
+      g.skills.some(s => s.toLowerCase().includes(query))
+    ) || GIG_PRESETS[0];
+
+    triggerSimulation(found);
+  };
+
+  const isCompleted = terminalLines.length === currentSnippets.length;
 
   return (
     <div className="verification-visualizer" ref={containerRef} style={{ margin: 'var(--spacing-xl) 0', position: 'relative' }}>
       <style>{`
+        .visualizer-search-box {
+          max-width: 680px;
+          margin: 0 auto 24px auto;
+          position: relative;
+        }
+
+        .search-input-wrap {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .search-input-wrap input {
+          width: 100%;
+          padding: 14px 48px 14px 44px;
+          border-radius: var(--radius-lg);
+          border: 1px solid var(--color-border);
+          background-color: var(--color-surface);
+          color: var(--color-text-primary);
+          font-size: 0.95rem;
+          font-weight: 500;
+          outline: none;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+          transition: all 0.2s ease;
+        }
+
+        .search-input-wrap input:focus {
+          border-color: var(--color-accent);
+          box-shadow: 0 0 20px var(--color-accent-subtle);
+        }
+
+        .search-icon-left {
+          position: absolute;
+          left: 14px;
+          color: var(--color-accent);
+          pointer-events: none;
+        }
+
+        .search-btn-right {
+          position: absolute;
+          right: 8px;
+          padding: 6px 14px;
+          border-radius: var(--radius-md);
+          background-color: var(--color-accent);
+          color: #000;
+          font-weight: 700;
+          font-size: 0.8rem;
+          border: none;
+          cursor: pointer;
+        }
+
+        .search-pills {
+          display: flex;
+          gap: 8px;
+          justify-content: center;
+          flex-wrap: wrap;
+          margin-top: 10px;
+        }
+
+        .search-pill {
+          padding: 5px 12px;
+          border-radius: 20px;
+          border: 1px solid var(--color-border);
+          background-color: var(--color-surface-elevated);
+          color: var(--color-text-secondary);
+          font-size: 0.75rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .search-pill.active, .search-pill:hover {
+          border-color: var(--color-accent);
+          color: var(--color-accent);
+          background-color: var(--color-accent-subtle);
+        }
+
         .visualizer-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -91,7 +245,7 @@ export const VerificationVisualizer: React.FC = () => {
         }
 
         .terminal-pane {
-          background-color: #0d1117; /* GitHub Dark BG */
+          background-color: #0d1117;
           border: 1px solid #30363d;
           border-radius: var(--radius-md);
           overflow: hidden;
@@ -99,7 +253,7 @@ export const VerificationVisualizer: React.FC = () => {
           font-size: 0.85rem;
           color: #c9d1d9;
           box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-          height: 350px;
+          height: 360px;
           display: flex;
           flex-direction: column;
         }
@@ -138,7 +292,7 @@ export const VerificationVisualizer: React.FC = () => {
           border-radius: var(--radius-md);
           padding: var(--spacing-lg);
           box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-          height: 350px;
+          height: 360px;
           display: flex;
           flex-direction: column;
           position: relative;
@@ -199,14 +353,27 @@ export const VerificationVisualizer: React.FC = () => {
         }
       `}</style>
 
-      {/* Introductory Context Header especially helpful for mobile */}
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '12px', letterSpacing: '-0.02em' }}>
-          See our AI verification system at work
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px', letterSpacing: '-0.02em' }}>
+          Instant WhatsApp Job Dispatch
         </h3>
-        <p style={{ fontSize: '1rem', color: 'var(--color-text-secondary)', maxWidth: '640px', margin: '0 auto', lineHeight: 1.5 }}>
-          Watch how our engine parses raw repository data, evaluates commits, audits system architecture, and builds a verified talent profile in real-time.
+        <p style={{ fontSize: '0.95rem', color: 'var(--color-text-secondary)', maxWidth: '620px', margin: '0 auto', lineHeight: 1.5 }}>
+          Watch how a newly posted micro-gig searches verified African builders, dispatches a WhatsApp ping, locks escrow, and assigns the work in seconds.
         </p>
+
+        {/* Preset Gig Action Buttons */}
+        <div className="search-pills" style={{ marginTop: '16px' }}>
+          {GIG_PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              onClick={() => triggerSimulation(preset)}
+              className={`search-pill ${activeGig.id === preset.id ? 'active' : ''}`}
+            >
+              ⚡ {preset.title} (${preset.budget})
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="visualizer-grid">
@@ -216,62 +383,82 @@ export const VerificationVisualizer: React.FC = () => {
             <div className="terminal-dot" style={{ backgroundColor: '#ff5f56' }}></div>
             <div className="terminal-dot" style={{ backgroundColor: '#ffbd2e' }}></div>
             <div className="terminal-dot" style={{ backgroundColor: '#27c93f' }}></div>
-            <span style={{ marginLeft: '8px', color: '#8b949e', fontSize: '0.75rem' }}>ai_auditor.sh</span>
+            <span style={{ marginLeft: '8px', color: '#8b949e', fontSize: '0.75rem' }}>job_dispatcher.sh</span>
           </div>
           <div className="terminal-body">
             {terminalLines.filter(Boolean).map((line, i) => (
-              <div key={i} className="terminal-line" style={{ color: line?.includes('PASS') ? '#2ea043' : line?.includes('Detected') ? '#79c0ff' : 'inherit' }}>
+              <div key={i} className="terminal-line" style={{ 
+                color: line?.includes('PASS') ? '#2ea043' : line?.includes('Candidate') || line?.includes('Response') ? '#79c0ff' : line?.includes('STATUS') ? '#e3b341' : 'inherit' 
+              }}>
                 {line}
               </div>
             ))}
-            {terminalLines.length > 0 && terminalLines.length < rawCodeSnippets.length && (
+            {terminalLines.length > 0 && !isCompleted && (
               <div className="pulse-loader" style={{ marginTop: '8px', width: '8px', height: '8px', backgroundColor: '#8b949e' }}></div>
             )}
           </div>
         </div>
 
-        {/* Right Pane: Verified Portfolio Card */}
-        <div className={`verified-pane ${terminalLines.length === rawCodeSnippets.length ? 'completed' : ''}`}>
+        {/* Right Pane: Live Job Match Card */}
+        <div className={`verified-pane ${isCompleted ? 'completed' : ''}`}>
           
-          <div className={`scanning-overlay ${terminalLines.length > 2 ? 'hidden' : ''}`}>
+          <div className={`scanning-overlay ${terminalLines.length > 1 ? 'hidden' : ''}`}>
              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-tertiary)', fontSize: '0.85rem' }}>
                <div className="pulse-loader"></div>
-               Awaiting repository data...
+               Dispatching gig search query...
              </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
              <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '4px' }}>VERIFIED CASE STUDY</div>
-                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>Asset Compliance Database</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-accent)', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '4px' }}>
+                  {isCompleted ? '⚡ GIG ASSIGNED & ESCROW LOCKED' : 'SEARCHING BUILDER MATCH...'}
+                </div>
+                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-text-primary)' }}>{activeGig.title}</div>
              </div>
              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Build Score</div>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: buildScore > 0 ? 'var(--color-accent)' : 'var(--color-text-tertiary)', transition: 'color 0.3s' }}>
-                  {buildScore}
+                <div style={{ fontSize: '0.65rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700 }}>Escrow Amount</div>
+                <div style={{ fontSize: '1.35rem', fontWeight: 800, color: escrowAmount > 0 ? '#34d399' : 'var(--color-text-tertiary)', transition: 'color 0.3s' }}>
+                  ${escrowAmount}.00
                 </div>
              </div>
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>Extracted Capabilities:</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', minHeight: '30px' }}>
+            <div style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: '6px' }}>Required Verified Skills:</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', minHeight: '30px' }}>
               {verifiedSkills.map((skill, idx) => (
-                <span key={idx} className="badge badge-accent animated-badge" style={{ fontSize: '0.75rem', padding: '4px 8px', borderRadius: '4px' }}>
+                <span key={idx} className="badge badge-accent animated-badge" style={{ fontSize: '0.72rem', padding: '3px 8px', borderRadius: '4px' }}>
                   {skill}
                 </span>
               ))}
             </div>
           </div>
 
-          <div style={{ marginTop: 'auto', borderTop: '1px solid var(--color-border)', paddingTop: '16px' }}>
-             <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-               {terminalLines.length >= 12 ? (
-                  <span className="animated-badge">
-                    <strong>AI Summary:</strong> Analyzed 243 commits. Verified ACID transaction compliance in PostgreSQL and schema integrity in AWS. Compliance database verified.
+          <div style={{ backgroundColor: 'var(--color-surface)', padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', marginBottom: 'auto' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px' }}>
+              Assigned Talent
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--color-accent-subtle)', color: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.75rem' }}>
+                {activeGig.candidateInitials}
+              </div>
+              <div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>{activeGig.candidateName}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>{activeGig.candidateLocation} • WhatsApp Verified</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 'auto', borderTop: '1px solid var(--color-border)', paddingTop: '12px' }}>
+             <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+               {isCompleted ? (
+                  <span className="animated-badge" style={{ color: '#34d399', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Claimed in 3.4s via WhatsApp! Escrow locked in wallet.
                   </span>
                ) : (
-                 <span style={{ color: 'var(--color-text-tertiary)' }}>Generating human-readable summary from codebase...</span>
+                 <span style={{ color: 'var(--color-text-tertiary)' }}>Dispatching WhatsApp ping to candidate...</span>
                )}
              </div>
           </div>

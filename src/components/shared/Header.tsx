@@ -1,21 +1,134 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from '../../context/AppContext';
+
+interface SearchResult {
+  id: string;
+  title: string;
+  subtitle: string;
+  type: 'talent' | 'gig' | 'page';
+  url: string;
+}
+
+const STATIC_PAGES: SearchResult[] = [
+  { id: 'page-whatsapp', title: 'WhatsApp Bot', subtitle: 'Manage portfolio & apply to gigs over WhatsApp', type: 'page', url: '/whatsapp' },
+  { id: 'page-talent', title: 'Talent Portal & Find Work', subtitle: 'Browse verified African builders and job feeds', type: 'page', url: '/talent' },
+  { id: 'page-recruiter', title: 'Recruiter Portal & Hire', subtitle: 'Search proof-of-work profiles & post micro-gigs', type: 'page', url: '/recruiter' },
+  { id: 'page-communities', title: 'Developer Communities', subtitle: 'Join skill circles across 54 African countries', type: 'page', url: '/resources/communities' },
+  { id: 'page-teams', title: 'Teams & Payments', subtitle: 'Global payroll & escrow management', type: 'page', url: '/teams-payments' },
+  { id: 'page-manifesto', title: 'Our Manifesto', subtitle: 'Africans Hiring Africans: The trust infrastructure', type: 'page', url: '/manifesto' },
+];
 
 const Header: React.FC = () => {
   const pathname = usePathname();
-  const { theme, setTheme, resetDatabase, mounted } = useApp();
+  const router = useRouter();
+  const { theme, setTheme, resetDatabase, profiles, gigs, jobs, mounted } = useApp();
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [platformDropdownOpen, setPlatformDropdownOpen] = useState(false);
   const [techDropdownOpen, setTechDropdownOpen] = useState(false);
   const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
 
+  // Search Bar State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Close search dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSearchFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const isActive = (path: string) => {
     if (path === '/' && pathname !== '/') return false;
     return pathname?.startsWith(path);
+  };
+
+  // Compute Search Results
+  const getSearchResults = (): SearchResult[] => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase().trim();
+    const results: SearchResult[] = [];
+
+    // Search Pages
+    STATIC_PAGES.forEach(page => {
+      if (page.title.toLowerCase().includes(q) || page.subtitle.toLowerCase().includes(q)) {
+        results.push(page);
+      }
+    });
+
+    // Search Talent / Profiles
+    profiles?.slice(0, 5).forEach(profile => {
+      if (
+        profile.fullName.toLowerCase().includes(q) ||
+        profile.techFocus.toLowerCase().includes(q) ||
+        profile.country.toLowerCase().includes(q) ||
+        profile.skills?.some(s => s.toLowerCase().includes(q))
+      ) {
+        results.push({
+          id: `profile-${profile.id}`,
+          title: profile.fullName,
+          subtitle: `${profile.techFocus} · ${profile.country}`,
+          type: 'talent',
+          url: `/talent`
+        });
+      }
+    });
+
+    // Search Gigs & Jobs
+    gigs?.slice(0, 5).forEach(gig => {
+      if (
+        gig.title.toLowerCase().includes(q) ||
+        gig.description.toLowerCase().includes(q) ||
+        gig.requiredSkills?.some(s => s.toLowerCase().includes(q))
+      ) {
+        results.push({
+          id: `gig-${gig.id}`,
+          title: gig.title,
+          subtitle: `Micro-Gig · Est. GHS ${gig.budgetGHS}`,
+          type: 'gig',
+          url: `/recruiter`
+        });
+      }
+    });
+
+    jobs?.slice(0, 5).forEach(job => {
+      if (
+        job.title.toLowerCase().includes(q) ||
+        job.description.toLowerCase().includes(q) ||
+        job.requiredSkills?.some(s => s.toLowerCase().includes(q))
+      ) {
+        results.push({
+          id: `job-${job.id}`,
+          title: job.title,
+          subtitle: `Full-Time Job · ${job.location}`,
+          type: 'gig',
+          url: `/talent`
+        });
+      }
+    });
+
+    return results.slice(0, 6);
+  };
+
+  const searchResults = getSearchResults();
+
+  const handleSelectResult = (url: string) => {
+    setSearchQuery('');
+    setSearchFocused(false);
+    setMobileSearchOpen(false);
+    setMobileMenuOpen(false);
+    router.push(url);
   };
 
   return (
@@ -70,14 +183,6 @@ const Header: React.FC = () => {
                     fontSize: '0.9rem',
                     borderBottom: '1px solid var(--color-border)',
                     transition: 'all 0.15s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                    e.currentTarget.style.color = 'var(--color-accent)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
                     For Recruiters
                   </Link>
@@ -87,14 +192,6 @@ const Header: React.FC = () => {
                     color: 'var(--color-text-secondary)',
                     fontSize: '0.9rem',
                     transition: 'all 0.15s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                    e.currentTarget.style.color = 'var(--color-accent)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
                     Find Work
                   </Link>
@@ -136,14 +233,6 @@ const Header: React.FC = () => {
                     fontSize: '0.9rem',
                     borderBottom: '1px solid var(--color-border)',
                     transition: 'all 0.15s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                    e.currentTarget.style.color = 'var(--color-accent)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
                     WhatsApp Bot
                   </Link>
@@ -154,14 +243,6 @@ const Header: React.FC = () => {
                     fontSize: '0.9rem',
                     borderBottom: '1px solid var(--color-border)',
                     transition: 'all 0.15s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                    e.currentTarget.style.color = 'var(--color-accent)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
                     Teams & Payments
                   </Link>
@@ -171,14 +252,6 @@ const Header: React.FC = () => {
                     color: 'var(--color-text-secondary)',
                     fontSize: '0.9rem',
                     transition: 'all 0.15s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                    e.currentTarget.style.color = 'var(--color-accent)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--color-text-secondary)';
                   }}>
                     Our Manifesto
                   </Link>
@@ -205,122 +278,173 @@ const Header: React.FC = () => {
             </button>
             {resourcesDropdownOpen && (
               <div className="dropdown-menu-wrapper">
-              <div style={{ 
-                backgroundColor: 'var(--color-surface)', 
-                border: '1px solid var(--color-border)',
-                borderRadius: '8px',
-                minWidth: '220px',
-                overflow: 'hidden',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
-              }}>
-                <Link href="/resources/upskill" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  borderBottom: '1px solid var(--color-border)',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-text-muted)';
+                <div style={{ 
+                  backgroundColor: 'var(--color-surface)', 
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '8px',
+                  minWidth: '220px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
                 }}>
-                  <div style={{ fontWeight: 600 }}>Upskill & Grow</div>
-                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Programs to grow your career</div>
-                </Link>
-
-                <Link href="/resources/communities" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  borderBottom: '1px solid var(--color-border)',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-text-muted)';
-                }}>
-                  <div style={{ fontWeight: 600 }}>Communities</div>
-                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Join peer developer circles</div>
-                </Link>
-
-                <Link href="/resources/blog" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  borderBottom: '1px solid var(--color-border)',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-text-muted)';
-                }}>
-                  <div style={{ fontWeight: 600 }}>Blog & Insights</div>
-                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>Latest updates and guides</div>
-                </Link>
-
-                <Link href="/resources/foundation" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ 
-                  display: 'block', 
-                  padding: '10px 16px', 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)';
-                  e.currentTarget.style.color = 'var(--color-accent)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-accent)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                  const desc = e.currentTarget.querySelector('.dropdown-desc') as HTMLElement;
-                  if (desc) desc.style.color = 'var(--color-text-muted)';
-                }}>
-                  <div style={{ fontWeight: 600 }}>Foundation</div>
-                  <div className="dropdown-desc" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px', transition: 'color 0.15s' }}>BorderLine social impact</div>
-                </Link>
-              </div>
+                  <Link href="/resources/upskill" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ display: 'block', padding: '10px 16px', color: 'var(--color-text-secondary)', fontSize: '0.9rem', borderBottom: '1px solid var(--color-border)' }}>
+                    <div style={{ fontWeight: 600 }}>Upskill & Grow</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Programs to grow your career</div>
+                  </Link>
+                  <Link href="/resources/communities" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ display: 'block', padding: '10px 16px', color: 'var(--color-text-secondary)', fontSize: '0.9rem', borderBottom: '1px solid var(--color-border)' }}>
+                    <div style={{ fontWeight: 600 }}>Communities</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Join peer developer circles</div>
+                  </Link>
+                  <Link href="/resources/blog" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ display: 'block', padding: '10px 16px', color: 'var(--color-text-secondary)', fontSize: '0.9rem', borderBottom: '1px solid var(--color-border)' }}>
+                    <div style={{ fontWeight: 600 }}>Blog & Insights</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>Latest updates and guides</div>
+                  </Link>
+                  <Link href="/resources/foundation" onClick={() => setResourcesDropdownOpen(false)} className="dropdown-item" style={{ display: 'block', padding: '10px 16px', color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
+                    <div style={{ fontWeight: 600 }}>Foundation</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>BorderLine social impact</div>
+                  </Link>
+                </div>
               </div>
             )}
           </div>
         </nav>
 
+        {/* Desktop Global Search Bar */}
+        <div 
+          className="header-search-container desktop-only" 
+          ref={searchContainerRef}
+          style={{ position: 'relative', margin: '0 12px' }}
+        >
+          <div style={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            width: searchFocused ? '240px' : '170px',
+            transition: 'all 0.25s ease'
+          }}>
+            <svg 
+              width="14" 
+              height="14" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              style={{ position: 'absolute', left: '10px', color: 'var(--color-text-tertiary)', pointerEvents: 'none' }}
+            >
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              placeholder="Search..."
+              style={{
+                width: '100%',
+                padding: '6px 28px 6px 30px',
+                fontSize: '0.8rem',
+                borderRadius: '20px',
+                border: searchFocused ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                outline: 'none',
+                boxShadow: searchFocused ? '0 0 12px var(--color-accent-subtle)' : 'none',
+                transition: 'all 0.2s ease'
+              }}
+            />
+
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-text-tertiary)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            )}
+          </div>
+
+          {/* Desktop Search Dropdown Results */}
+          {searchFocused && searchQuery.trim() && (
+            <div style={{
+              position: 'absolute',
+              top: 'calc(100% + 8px)',
+              right: 0,
+              width: '300px',
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+              overflow: 'hidden',
+              zIndex: 1000,
+              animation: 'fadeIn 0.15s ease-out'
+            }}>
+              {searchResults.length > 0 ? (
+                <div style={{ padding: '6px 0' }}>
+                  <div style={{ padding: '6px 12px', fontSize: '0.68rem', fontWeight: 700, color: 'var(--color-text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Search Results ({searchResults.length})
+                  </div>
+                  {searchResults.map((res) => (
+                    <button
+                      key={res.id}
+                      onClick={() => handleSelectResult(res.url)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: 'var(--color-text-primary)',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.15s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-accent-subtle)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <span style={{ fontSize: '1rem', marginTop: '1px' }}>
+                        {res.type === 'talent' ? '👤' : res.type === 'gig' ? '💼' : '⚡'}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {res.title}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {res.subtitle}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ padding: '16px 12px', fontSize: '0.8rem', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
+                  No results matching &quot;{searchQuery}&quot;
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Desktop Actions */}
         <div className="header-actions desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Theme & DB Reset buttons grouped together */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button 
               onClick={resetDatabase} 
               className="theme-toggle"
-              title="Reset Database to initial mock data"
+              title="Reset Database"
               aria-label="Reset Database"
               style={{ width: '32px', height: '32px', padding: 0 }}
             >
@@ -348,28 +472,35 @@ const Header: React.FC = () => {
             </button>
           </div>
 
-          {/* Sign In link */}
           <Link href="/talent/login" style={{ 
             fontSize: '0.8rem', 
             color: 'var(--color-text-secondary)', 
             fontWeight: 600, 
             textDecoration: 'none',
-            marginRight: '6px',
-            transition: 'color var(--transition-fast)'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'}
-          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-text-secondary)'}>
+            marginRight: '4px'
+          }}>
             Sign In
           </Link>
 
-          {/* Partner with Us link */}
           <Link href="/recruiter" className="btn btn-secondary btn-header-partner" style={{ borderRadius: '8px', padding: '6px 14px', fontSize: '0.8rem', fontWeight: 600 }}>
             Partner with Us
           </Link>
         </div>
 
         {/* Mobile Header Actions */}
-        <div className="mobile-header-actions mobile-only">
+        <div className="mobile-header-actions mobile-only" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Mobile Search Toggle Button */}
+          <button
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            className="theme-toggle"
+            aria-label="Search"
+            style={{ width: '32px', height: '32px', padding: 0 }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </button>
+
           <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="theme-toggle"
@@ -409,9 +540,110 @@ const Header: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Expanding Search Bar Bar */}
+      {mobileSearchOpen && (
+        <div style={{
+          padding: '8px 16px 12px 16px',
+          backgroundColor: 'var(--color-surface)',
+          borderBottom: '1px solid var(--color-border)',
+          position: 'relative'
+        }} className="mobile-only">
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ position: 'absolute', left: '12px', color: 'var(--color-text-tertiary)' }}>
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="text"
+              autoFocus
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search talent, micro-gigs, or pages..."
+              style={{
+                width: '100%',
+                padding: '8px 32px 8px 34px',
+                borderRadius: '20px',
+                border: '1px solid var(--color-accent)',
+                backgroundColor: 'var(--color-bg)',
+                color: 'var(--color-text-primary)',
+                fontSize: '0.85rem',
+                outline: 'none'
+              }}
+            />
+          </div>
+
+          {/* Mobile Search Results */}
+          {searchQuery.trim() && (
+            <div style={{
+              marginTop: '8px',
+              backgroundColor: 'var(--color-surface-elevated)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              maxHeight: '260px',
+              overflowY: 'auto'
+            }}>
+              {searchResults.length > 0 ? (
+                searchResults.map(res => (
+                  <button
+                    key={res.id}
+                    onClick={() => handleSelectResult(res.url)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: 'none',
+                      borderBottom: '1px solid var(--color-border)',
+                      backgroundColor: 'transparent',
+                      color: 'var(--color-text-primary)',
+                      textAlign: 'left'
+                    }}
+                  >
+                    <span>{res.type === 'talent' ? '👤' : res.type === 'gig' ? '💼' : '⚡'}</span>
+                    <div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700 }}>{res.title}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>{res.subtitle}</div>
+                    </div>
+                  </button>
+                ))
+              ) : (
+                <div style={{ padding: '12px', fontSize: '0.8rem', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
+                  No results found.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
         <div className="mobile-drawer-content mobile-only">
+          {/* Search inside drawer */}
+          <div style={{ padding: '8px 12px 12px 12px' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ position: 'absolute', left: '12px', color: 'var(--color-text-tertiary)' }}>
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                style={{
+                  width: '100%',
+                  padding: '8px 12px 8px 34px',
+                  borderRadius: '20px',
+                  border: '1px solid var(--color-border)',
+                  backgroundColor: 'var(--color-surface)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: '0.85rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
+          </div>
+
           <nav className="mobile-nav-links">
             <Link href="/" onClick={() => setMobileMenuOpen(false)} className={`mobile-nav-item ${isActive('/') ? 'active' : ''}`}>
               Home
