@@ -55,6 +55,13 @@ const countryData: Record<string, { capital: string; talent: string; name: strin
   dj: { name: 'Djibouti', capital: 'Djibouti', talent: '12,000+' },
   ss: { name: 'South Sudan', capital: 'Juba', talent: '22,000+' },
   st: { name: 'São Tomé and Príncipe', capital: 'São Tomé', talent: '5,000+' },
+  cv: { name: 'Cape Verde', capital: 'Praia', talent: '8,000+' },
+  sc: { name: 'Seychelles', capital: 'Victoria', talent: '3,000+' },
+  mu: { name: 'Mauritius', capital: 'Port Louis', talent: '18,000+' },
+  km: { name: 'Comoros', capital: 'Moroni', talent: '4,000+' },
+  sx: { name: 'Somaliland', capital: 'Hargeisa', talent: '20,000+' },
+  eh: { name: 'Western Sahara', capital: 'Laayoune', talent: '10,000+' },
+  fr: { name: 'Mayotte / Réunion', capital: 'Mamoudzou', talent: '5,000+' },
 };
 
 // ─── Cities ──────────────────────────────────────────────────────────────────
@@ -431,6 +438,7 @@ export const HeroMap = React.memo(() => {
         {/* ── Tooltip card ── */}
         {tooltipVisible && selectedCountry && (
           <div
+            key={selectedCountryId}
             className="hm-tooltip-card"
             style={{
               position: 'absolute',
@@ -449,7 +457,7 @@ export const HeroMap = React.memo(() => {
             }}
           >
             <div style={{ fontWeight: 700, color: '#34D399', fontSize: '0.9rem', marginBottom: '7px', borderBottom: '1px solid rgba(52,211,153,0.18)', paddingBottom: '6px', letterSpacing: '-0.01em' }}>
-              {selectedCountry.name}
+              <span>{selectedCountry.name}</span>
             </div>
             <div style={{ fontSize: '0.77rem', color: 'rgba(255,255,255,0.55)', marginBottom: '3px' }}>
               Capital: <strong style={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600 }}>{selectedCountry.capital}</strong>
