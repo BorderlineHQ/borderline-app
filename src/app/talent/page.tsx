@@ -7,6 +7,7 @@ import TalentHeader from '../../components/talent/TalentHeader';
 import TalentSidebar from '../../components/talent/TalentSidebar';
 import GigCard from '../../components/talent/GigCard';
 import ProjectCard from '../../components/talent/ProjectCard';
+import ResumeModal from '../../components/talent/ResumeModal';
 import { currencySymbols } from '../../data/teamsData';
 
 type TabType = 'opportunities' | 'portfolio' | 'verify' | 'contracts' | 'resources' | 'notifications' | 'settings';
@@ -34,6 +35,7 @@ export default function TalentPortal() {
   const [activeTab, setActiveTab] = useState<TabType>('opportunities');
   const [opportunityType, setOpportunityType] = useState<'GIGS' | 'JOBS'>('GIGS');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
 
   // Form states for AI Compiler
   const [title, setTitle] = useState('');
@@ -217,6 +219,7 @@ export default function TalentPortal() {
         isVerified={currentProfile.isVerified}
         skills={currentProfile.skills}
         onUploadProject={() => setIsDrawerOpen(true)}
+        onOpenResume={() => setIsResumeModalOpen(true)}
       />
 
       <div className="talent-grid">
@@ -322,7 +325,22 @@ export default function TalentPortal() {
           {/* TAB 2: PORTFOLIO */}
           {activeTab === 'portfolio' && (
             <div className="portfolio-section">
-              <h3>My Portfolio</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-md)', flexWrap: 'wrap', gap: '12px' }}>
+                <h3 style={{ margin: 0 }}>My Portfolio</h3>
+                <button
+                  onClick={() => setIsResumeModalOpen(true)}
+                  className="btn btn-secondary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                  Export ATS Resume (PDF)
+                </button>
+              </div>
               {currentProfile.projects.length === 0 ? (
                 <div className="empty-state">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -783,6 +801,13 @@ export default function TalentPortal() {
           </div>
         </div>
       )}
+
+      {/* ATS Resume Modal */}
+      <ResumeModal
+        isOpen={isResumeModalOpen}
+        onClose={() => setIsResumeModalOpen(false)}
+        profile={currentProfile}
+      />
     </div>
   );
 }

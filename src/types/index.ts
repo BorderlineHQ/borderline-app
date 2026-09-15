@@ -140,3 +140,50 @@ export interface PaymentRun {
   processedAt: string;
 }
 
+export interface ResumeExperience {
+  role: string;
+  companyOrProject: string;
+  duration: string;
+  location?: string;
+  highlights: string[];
+}
+
+export interface ResumeProject {
+  title: string;
+  verifiedSkills: string[];
+  summary: string;
+  bullets: string[];
+  link?: string;
+  isAudited?: boolean;
+}
+
+export interface ResumeEducation {
+  institution: string;
+  degree: string;
+  graduationYear: string;
+}
+
+export interface ResumeData {
+  fullName: string;
+  title: string;
+  email: string;
+  phone?: string;
+  location: string;
+  portfolioUrl: string;
+  githubUrl?: string;
+  summary: string;
+  skills: {
+    languages: string[];
+    frameworks: string[];
+    toolsAndDatabases: string[];
+  };
+  experiences: ResumeExperience[];
+  projects: ResumeProject[];
+  education: ResumeEducation[];
+  borderlineVerification: {
+    buildScore: number;
+    badgeUrl: string;
+    vouchedBy?: string;
+  };
+}
+

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { mockProfiles } from "../../../data/mockData";
 import type { Metadata } from "next";
+import PublicProfileActions from "../../../components/talent/PublicProfileActions";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -239,14 +240,9 @@ export default async function PublicProfilePage({ params }: Props) {
                     </div>
                   </div>
 
-                  {/* Connect CTA */}
+                  {/* Connect & Resume CTAs */}
                   <div style={{ flexShrink: 0 }}>
-                    <Link href="/whatsapp" className="btn btn-primary" style={{ borderRadius: "8px", padding: "12px 24px", fontSize: "0.95rem", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                      </svg>
-                      Contact via WhatsApp Bot
-                    </Link>
+                    <PublicProfileActions profile={profile} />
                   </div>
 
                 </div>

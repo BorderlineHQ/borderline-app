@@ -1,3 +1,5 @@
+import { Profile, ResumeData } from '../types';
+
 export interface AIServiceResponse {
   aiSummary: string;
   verifiedSkills: string[];
@@ -23,6 +25,27 @@ export const aiService = {
       console.error('AI Service Error:', error);
       // Fallback local simulation in case API is offline or fails
       return this.simulateLocalCaseStudy(title, rawInput);
+    }
+  },
+
+  async generateResume(profile: Profile, rawNotes?: string, targetJobTitle?: string): Promise<{ resume: ResumeData }> {
+    try {
+      const response = await fetch('/api/generate-resume', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ profile, rawNotes, targetJobTitle }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate resume');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('AI Resume Service Error:', error);
+      throw error;
     }
   },
 
