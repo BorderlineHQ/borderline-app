@@ -7243,3 +7243,414 @@ body.light-theme .site-footer {
 .footer-legal-link:hover {
   color: var(--color-text-secondary);
 }
+
+/* ==========================================================================
+   Cinematic Hero Background Multi-Image Crossfade Slideshow & Gradients
+   ========================================================================== */
+
+@keyframes hero-pill-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+.hero-cinematic-banner {
+  position: relative;
+  width: 100%;
+  min-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 260px 24px 64px 24px;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  transition: background-color var(--transition-normal);
+}
+
+/* Multi-image Crossfade Layers */
+.hero-slideshow-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.hero-slide-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  opacity: 0;
+  z-index: 1;
+  transform: scale(1.03);
+  transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1), transform 5s ease-out;
+  will-change: opacity, transform;
+}
+
+.hero-slide-image.active {
+  opacity: 1;
+  z-index: 2;
+  transform: scale(1);
+}
+
+/* Light Theme - Ultra-light top sheer wash fading smoothly to white at the bottom where text sits */
+body.light-theme .hero-cinematic-banner {
+  background-color: #FFFFFF;
+}
+
+body.light-theme .hero-cinematic-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: 
+    linear-gradient(180deg, 
+      rgba(255, 255, 255, 0.04) 0%, 
+      rgba(255, 255, 255, 0.08) 28%, 
+      rgba(255, 255, 255, 0.45) 52%, 
+      rgba(255, 255, 255, 0.88) 72%, 
+      var(--color-bg) 92%, 
+      var(--color-bg) 100%
+    );
+}
+
+body.light-theme .hero-cinematic-title {
+  color: #0A0F1D;
+  text-shadow: 0 1px 18px rgba(255, 255, 255, 0.95), 0 2px 35px rgba(255, 255, 255, 0.85);
+}
+
+body.light-theme .hero-cinematic-subtitle {
+  color: #047857;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.95);
+}
+
+body.light-theme .hero-cinematic-desc {
+  color: #1E293B;
+  text-shadow: 0 1px 14px rgba(255, 255, 255, 0.95);
+}
+
+body.light-theme .hero-glass-pill {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.09), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+body.light-theme .hero-pill-text {
+  color: #0F172A;
+  text-shadow: none;
+}
+
+body.light-theme .hero-value-chip {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #0F172A;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+}
+
+body.light-theme .btn-hero-glass-secondary {
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+body.light-theme .btn-hero-glass-secondary:hover {
+  background: #F8FAFC;
+  border-color: #94A3B8;
+}
+
+/* Dark Theme - Radiant, translucent, lighter with emerald glow */
+body.dark-theme .hero-cinematic-banner {
+  background-color: #030712;
+}
+
+body.dark-theme .hero-cinematic-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: 
+    linear-gradient(180deg, 
+      rgba(3, 7, 18, 0.06) 0%, 
+      rgba(3, 7, 18, 0.12) 28%, 
+      rgba(3, 7, 18, 0.45) 52%, 
+      rgba(3, 7, 18, 0.88) 72%, 
+      var(--color-bg) 92%, 
+      var(--color-bg) 100%
+    );
+}
+
+body.dark-theme .hero-cinematic-title {
+  color: #FFFFFF;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.8);
+}
+
+body.dark-theme .hero-cinematic-subtitle {
+  color: #34D399;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+body.dark-theme .hero-cinematic-desc {
+  color: #E2E8F0;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.85);
+}
+
+body.dark-theme .hero-glass-pill {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+body.dark-theme .hero-pill-text {
+  color: #FFFFFF;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-theme .hero-value-chip {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #F1F5F9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-theme .btn-hero-glass-secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .btn-hero-glass-secondary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Content Container */
+.hero-cinematic-content {
+  position: relative;
+  z-index: 4;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Pulsating Dot Glass Pill - very thin, very long */
+.hero-glass-pill {
+  position: relative;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 36px;
+  border-radius: 9999px;
+  margin-bottom: var(--spacing-lg);
+  max-width: 95%;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.hero-glass-pill:hover {
+  border-color: rgba(34, 197, 94, 0.6);
+  transform: translateY(-1px);
+}
+
+.hero-pill-dot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+.hero-pill-dot-inner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #22C55E;
+  box-shadow: 0 0 12px #22C55E, 0 0 24px rgba(34, 197, 94, 0.8);
+  animation: hero-pill-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.hero-pill-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.hero-cinematic-title {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(2rem, 5.5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.12;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.025em;
+}
+
+.hero-cinematic-subtitle {
+  display: block;
+  font-size: 0.52em;
+  font-style: normal;
+  font-weight: 600;
+  font-family: var(--font-body), system-ui, sans-serif;
+  margin-top: 10px;
+}
+
+.hero-cinematic-desc {
+  font-size: clamp(0.95rem, 2.2vw, 1.125rem);
+  line-height: 1.65;
+  max-width: 760px;
+  margin: 0 auto var(--spacing-xl) auto;
+}
+
+.hero-value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.btn-hero-glass-secondary {
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-hero-glass-secondary:hover {
+  transform: translateY(-1px);
+}
+
+/* Mobile Adaptive Layout: Controlled top background, not filling the full screen or zooming in, text moved below to white */
+@media (max-width: 768px) {
+  .hero-cinematic-banner {
+    min-height: auto;
+    padding: 240px 16px 48px 16px;
+    justify-content: flex-start;
+  }
+
+  /* Background photo covers only the top 310px on mobile, not the entire phone screen! */
+  .hero-slideshow-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: 310px;
+    z-index: 1;
+  }
+
+  .hero-slide-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center top;
+    transform: none !important;
+  }
+
+  /* Overlay on mobile fades the bottom half of the photo into white */
+  body.light-theme .hero-cinematic-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: 310px;
+    z-index: 2;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.02) 0%,
+      rgba(255, 255, 255, 0.1) 40%,
+      rgba(255, 255, 255, 0.72) 75%,
+      var(--color-bg) 100%
+    );
+  }
+
+  body.dark-theme .hero-cinematic-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: 310px;
+    z-index: 2;
+    background: linear-gradient(
+      180deg,
+      rgba(3, 7, 18, 0.04) 0%,
+      rgba(3, 7, 18, 0.15) 40%,
+      rgba(3, 7, 18, 0.78) 75%,
+      var(--color-bg) 100%
+    );
+  }
+
+  .hero-cinematic-content {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .hero-glass-pill {
+    padding: 5px 20px;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .hero-pill-text {
+    font-size: 0.74rem;
+  }
+
+  .hero-cinematic-title {
+    font-size: 2.1rem;
+  }
+
+  .hero-value-chip {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+  }
+}
+
+

@@ -66,11 +66,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTeamMembers(dbService.getTeamMembers());
     setPaymentHistory(dbService.getPaymentRuns());
 
-    // Load theme
+    // Load theme: match system settings by default, or respect saved user preference
+    const getSystemTheme = (): 'dark' | 'light' => {
+      if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+      return 'light';
+    };
+
     const savedTheme = localStorage.getItem('borderline_theme') as 'dark' | 'light';
-    const initialTheme = savedTheme || 'light';
+    const initialTheme = savedTheme || getSystemTheme();
     setThemeState(initialTheme);
     document.body.className = `${initialTheme}-theme`;
+
+    // Listen for system theme changes dynamically
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      const userSelected = localStorage.getItem('borderline_theme');
+      if (!userSelected) {
+        const newSysTheme = e.matches ? 'dark' : 'light';
+        setThemeState(newSysTheme);
+        document.body.className = `${newSysTheme}-theme`;
+      }
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleSystemThemeChange);
+    }
 
     // Welcome message for WhatsApp Chatbot
     setWhatsappMessages([
@@ -83,6 +105,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ]);
 
     setMounted(true);
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleSystemThemeChange);
+      }
+    };
   }, []);
 
   const setTheme = (newTheme: 'dark' | 'light') => {

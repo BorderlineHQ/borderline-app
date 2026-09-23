@@ -107,10 +107,61 @@ const PartnerLogo: React.FC<{ domain: string; name: string }> = ({ name }) => {
   );
 };
 
+// Cinematic hero background photos cycling through Demo Day & Fellowship moments (compressed WebP)
+const heroSlides = [
+  {
+    url: '/hero-slides/B86I1348.webp',
+    label: '🏆 1st Prize Trophy Champions',
+    tag: 'Demo Day 2026',
+  },
+  {
+    url: '/hero-slides/B86I0954.webp',
+    label: '📊 Live Pitch Day Presentation',
+    tag: 'Stage Demo',
+  },
+  {
+    url: '/hero-slides/IMG_6595.webp',
+    label: '🎓 Graduation Ceremony & Red Carpet',
+    tag: 'Yango Fellowship 2026',
+  },
+  {
+    url: '/hero-slides/B86I1179.webp',
+    label: '⚡ Africoded Core Team Builders',
+    tag: 'Team 4',
+  },
+  {
+    url: '/hero-slides/B86I1420.webp',
+    label: '🌟 Fellowship Winners On Stage',
+    tag: 'Grand Stage',
+  },
+  {
+    url: '/hero-slides/B86I1337.webp',
+    label: '🎉 Team Victory & Celebration Hugs',
+    tag: 'Championship Moment',
+  },
+];
+
 export default function Home() {
   const { theme, mounted } = useApp();
   const router = useRouter();
   const featuredCourses = mockCourses.slice(0, 3);
+
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    // Preload all 6 images immediately into browser cache
+    if (typeof window !== 'undefined') {
+      heroSlides.forEach((slide) => {
+        const img = new window.Image();
+        img.src = slide.url;
+      });
+    }
+
+    const slideTimer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 3200);
+    return () => clearInterval(slideTimer);
+  }, []);
 
   const [selectedProfile, setSelectedProfile] = useState<any>(null);
   const [activeProject, setActiveProject] = useState<any>(null);
@@ -388,31 +439,57 @@ A full-stack web application that helps students form peer study groups based on
 
   return (
     <div className="landing-page">
-      {/* Hero Section */}
-      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 'var(--spacing-lg) var(--spacing-md)' }}>
-        <div className="container" style={{ position: 'relative', zIndex: 1, maxWidth: '850px', margin: '0 auto' }}>
+      {/* Hero Section with Cinematic Multi-Image WebP Background & Gradient Overlay */}
+      <section className="hero-cinematic-banner">
+        {/* Multi-image Crossfade Slideshow (compressed WebP images) */}
+        <div className="hero-slideshow-container" aria-hidden="true">
+          {heroSlides.map((slide, idx) => (
+            <div
+              key={slide.url}
+              className={`hero-slide-image ${idx === activeSlide ? 'active' : ''}`}
+              style={{
+                backgroundImage: `url('${slide.url}')`,
+                opacity: idx === activeSlide ? 1 : 0,
+                zIndex: idx === activeSlide ? 2 : 1,
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Layered Gradient Overlay for legibility & contrast */}
+        <div className="hero-cinematic-overlay" aria-hidden="true" />
 
+        {/* Overlaid Hero Content - Shifted down towards the white part of the gradient */}
+        <div className="hero-cinematic-content">
+          {/* Pulsating Dot Glass Pill - Very Thin, Very Long */}
+          <div className="hero-glass-pill" role="status" aria-label="Winners of Yango Fellowship Demo Day 2026">
+            <span className="hero-pill-dot">
+              <span className="hero-pill-dot-inner" />
+            </span>
+            <span className="hero-pill-text">
+              Winners of Yango Fellowship Demo Day 2026
+            </span>
+          </div>
 
-          <h1 style={{ fontFamily: 'var(--font-serif), Georgia, serif', fontSize: 'clamp(0.95rem, 5vw, 3.5rem)', fontWeight: 700, lineHeight: 1.15, color: 'var(--color-text-primary)', marginBottom: 'var(--spacing-md)', letterSpacing: '-0.02em' }}>
+          <h1 className="hero-cinematic-title">
             Connecting Africa's Top Talent
-            <br />
-            <span style={{ color: 'var(--color-accent)', fontSize: '0.55em', fontStyle: 'normal', fontWeight: '600', fontFamily: 'var(--font-body), system-ui, sans-serif' }}>
+            <span className="hero-cinematic-subtitle">
               Create and verify your portfolio easily. Get hired by top African companies and StartUps.
             </span>
           </h1>
 
-          <p style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', color: 'var(--color-text-primary)', lineHeight: 1.6, maxWidth: '750px', margin: '0 auto var(--spacing-xl) auto' }}>
+          <p className="hero-cinematic-desc">
             Africa has the talent and the demand, yet collaboration is at an all-time low. BorderLine is building the trust layer for Africa's tech and creative talent, helping builders find work, enabling startups to hire verified talent, and managing team contracts and payroll continentally.
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', margin: '0 auto var(--spacing-xl) auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap', margin: '0 auto var(--spacing-xl) auto' }}>
             {[
               'Access to borderless opportunities',
               'AI powered Skill verification',
               'Apply and get hired easily'
             ].map((text, idx) => (
-              <div key={idx} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <div key={idx} className="hero-value-chip">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
                 <span>{text}</span>
@@ -420,23 +497,43 @@ A full-stack web application that helps students form peer study groups based on
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: 'var(--spacing-xl)' }}>
-            <Link href="/recruiter" className="btn btn-primary" id="btn-hero-recruiter" style={{ borderRadius: '8px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <Link href="/recruiter" className="btn btn-primary" id="btn-hero-recruiter" style={{ borderRadius: '8px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)' }}>
               <span className="hero-cta-desktop">Start Hiring</span>
               <span className="hero-cta-mobile">Start Hiring  </span>
               <span style={{ marginLeft: '8px' }}>➔</span>
             </Link>
-            <Link href="/talent" className="btn btn-secondary" id="btn-hero-talent" style={{ borderRadius: '8px', padding: '12px 28px', fontSize: '0.95rem', fontWeight: 600 }}>
+            <Link href="/talent" className="btn-hero-glass-secondary" id="btn-hero-talent">
               Create Your Profile
             </Link>
           </div>
+        </div>
+      </section>
 
-          {/* Dedicated Map Viewport Section */}
+      {/* Interactive Africa Talent Map Section */}
+      <section className="hero-map-section" style={{
+        position: 'relative',
+        padding: 'var(--spacing-xxl) var(--spacing-md)',
+        backgroundColor: 'var(--color-bg)',
+      }}>
+        <div className="container" style={{ maxWidth: '1400px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto var(--spacing-xl) auto' }}>
+            <span className="feature-tag" style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+              CONTINENTAL TALENT NETWORK
+            </span>
+            <h2 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.85rem)', fontWeight: 800, marginTop: '8px', color: 'var(--color-text-primary)' }}>
+              Explore Africa's Digital Workforce
+            </h2>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '6px' }}>
+              Interactive live density of verified builders, engineers, and creatives across major African tech hubs.
+            </p>
+          </div>
+
           <div className="hero-map-viewport" style={{
             width: '100%',
             maxWidth: '1400px',
-            height: 'clamp(500px, 80vh, 900px)',
-            margin: 'var(--spacing-md) auto 0 auto',
+            height: 'clamp(500px, 80vh, 850px)',
+            margin: '0 auto',
             position: 'relative',
             display: 'flex',
             alignItems: 'center',

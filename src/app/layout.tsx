@@ -64,21 +64,22 @@ export const metadata: Metadata = {
     url: "https://borderline.africa",
     siteName: "BorderLine",
     title: "BorderLine | Find Work and Hire Across Africa",
-    description: "AI-powered economic infrastructure that verifies, connects, and monetizes Africa's emerging digital builders. WhatsApp-native profile management and escrow payments.",
+    description: "AI-powered economic infrastructure that verifies, connects, and monetizes Africa's emerging digital builders. Winners of Yango Fellowship Demo Day 2026.",
     images: [
       {
-        url: "/borderline_talent_cafe.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "BorderLine - Connecting Africa's Top Digital Talent",
+        type: "image/jpeg",
+        alt: "BorderLine Team - Winners of Yango Fellowship Demo Day 2026",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: "BorderLine | Find Work and Hire Across Africa",
-    description: "AI-powered economic infrastructure that verifies, connects, and monetizes Africa's emerging digital builders.",
-    images: ["/borderline_talent_cafe.png"],
+    description: "AI-powered economic infrastructure that verifies, connects, and monetizes Africa's emerging digital builders. Winners of Yango Fellowship Demo Day 2026.",
+    images: ["/og-image.jpg"],
     creator: "@borderline_africa",
   },
   robots: {
@@ -114,10 +115,12 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                var savedTheme = localStorage.getItem('borderline_theme') || 'light';
+                var savedTheme = localStorage.getItem('borderline_theme');
+                var systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                var theme = savedTheme || systemTheme;
                 var observer = new MutationObserver(function(mutations) {
                   if (document.body) {
-                    document.body.className = savedTheme + '-theme';
+                    document.body.className = theme + '-theme';
                     observer.disconnect();
                   }
                 });
@@ -127,7 +130,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="light-theme" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <AppProvider>
           <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             <Header />
